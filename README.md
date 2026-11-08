@@ -1,5 +1,7 @@
 # JustType — 繁體中文打字練習（輕量版）
 
+> **授權說明：** JustType 自身程式碼、介面與原創文件採 **MIT License**（見根目錄 `LICENSE`）。但 `boshiamy.json` 是由 GPLv3+ 來源衍生的第三方資料，必須保留 GPL 授權；MIT 不適用於該字庫。完整出處與第三方授權見 `NOTICE`，GPL 原文見 `LICENSES/GPL-3.0-or-later.txt`。
+
 不分年齡層、無後端、解壓就能跑的原創重寫版。
 
 | 模式 | 題庫 | 說明 |
@@ -28,7 +30,7 @@ python3 serve.py 8092
 - 首頁關卡選擇改為 3D 旋轉木馬（coverflow）：中央卡片平貼放大，兩側卡片依距離自動 ±42° 內轉、後退並淡出；支援拖曳慣性、滾輪、導航箭頭（‹ / ›）、下方圓點與方向鍵切換，點正中央卡片開始挑戰；正中央卡片帶頂部光源高光掃過、圖層永遠在最上層。
 - 打字介面下方可勾選「鍵位提示」：輸入框下方出現與真實物理鍵盤 1:1 排列的螢幕鍵盤（採標準 ANSI 5 排鍵位與標準交錯寬度：注音版面採台灣標準排列，鍵面上方顯示注音符號與聲調、下方顯示實體鍵如 1/Q/A），包含完整修飾鍵與空白鍵；勾選狀態和版面存在 `localStorage`，下次自動記住。
 - 鍵位提示動態偵測當前目標字：系統即時偵測目前打到哪個字，動態至字庫（`zhuyin.json` 包含 41,000+ 繁體漢字庫與常用詞庫）查詢該字的注音，將注音符號與聲調逐一映射到實體鍵盤對應鍵位；提示一次只亮**下一鍵**（不顯示 1/2/3 數字順序），注音打到哪裡就跟到哪裡，整個鍵盤只留下一鍵高亮、已打過的鍵不留痕（例如「躺」先亮 ㄊ(W)，打完後才亮 ㄤ(;)，再來是 ˇ(3)；一聲字最後亮空白鍵）。實作上會先把 `input` 事件的整盒值切掉已打字前綴只比對當前字段，避免第一個字的注音一直重複；標點符號與英文亦動態對應實體鍵位與 Shift 提示。完全擺脫寫死的題庫對應表，適用於任何文章與詞彙。
-- 拆字提示：練習頁目標文字**右上角**一律顯示目前要打的字之拆字，**倉頡／嘸蝦米／速成三個完整方塊做成橫向反向環滾輪**（整顆小長方形，中央顯示目前選中的輸入法如「倉頡 一：一 m」／「嘸蝦米 一：E」／「速成 一：一 m」；拖曳、滾輪、點側邊方塊或點左右箭頭切換，選擇存在 `localStorage`，下次自動記住；角度與首頁 coverflow 反向：首頁 `rotateY(-off*42°)` 平面排，這裡 `rotateY(+off*26°)` 配 sin/cos 圓柱投影繞環往後收），隨打字進度即時偵測更新，不依賴「鍵位提示」勾選；標點/英數顯示「照打」、字庫未載入或查無拆字亦有明確提示；組字時整顆滾輪凍結不跳動（送出後才換下一字）。字庫 `cangjie.json`（41,857 字）由 `build_cangjie.py` 依 Jackchows/Cangjie5 `Cangjie5_TC.txt`（倉頡五代、台灣用字優先，MIT License）產生，範圍與 `zhuyin.json` 的 chars 平行，每字取碼表首選碼；`boshiamy.json`（13,076 字）由 `build_boshiamy.py` 依 chinese-opendesktop/cin-tables `boshiamy.cin`（行易嘸蝦米碼表，非商業授權）產生，每字取最短碼，題庫漢字覆蓋 1460/1464（未覆蓋僅標點/省略號）；**速成**沒有獨立字庫，由倉頡碼即時推導（3 碼以上取首碼＋尾碼，如謝 `yrhhi`→速成 `yi`，半 `fq` 不變）。重跑 `python3 build_cangjie.py` / `python3 build_boshiamy.py` 即可更新。已用維基百科範例交叉核對（謝倉頡 `yrhhi`、嘸蝦米 `isa`）。
+- 拆字提示：練習頁目標文字**右上角**一律顯示目前要打的字之拆字，**倉頡／嘸蝦米／速成三個完整方塊做成橫向反向環滾輪**（整顆小長方形，中央顯示目前選中的輸入法如「倉頡 一：一 m」／「嘸蝦米 一：E」／「速成 一：一 m」；拖曳、滾輪、點側邊方塊或點左右箭頭切換，選擇存在 `localStorage`，下次自動記住；角度與首頁 coverflow 反向：首頁 `rotateY(-off*42°)` 平面排，這裡 `rotateY(+off*26°)` 配 sin/cos 圓柱投影繞環往後收），隨打字進度即時偵測更新，不依賴「鍵位提示」勾選；標點/英數顯示「照打」、字庫未載入或查無拆字亦有明確提示；組字時整顆滾輪凍結不跳動（送出後才換下一字）。字庫 `cangjie.json`（41,857 字）由 `build_cangjie.py` 依 Jackchows/Cangjie5 `Cangjie5_TC.txt`（倉頡五代、台灣用字優先，MIT License，見 `LICENSES/Jackchows-Cangjie5-MIT.txt`）產生，範圍與 `zhuyin.json` 的 chars 平行，每字取碼表首選碼；`boshiamy.json`（18,439 字）由 `build_boshiamy.py` 依 fcitx/fcitx5-table-extra `tables/boshiamy.txt`（GPL-3.0-or-later，見 `LICENSES/GPL-3.0-or-later.txt`）產生，每字取最短碼，題庫漢字覆蓋 1292/1304（未覆蓋僅標點/簡體字）；**速成**沒有獨立字庫，由倉頡碼即時推導（3 碼以上取首碼＋尾碼，如謝 `yrhhi`→速成 `yi`，半 `fq` 不變）。重跑 `python3 build_cangjie.py` / `python3 build_boshiamy.py` 即可更新。已用維基百科範例交叉核對（謝倉頡 `yrhhi`、嘸蝦米 `isa`）。
 - 鍵位提示版面：版面下拉（注音／倉頡／嘸蝦米／速成）。倉頡鍵面主字為字根（A=日 … Y=卜，X=難，Z=重）、副字為英文字母；嘸蝦米／速成鍵面只顯示大寫英文字母（不要漢字部首），空白鍵副字為「選字」；逐步高亮規則同注音（一次只亮下一鍵、已打鍵不留痕，最後亮空白鍵「選字」）；已打進度由組字區字母反推，IME 不把 preedit 放進輸入值時停在首鍵、送出後自動跳下一字。原「英數（QWERTY）」選項已改名為「嘸蝦米」，舊選擇會自動對應過去。
 - 小短文亦有「無盡模式」，**預設關閉**：勾選後不結算彈窗、持續自動跳下一題（標題顯示「· 無盡」），未勾選維持原本每篇結算彈窗；與單字／短句子一樣依模式存於 `localStorage`。
 - 單字 10 題一輪、句子 5 題一輪：輪中自動跳下一題不彈窗，第 10／5 題完成輸入框才結算（整輪累積用時、正確率、答對字數與個人最佳）；勾選下方「無盡模式」則不結算，持續自動跳下一題。
@@ -52,8 +54,11 @@ python3 serve.py 8092
 - `favicon.svg` / `favicon.png` / `favicon-32.png` / `favicon-16.png` — 瀏覽器分頁圖示（藍底白「打」，對齊左上角品牌標）
 - `data.json` — 題庫
 - `zhuyin.json` — 每題逐字注音對齊（離線由 pypinyin 產生，817 題）
-- `cangjie.json` — 倉頡拆字字庫（41,857 字，`build_cangjie.py` 由 Jackchows/Cangjie5 `Cangjie5_TC.txt` 產生）
-- `boshiamy.json` — 嘸蝦米拆字字庫（13,076 字，`build_boshiamy.py` 由 cin-tables `boshiamy.cin` 產生；速成由倉頡碼推導，無獨立字庫）
+- `cangjie.json` — 倉頡拆字字庫（41,857 字，`build_cangjie.py` 由 Jackchows/Cangjie5 `Cangjie5_TC.txt` 產生；MIT，見 `LICENSES/Jackchows-Cangjie5-MIT.txt`）
+- `boshiamy.json` — 嘸蝦米拆字字庫（18,439 字，`build_boshiamy.py` 由 fcitx/fcitx5-table-extra `tables/boshiamy.txt` 產生；**GPL-3.0-or-later**，見 `LICENSES/GPL-3.0-or-later.txt`；速成由倉頡碼推導，無獨立字庫）
+- `LICENSE` — JustType 自身程式碼與文件的 MIT License
+- `NOTICE` — 第三方來源、出處與其授權清單
+- `LICENSES/` — 上述第三方授權原文
 - `build_cangjie.py` — 重跑產生 `cangjie.json`（自動下載或讀本機碼表）
 - `build_boshiamy.py` — 重跑產生 `boshiamy.json`（自動下載或讀本機碼表）
 - `serve.py` / `serve.sh` — 靜態伺服器
@@ -62,3 +67,10 @@ python3 serve.py 8092
 
 - 統計頁（歷史趨勢圖）
 - 聊天室／即時排行（需後端）
+
+## 授權
+
+- JustType 自身程式碼、介面與原創內容：MIT License（根目錄 `LICENSE`）。
+- `boshiamy.json`：GNU General Public License v3.0 or later。屬於 GPL 第三方資料，不受 MIT 覆蓋；若散布含此字庫的完整專案，必須同時提供 GPL 授權文字並遵守 GPL 規範。
+- `cangjie.json`：MIT，見 `LICENSES/Jackchows-Cangjie5-MIT.txt`。
+- 所有第三方來源與授權關係見 `NOTICE`。
