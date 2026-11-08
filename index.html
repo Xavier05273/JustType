@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JustType — 繁體中文打字練習</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="apple-touch-icon" href="favicon.png" />
+<meta name="theme-color" content="#2563eb" />
+<meta name="description" content="繁體中文打字練習：單字、句子、小短文。" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">打</span>
+    <div class="brand-title">JustType</div>
+  </div>
+  <div class="topbar-actions">
+    <button id="themeToggleBtn" class="btn ghost small theme-btn" type="button" aria-label="切換深淺色主題" title="切換深淺色主題">
+      <span id="themeIcon">☀️</span> <span id="themeText">淺色</span>
+    </button>
+    <label class="font-size-label" for="fontSizeSelect">字體大小</label>
+    <select id="fontSizeSelect" aria-label="字體大小">
+      <option value="sm">小</option>
+      <option value="md" selected>中</option>
+      <option value="lg">大</option>
+    </select>
+    <button id="resetStatsBtn" class="btn ghost small" type="button">清除紀錄</button>
+  </div>
+</header>
+
+<main id="homeView" class="container">
+  <section class="hero">
+    <h1>選一種練習，直接開始打</h1>
+    <p class="hero-sub"><strong>單字</strong>、<strong>句子</strong>、<strong>小短文</strong></p>
+  </section>
+
+  <section class="carousel-shell" aria-label="練習模式">
+    <div id="carouselViewport" class="carousel-viewport">
+      <div class="carousel-light" aria-hidden="true"></div>
+      <div id="modeGrid" class="mode-carousel"></div>
+    </div>
+    <div class="carousel-nav">
+      <button id="carouselPrev" class="btn small" type="button" aria-label="上一個模式">‹</button>
+      <div id="carouselDots" class="carousel-dots" aria-label="選擇模式"></div>
+      <button id="carouselNext" class="btn small" type="button" aria-label="下一個模式">›</button>
+    </div>
+  </section>
+
+  <footer class="footer">JustType · 本地靜態站 · 資料在 <code>data.json</code></footer>
+</main>
+
+<main id="practiceView" class="container hidden">
+  <div class="practice-head">
+    <button id="backHomeBtn" class="btn ghost" type="button">← 回首頁</button>
+    <div class="practice-title" id="practiceTitle">練習</div>
+    <div class="hud">
+      <span class="hud-item">時間 <strong id="hudTime">00:00</strong></span>
+      <span class="hud-item">速度 <strong id="hudWpm">0</strong> 字/分</span>
+      <span class="hud-item">正確率 <strong id="hudAcc">100%</strong></span>
+      <span class="hud-item">進度 <strong id="hudProg">0%</strong></span>
+    </div>
+  </div>
+
+  <div class="progress-track" aria-hidden="true"><div id="progressBar" class="progress-bar"></div></div>
+
+  <div class="cangjie-bar">
+    <div id="cangjieHint" class="cangjie-hint" aria-live="polite" title="目前要打的字之拆字（倉頡／嘸蝦米／速成三方塊橫向反向環滾輪，拖曳/滾輪/箭頭切換；組字時凍結）">拆字：—</div>
+  </div>
+  <div id="targetBox" class="target-box" tabindex="0" aria-label="目標文字，點一下聚焦輸入框"></div>
+  <div id="inputBox" class="input-box"></div>
+  <p id="hintLine" class="hint-line" aria-live="polite"></p>
+
+  <div class="practice-foot">
+    <button id="restartBtn" class="btn" type="button">換一題重抽</button>
+    <label class="auto-advance-label" for="autoAdvanceCheck" title="完成後不跳出彈窗，直接進入下一題">
+      <input type="checkbox" id="autoAdvanceCheck" />
+      <span>自動跳下一題（不彈窗）</span>
+    </label>
+    <label class="auto-advance-label" id="endlessLabel" for="endlessCheck" title="開啟後不結算，持續自動跳下一題">
+      <input type="checkbox" id="endlessCheck" />
+      <span>無盡模式</span>
+    </label>
+    <label class="auto-advance-label" for="onKeyboardCheck" title="在輸入框下方顯示鍵位提示">
+      <input type="checkbox" id="onKeyboardCheck" />
+      <span>鍵位提示</span>
+    </label>
+    <label class="auto-advance-label" for="layoutSelect">版面
+      <select id="layoutSelect" aria-label="鍵盤版面">
+        <option value="bopomofo" selected>注音</option>
+        <option value="cangjie">倉頡</option>
+        <option value="boshiamy">嘸蝦米</option>
+        <option value="sucheng">速成</option>
+      </select>
+    </label>
+  </div>
+
+  <section id="onKeyboardWrap" class="on-kb-wrap hidden" aria-label="鍵位提示">
+    <div id="onKeyboard" class="on-kb"></div>
+  </section>
+</main>
+
+<div id="resultOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+  <div class="modal">
+    <h2 id="resultTitle">本局完成</h2>
+    <div id="resultGrid" class="result-grid"></div>
+    <p id="anomalyLine" class="anomaly-line hidden"></p>
+    <p id="newRecordLine" class="new-record hidden">★ 新紀錄！</p>
+    <div class="modal-actions">
+      <button id="againBtn" class="btn primary" type="button">再來一局</button>
+      <button id="homeBtn" class="btn" type="button">回首頁</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
