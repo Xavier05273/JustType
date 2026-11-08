@@ -1,5 +1,5 @@
 // JustType — original typing engine (modes align with TypeMate categories,
-// UI/code are original). Data in data.json: words / sentences / articles_punct.
+// UI/code are original). Data in data.json: words / sentences.
 (function () {
   "use strict";
   const LS_BEST = "tp-lite-best-v1";
@@ -111,6 +111,13 @@
     "˙": "7",
   };
 
+  // Physical code -> key char (for tracking typed keys during IME composition,
+  // where e.key is often "Process" and only e.code is reliable).
+  const CODE_TO_KEY = {};
+  ANSI_KEYBOARD_ROWS.forEach((row) => row.forEach((item) => {
+    if (item.key) CODE_TO_KEY[item.id] = item.key;
+  }));
+
   // Cangjie (倉頡) code letter -> radical （字根）. cangjie.json 存小寫碼，
   // 例如 半=fq（火手）、謝=yrhhi（卜口竹竹戈）。x=難（難字）、z=重（重碼鍵）。
   const CANGJIE_RADICAL = {
@@ -147,14 +154,14 @@
 
   // Finite round sizes: words settle after 10 items, sentences after 5.
   // Articles are one item per round. Endless mode disables settlement.
-  // Endless is offered for every mode (words / sentences / articles_punct)
+  // Endless is offered for every mode (words / sentences)
   // but is always off by default (LS_ENDLESS only true if user set it).
   const ROUND_TARGET = { words: 10, sentences: 5 };
 
   const MODES = [
     { key: "words", title: "單字", desc: "萬丈高樓平地起", dataKey: "words", color: "blue" },
     { key: "sentences", title: "句子", desc: "小有所成，切勿驕縱", dataKey: "sentences", color: "emerald" },
-    { key: "articles_punct", title: "小短文", desc: "嚐嚐這個如何", dataKey: "articles_punct", color: "violet" },
+    { key: "articles_punct", title: "小短文", desc: "萬水千山走遍", dataKey: "articles_punct", color: "violet" },
   ];
 
   const $ = (s) => document.querySelector(s);
@@ -240,7 +247,7 @@
   function loadBest() {
     const best = loadJSON(LS_BEST, {});
     let dirty = false;
-    for (const k of ["words", "sentences", "articles_punct"]) {
+    for (const k of ["words", "sentences"]) {
       if (best[k] && (best[k].wpm > 450 || best[k].wpm <= 0 || !Number.isFinite(best[k].wpm))) {
         delete best[k];
         dirty = true;
@@ -304,7 +311,7 @@
       endlessLabel.style.display = show ? "" : "none";
       endlessLabel.title = show
         ? "開啟後不結算，持續自動跳下一題（小短文亦同；預設關閉）"
-        : "無盡模式只適用單字／句子";
+        : "無盡模式適用所有模式";
     }
   }
 
@@ -636,6 +643,9 @@
       composingText: "",
       composingRawText: "",
       composingKeys: [],
+      composingKeysBase: 0, // composingKeys indices < base belong to committed chars (phrase composition)
+      lastHintCharIdx: 0, // charIdx at last paintOnKeyboard (detects commits within one composition)
+      lastKeySeqIdx: null, // last hinted position {charIdx, layout} — detects state recreation below
       frozenCangjieHint: null,
       frozenCangjieInfo: null,
       lastKeyError: null, // wrong physical key label that currently shows red frame
@@ -774,6 +784,7 @@
       state.composingText = "";
       state.composingRawText = "";
       state.composingKeys = [];
+      state.composingKeysBase = 0;
       // Freeze ONLY the top-right decomposition until the user presses
       // Space (or otherwise commits the composition). The bottom key hint
       // must keep progressing one key at a time (see paintOnKeyboard).
@@ -793,6 +804,7 @@
       state.composingText = "";
       state.composingRawText = "";
       state.composingKeys = [];
+      state.composingKeysBase = 0;
       state.frozenCangjieHint = null;
       state.frozenCangjieInfo = null;
       if (checkEnglishProtection(e.target.value)) return;
@@ -814,14 +826,32 @@
         setHintDefault();
       }
       if (state) state.lastInputVal = e.target.value;
+      const info = getCurrentPosInfo();
+      const completedStr = info && info.completed ? info.completed.join("") : "";
+      if (completedStr.length > (state.inputs[li] || "").length) {
+        state.inputs[li] = completedStr;
+        onCommitted(li);
+        maybeFinish();
+      }
+
       if (state.composing) {
         const val = e.target.value;
-        const hasTrailingPreedit = /[ㄅ-ㄩˊˇˋ˙a-zA-Z日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重]$/.test(val);
+        // Only treat the live value as preedit when it actually ends with
+        // preedit for the current layout. The Cangjie-radical set must NOT
+        // apply to Zhuyin: a committed hanzi like 中/一/人 matches it, and
+        // overwriting composingText with hanzi-only val destroys the
+        // preedit from compositionupdate -> hint freezes on the first key.
+        const layoutNow = getCurrentLayout();
+        const isCodeNow = layoutNow === "cangjie" || layoutNow === "boshiamy" || layoutNow === "sucheng";
+        const hasTrailingPreedit = isCodeNow
+          ? /[a-zA-Z日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重]$/.test(val)
+          : /[ㄅ-ㄩˊˇˋ˙]$/.test(val);
         if (hasTrailingPreedit) {
           state.composingText = val;
           state.composingRawText = val;
-        } else if (!state.composingRawText) {
-          state.composingText = val;
+        } else {
+          state.composingText = "";
+          state.composingRawText = "";
         }
         // If the DOM value does not expose the preedit (common for Cangjie:
         // value stays "" / committed-only while letters live only in
@@ -870,12 +900,12 @@
           const k = e.key.toLowerCase();
           pressedEl = k === " "
             ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
-            : onKeyboard.querySelector(`.on-kb-key[data-key="${k}"]`);
+            : findOnKbKey(k);
         }
 
         if (pressedEl) {
           const expected = currentExpectedKey;
-          const isSpacePress = e.code === "Space" || (e.key === " " && e.key !== "Process");
+          const isSpacePress = e.code === "Space" || (expected.isSpace && (e.code === "Digit1" || e.key === "1")) || (e.key === " " && e.key !== "Process");
           let isCorrect = false;
 
           if (expected.isSpace) {
@@ -911,13 +941,23 @@
       }
       if (state.composing) {
         let pressedLetter = null;
-        if (/^[a-zA-Z]$/.test(e.key)) {
+        if (e.key && /^[a-zA-Z]$/.test(e.key)) {
           pressedLetter = e.key.toLowerCase();
-        } else if (e.code && e.code.startsWith("Key") && e.code.length === 4) {
-          pressedLetter = e.code.slice(3).toLowerCase();
+        } else if (e.code && CODE_TO_KEY[e.code]) {
+          // During IME composition e.key is often "Process"; e.code carries
+          // the physical key, including digits (tones) and punctuation.
+          pressedLetter = CODE_TO_KEY[e.code];
         }
         if (pressedLetter) state.composingKeys.push(pressedLetter);
         else if (isBackspace) state.composingKeys.pop();
+      } else if (!isBackspace && !isModifierOrNav && e.key && e.key !== "Process") {
+        // No composition events at all (rare IME/browser combos). Track
+        // physical keys anyway so the key hint can advance from them.
+        if (/^[a-zA-Z]$/.test(e.key)) {
+          state.composingKeys.push(e.key.toLowerCase());
+        } else if (e.code && CODE_TO_KEY[e.code]) {
+          state.composingKeys.push(CODE_TO_KEY[e.code]);
+        }
       }
       if (isEnter) {
         e.preventDefault();
@@ -1142,74 +1182,92 @@
 
     const layout = getCurrentLayout();
     const liveVal = (state.currentInputEl ? state.currentInputEl.value : state.inputs[lineIdx]) || "";
-    // 倉頡/嘸蝦米/速成皆以單字為單位（按空白選字前不算已確認），共用此分支；
-    // 另一條件維持舊倉頡字根探測（輸入法切倉頡但版面仍是注音時）。
-    const isCangjie = layout === "cangjie" || layout === "boshiamy" || layout === "sucheng" ||
-      (state.composing && Array.from(liveVal).some((c) => CANGJIE_RADICAL_TO_KEY[c]));
-
-    if (isCangjie) {
-      // 倉頡輸入法以單字為單位：在按空白鍵（選字）確認前，
-      // 顯示的都是當前字的拆字拼字與逐鍵提示。
-      // 已確認的字元數完全由 state.inputs[lineIdx] 決定，組字中的字根不可視為已完成字。
-      const committedText = state.inputs[lineIdx] || "";
-      const committedChars = Array.from(committedText);
-      const currentCharIdx = committedChars.length;
-      if (currentCharIdx >= targetChars.length) return null;
-      const ch = targetChars[currentCharIdx];
-
-      let composingSlice = "";
-      if (state.composing) {
-        if (liveVal.startsWith(committedText)) {
-          composingSlice = liveVal.slice(committedText.length);
-        }
-        if (!composingSlice && state.composingRawText) {
-          composingSlice = state.composingRawText;
-        }
-        if (!composingSlice && state.composingText) {
-          composingSlice = state.composingText;
-        }
-      }
-
-      const zhuyin = lookupZhuyinForChar(ch, targetLine, currentCharIdx);
-      return { char: ch, zhuyin, lineIdx, charIdx: currentCharIdx, composingSlice };
-    }
-
-    // Read the live input value directly instead of reconstructing the
-    // committed prefix from state.inputs. During phrase/fuzzy composition
-    // (Microsoft Zhuyin, macOS Zhuyin, Kuyin) converted hanzi sit in the
-    // input buffer while composition is still ongoing, so state.inputs
-    // stays "" until compositionend and the old derivation collapsed back
-    // to "" — the hint was stuck on the first character forever.
     const liveChars = Array.from(liveVal);
 
-    // Trailing bopomofo symbols = the syllable still being composed
-    // (e.g. "ㄊ" -> "ㄊㄤ"). Everything before them is already hanzi.
-    const bopomofoRegex = /[ㄅ-ㄩˊˇˋ˙]/;
-    let bopomofoStart = liveChars.length;
-    if (state.composing) {
+    let completedChars = [];
+    let composingSlice = "";
+
+    if (layout === "bopomofo") {
+      const bopomofoRegex = /[ㄅ-ㄩˊˇˋ˙]/;
+      let bopomofoStart = liveChars.length;
       while (bopomofoStart > 0 && bopomofoRegex.test(liveChars[bopomofoStart - 1])) {
         bopomofoStart--;
       }
-    }
 
-    let composingSlice = liveChars.slice(bopomofoStart).join("");
-    // Some IMEs keep the preedit only in composition events, not in value.
-    if (state.composing && !composingSlice && state.composingText) {
-      const rawComp = Array.from(state.composingText);
-      let cStart = rawComp.length;
-      while (cStart > 0 && bopomofoRegex.test(rawComp[cStart - 1])) {
-        cStart--;
+      composingSlice = liveChars.slice(bopomofoStart).join("");
+      // Some IMEs keep the preedit only in composition events, not in value.
+      if (!composingSlice && state.composingText) {
+        const rawComp = Array.from(state.composingText);
+        let cStart = rawComp.length;
+        while (cStart > 0 && bopomofoRegex.test(rawComp[cStart - 1])) {
+          cStart--;
+        }
+        composingSlice = rawComp.slice(cStart).join("");
       }
-      composingSlice = rawComp.slice(cStart).join("");
+
+      completedChars = liveChars.slice(0, bopomofoStart);
+    } else if (layout === "boshiamy") {
+      let bStart = liveChars.length;
+      while (bStart > 0 && (liveChars.length - bStart) < 5 && /^[a-zA-Z]$/.test(liveChars[bStart - 1])) {
+        bStart--;
+      }
+      composingSlice = liveChars.slice(bStart).join("");
+      if (!composingSlice && state.composingRawText) composingSlice = state.composingRawText;
+      if (!composingSlice && state.composingText) composingSlice = state.composingText;
+      completedChars = liveChars.slice(0, bStart);
+    } else {
+      // 倉頡 (cangjie) / 速成 (sucheng)
+      // 只有英文字母 [a-zA-Z] 或 24 個倉頡字根 [日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重]
+      // 才可能是組字區的字根代碼。任何非字根漢字（如「功」、「有」、「這」、「個」、「能」、「打」等）或標點符號，
+      // 絕不可能為組字碼，必定是已送出的確定文字。
+      const isCjPreeditChar = (c) => /^[a-zA-Z日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重]$/.test(c);
+      const maxPreedit = (layout === "sucheng") ? 2 : 5;
+      let pStart = liveChars.length;
+      while (
+        pStart > 0 &&
+        (liveChars.length - pStart) < maxPreedit &&
+        isCjPreeditChar(liveChars[pStart - 1])
+      ) {
+        pStart--;
+      }
+
+      // 若目標文字本身剛好是字根漢字（例如「一」、「大」、「中」），
+      // 且使用者先前已送出該字，後方接續的是新字的字根，需向後推進已確定字數。
+      while (pStart < liveChars.length) {
+        const targetIdx = pStart;
+        if (targetIdx >= targetChars.length) break;
+        const curCh = liveChars[pStart];
+        const tgtCh = targetChars[targetIdx];
+        if (curCh === tgtCh) {
+          if (pStart < liveChars.length - 1) {
+            pStart++;
+            continue;
+          }
+          if (!state.composing) {
+            pStart++;
+            continue;
+          }
+        }
+        break;
+      }
+
+      composingSlice = liveChars.slice(pStart).join("");
+      if (!composingSlice && state.composingRawText) {
+        composingSlice = state.composingRawText;
+      }
+      if (!composingSlice && state.composingText) {
+        composingSlice = state.composingText;
+      }
+
+      completedChars = liveChars.slice(0, pStart);
     }
 
-    const completedChars = liveChars.slice(0, bopomofoStart);
     const currentCharIdx = completedChars.length;
     if (currentCharIdx >= targetChars.length) return null;
     const ch = targetChars[currentCharIdx];
 
     const zhuyin = lookupZhuyinForChar(ch, targetLine, currentCharIdx);
-    return { char: ch, zhuyin, lineIdx, charIdx: currentCharIdx, composingSlice };
+    return { char: ch, zhuyin, lineIdx, charIdx: currentCharIdx, composingSlice, completed: completedChars };
   }
 
   // Extract Cangjie code letters from IME preedit fragments.
@@ -1567,18 +1625,21 @@
       if (state) cangjieHint.classList.add("is-done");
       return;
     }
-    // Freeze the top-right wheel during composition. Returning without
-    // touching the DOM keeps wheel cards and transforms exactly frozen.
-    if (state.composing && state.frozenCangjieHint) {
-      cangjieHint.classList.remove("is-done");
-      return;
-    }
     const info = getCurrentPosInfo();
     if (!info) {
       clearDecompWheel();
       cangjieHint.textContent = "拆字：—";
       return;
     }
+    // Freeze the top-right wheel during composition of the SAME character.
+    // If the character advanced (e.g. continuous composition session),
+    // unfreeze and update the wheel to the new character.
+    if (state.composing && state.frozenCangjieHint && state.frozenCangjieInfo && state.frozenCangjieInfo.char === info.char) {
+      cangjieHint.classList.remove("is-done");
+      return;
+    }
+    state.frozenCangjieHint = cangjieHint.innerHTML;
+    state.frozenCangjieInfo = info;
     const ch = info.char;
     // If wheel already exists, update cards in place without DOM reconstruction or jump
     if (decompWheel) {
@@ -1613,9 +1674,20 @@
     if (state) state.lastKeyError = null;
   }
 
+  // Find an on-screen key by its data-key WITHOUT building a CSS selector
+  // from the key name (a backslash key like 、 would make an invalid
+  // selector and silently never match).
+  function findOnKbKey(k) {
+    if (!onKeyboard || k == null) return null;
+    const keys = onKeyboard.querySelectorAll(".on-kb-key[data-key]");
+    for (const el of keys) {
+      if (el.dataset.key === k) return el;
+    }
+    return null;
+  }
+
   function setExpectedKey(keyEl, isSpace, keyChar) {
     if (keyEl) {
-      keyEl.classList.remove("is-typed");
       keyEl.classList.add("is-next");
       currentExpectedKey = {
         code: keyEl.dataset.code,
@@ -1638,15 +1710,10 @@
     const isSucheng = layout === "sucheng";
     const isCodeLayout = isCangjie || isBoshiamy || isSucheng;
 
-    // Track keys typed in current session for feedback
-    const typedKeys = new Set();
-    state.lines.forEach((line, i) => {
-      Array.from(state.inputs[i] || "").forEach((ch) => typedKeys.add(ch.toLowerCase()));
-    });
-
-    // Clear previous highlights
+    // Clear previous highlights: only the next key stays highlighted,
+    // already-typed keys leave no trace on the keyboard.
     onKeyboard.querySelectorAll(".on-kb-key").forEach((k) => {
-      k.classList.remove("is-next", "is-typed");
+      k.classList.remove("is-next");
     });
     currentExpectedKey = null;
 
@@ -1655,11 +1722,40 @@
       return;
     }
 
+    // Anti-staleness: if the hinted position moved BACKWARD (or the layout
+    // changed) while the live value grew, the state was recreated (new
+    // question) or composition restarted — old key history is invalid.
+    // In particular, a stale composingKeys from the previous question
+    // otherwise pins the hint on the previous char's first key forever.
+    // Reset conservatively; the typed-step derivations below rebuild from
+    // the live value / composition data.
+    if (
+      state.lastKeySeqIdx &&
+      (info.charIdx < state.lastKeySeqIdx.charIdx ||
+        (info.charIdx === state.lastKeySeqIdx.charIdx && layout !== state.lastKeySeqIdx.layout))
+    ) {
+      state.composingKeys = [];
+      state.composingKeysBase = 0;
+      state.composingRawText = "";
+      state.composingText = "";
+    }
+    state.lastKeySeqIdx = { charIdx: info.charIdx, layout };
+
+    // Phrase composition (one session spanning many chars) keeps appending
+    // to composingKeys. When the current char index moved, all keys so far
+    // belong to committed chars — rebase so the fallback below only sees
+    // the current syllable's keys.
+    if (state.lastHintCharIdx !== info.charIdx) {
+      state.composingKeysBase = (state.composingKeys || []).length;
+      state.lastHintCharIdx = info.charIdx;
+    }
+    const curKeys = (state.composingKeys || []).slice(state.composingKeysBase || 0);
+
     const curChar = info.char;
     const zhuyin = info.zhuyin;
 
     if (isCodeLayout) {
-      // 倉頡／嘸蝦米／速成版面：逐步高亮（和注音同規則——一次只亮下一鍵、已打變綠）。
+      // 倉頡／嘸蝦米／速成版面：逐步高亮（和注音同規則——一次只亮下一鍵，已打鍵不留痕）。
       // 序列 = 拆字碼字母逐鍵 + 最後空白鍵（選字）。碼來源依版面：
       // 倉頡=cangjie.json、速成=倉頡首尾碼、嘸蝦米=boshiamy.json（只提示字母）。
       // 已打進度由組字區的字母（fq…）或字根反推；IME 不把 preedit 放進 value 時
@@ -1687,20 +1783,21 @@
         keySequence.push({ sym: "空白", key: " ", isSpace: true, label: "空白 (選字)" });
 
         let typedSteps = 0;
-        if (state.composing) {
+        {
           // 嘸蝦米/速成組字區裡的字母直接比對；倉頡另需字根反查才算已打。
           const validLetters = isBoshiamy
             ? (l) => /^[a-z]$/.test(l)
             : (l) => CANGJIE_RADICAL[l];
           let typedLetters = lettersFromPreedit(info.composingSlice).filter(validLetters);
-          if (!typedLetters.length && state.composingRawText) {
+          const isSameCharComp = state.frozenCangjieInfo && state.frozenCangjieInfo.char === curChar;
+          if (!typedLetters.length && isSameCharComp && state.composingRawText) {
             typedLetters = lettersFromPreedit(state.composingRawText).filter(validLetters);
           }
-          if (!typedLetters.length && state.composingText) {
+          if (!typedLetters.length && isSameCharComp && state.composingText) {
             typedLetters = lettersFromPreedit(state.composingText).filter(validLetters);
           }
-          if (!typedLetters.length && Array.isArray(state.composingKeys) && state.composingKeys.length) {
-            typedLetters = state.composingKeys.filter(validLetters);
+          if (!typedLetters.length && curKeys.length) {
+            typedLetters = curKeys.filter(validLetters);
           }
           while (
             typedSteps < typedLetters.length &&
@@ -1712,27 +1809,16 @@
           }
         }
 
-        keySequence.forEach((item, idx) => {
-          if (idx < typedSteps) {
-            const sel = item.isSpace
-              ? `.on-kb-key[data-code="Space"]`
-              : `.on-kb-key[data-key="${item.key}"]`;
-            const elTyped = onKeyboard.querySelector(sel);
-            if (elTyped) elTyped.classList.add("is-typed");
-          }
-        });
-
         const nextItem = typedSteps < keySequence.length ? keySequence[typedSteps] : null;
         if (nextItem) {
-          const selector = nextItem.isSpace
-            ? `.on-kb-key[data-code="Space"]`
-            : `.on-kb-key[data-key="${nextItem.key}"]`;
-          const keyEl = onKeyboard.querySelector(selector);
+          const keyEl = nextItem.isSpace
+            ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
+            : findOnKbKey(nextItem.key);
           setExpectedKey(keyEl, nextItem.isSpace, nextItem.key);
         }
       } else if (PUNCT_KEY_MAP[curChar]) {
         const pInfo = PUNCT_KEY_MAP[curChar];
-        const keyEl = onKeyboard.querySelector(`.on-kb-key[data-key="${pInfo.key}"]`);
+        const keyEl = findOnKbKey(pInfo.key);
         setExpectedKey(keyEl, false, pInfo.key);
         if (pInfo.shift) {
           const shiftEl = onKeyboard.querySelector(`.on-kb-key[data-code="ShiftLeft"]`);
@@ -1742,7 +1828,7 @@
         const lower = curChar.toLowerCase();
         const keyEl = lower === " "
           ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
-          : onKeyboard.querySelector(`.on-kb-key[data-key="${lower}"]`);
+          : findOnKbKey(lower);
         setExpectedKey(keyEl, lower === " ", lower);
       }
     } else if (isBopomofo) {
@@ -1764,53 +1850,42 @@
         }
 
         // Step-by-step hint: only the NEXT key is highlighted.
+        // Progress comes from the preedit slice, falling back to the
+        // physical keys pressed during this syllable (curKeys).
         let typedSteps = 0;
-        if (state.composing) {
-          if (info.composingSlice) {
-            const typedSymbols = Array.from(info.composingSlice).filter((s) => BOPOMOFO_TO_KEY[s]);
-            while (
-              typedSteps < typedSymbols.length &&
-              typedSteps < keySequence.length &&
-              !keySequence[typedSteps].isSpace &&
-              typedSymbols[typedSteps] === keySequence[typedSteps].sym
-            ) {
-              typedSteps++;
-            }
+        if (info.composingSlice) {
+          const typedSymbols = Array.from(info.composingSlice).filter((s) => BOPOMOFO_TO_KEY[s]);
+          while (
+            typedSteps < typedSymbols.length &&
+            typedSteps < keySequence.length &&
+            !keySequence[typedSteps].isSpace &&
+            typedSymbols[typedSteps] === keySequence[typedSteps].sym
+          ) {
+            typedSteps++;
           }
-          if (typedSteps === 0 && Array.isArray(state.composingKeys) && state.composingKeys.length) {
-            while (
-              typedSteps < state.composingKeys.length &&
-              typedSteps < keySequence.length &&
-              !keySequence[typedSteps].isSpace &&
-              state.composingKeys[typedSteps] === keySequence[typedSteps].key
-            ) {
-              typedSteps++;
-            }
+        }
+        if (typedSteps === 0 && curKeys.length) {
+          while (
+            typedSteps < curKeys.length &&
+            typedSteps < keySequence.length &&
+            !keySequence[typedSteps].isSpace &&
+            curKeys[typedSteps] === keySequence[typedSteps].key
+          ) {
+            typedSteps++;
           }
         }
 
-        keySequence.forEach((item, idx) => {
-          if (idx < typedSteps) {
-            const sel = item.isSpace
-              ? `.on-kb-key[data-code="Space"]`
-              : `.on-kb-key[data-key="${item.key}"]`;
-            const elTyped = onKeyboard.querySelector(sel);
-            if (elTyped) elTyped.classList.add("is-typed");
-          }
-        });
-
         const nextItem = typedSteps < keySequence.length ? keySequence[typedSteps] : null;
         if (nextItem) {
-          const selector = nextItem.isSpace
-            ? `.on-kb-key[data-code="Space"]`
-            : `.on-kb-key[data-key="${nextItem.key}"]`;
-          const keyEl = onKeyboard.querySelector(selector);
+          const keyEl = nextItem.isSpace
+            ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
+            : findOnKbKey(nextItem.key);
           setExpectedKey(keyEl, nextItem.isSpace, nextItem.key);
         }
       } else if (PUNCT_KEY_MAP[curChar]) {
         // Punctuation key mapping
         const pInfo = PUNCT_KEY_MAP[curChar];
-        const keyEl = onKeyboard.querySelector(`.on-kb-key[data-key="${pInfo.key}"]`);
+        const keyEl = findOnKbKey(pInfo.key);
         setExpectedKey(keyEl, false, pInfo.key);
         if (pInfo.shift) {
           const shiftEl = onKeyboard.querySelector(`.on-kb-key[data-code="ShiftLeft"]`);
@@ -1821,7 +1896,7 @@
         const lower = curChar.toLowerCase();
         const keyEl = lower === " "
           ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
-          : onKeyboard.querySelector(`.on-kb-key[data-key="${lower}"]`);
+          : findOnKbKey(lower);
         setExpectedKey(keyEl, lower === " ", lower);
       }
     } else {
@@ -1829,21 +1904,13 @@
       const lower = curChar.toLowerCase();
       let keyEl = lower === " "
         ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
-        : onKeyboard.querySelector(`.on-kb-key[data-key="${lower}"]`);
+        : findOnKbKey(lower);
       if (!keyEl && PUNCT_KEY_MAP[curChar]) {
-        keyEl = onKeyboard.querySelector(`.on-kb-key[data-key="${PUNCT_KEY_MAP[curChar].key}"]`);
+        keyEl = findOnKbKey(PUNCT_KEY_MAP[curChar].key);
       }
       setExpectedKey(keyEl, lower === " ", lower);
     }
 
-    // Keep typed keys styled (unless currently in error or next)
-    onKeyboard.querySelectorAll(".on-kb-key[data-key]").forEach((key) => {
-      if (key.classList.contains("is-next") || key.classList.contains("is-error")) return;
-      const k = key.dataset.key || "";
-      if (k && typedKeys.has(k)) {
-        key.classList.add("is-typed");
-      }
-    });
   }
 
   function setHintDefault() {
@@ -1861,21 +1928,13 @@
   }
 
   function displayFor(li) {
-    if (state.composing && li === state.lineIdx) {
-      const layout = getCurrentLayout();
-      if (layout === "cangjie" || layout === "boshiamy" || layout === "sucheng") {
-        // 倉頡/嘸蝦米/速成組字中尚未按空白鍵確認，輸入框內的碼不應被視為已確認字元
-        return state.inputs[li] || "";
+    if (li === state.lineIdx) {
+      const info = getCurrentPosInfo();
+      if (info && info.completed) {
+        return info.completed.join("");
       }
       const el = state.currentInputEl;
-      const val = el ? el.value : (state.inputs[li] || "");
-      const chars = Array.from(val);
-      const bopomofoRegex = /[ㄅ-ㄩˊˇˋ˙]/;
-      let end = chars.length;
-      while (end > 0 && bopomofoRegex.test(chars[end - 1])) {
-        end--;
-      }
-      return chars.slice(0, end).join("");
+      if (el) return el.value;
     }
     return state.inputs[li] || "";
   }
