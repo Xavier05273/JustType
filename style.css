@@ -364,7 +364,7 @@ html[data-theme="dark"] .anomaly-line{color:#fbbf24}
 
 /* Stats Modal */
 .modal.stats-modal{
-  max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;
+  max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow-y:auto;
 }
 .stats-modal-head{
   display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
@@ -412,4 +412,5 @@ html[data-theme="dark"] .anomaly-line{color:#fbbf24}
   .hud{gap:10px}
   .stats-overview{grid-template-columns:repeat(3, 1fr);gap:6px}
   .stats-best-grid{grid-template-columns:1fr;gap:6px}
+  .stats-hist-wrap{max-height:150px;min-height:100px}
 }

@@ -2233,6 +2233,10 @@
     function closeStatsModal() {
       if (!statsOverlay) return;
       statsOverlay.classList.add("hidden");
+      // Restore focus to active typing input if currently in practice view
+      if (practiceView && !practiceView.classList.contains("hidden")) {
+        focusCurrent();
+      }
     }
 
     function renderStatsModal() {
@@ -2246,14 +2250,21 @@
       const totalRounds = hist.length;
       let totalWpm = 0;
       let totalAcc = 0;
-      let totalTypedChars = 0;
+      let sumTyped = 0;
+      let sumCorrect = 0;
       hist.forEach((h) => {
         totalWpm += (h.wpm || 0);
         totalAcc += (h.acc || 0);
-        totalTypedChars += (h.typed || h.correct || 0);
+        if (typeof h.typed === "number" && typeof h.correct === "number") {
+          sumTyped += h.typed;
+          sumCorrect += h.correct;
+        }
       });
       const avgWpm = totalRounds > 0 ? Math.round(totalWpm / totalRounds) : 0;
-      const avgAcc = totalRounds > 0 ? (totalAcc / totalRounds).toFixed(1) : "100";
+      // Use weighted accuracy if typed/correct stats exist; fallback to simple average
+      const avgAcc = sumTyped > 0
+        ? ((sumCorrect / sumTyped) * 100).toFixed(1)
+        : (totalRounds > 0 ? (totalAcc / totalRounds).toFixed(1) : "100");
 
       if (overviewEl) {
         overviewEl.innerHTML = `
@@ -2312,6 +2323,11 @@
     if (statsOverlay) {
       statsOverlay.addEventListener("click", (e) => {
         if (e.target === statsOverlay) closeStatsModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !statsOverlay.classList.contains("hidden")) {
+          closeStatsModal();
+        }
       });
     }
 
