@@ -28,6 +28,7 @@
       <option value="md" selected>中</option>
       <option value="lg">大</option>
     </select>
+    <button id="statsBtn" class="btn ghost small" type="button" aria-label="查看練習紀錄與成效統計">成績統計</button>
     <button id="resetStatsBtn" class="btn ghost small" type="button">清除紀錄</button>
   </div>
 </header>
@@ -112,6 +113,25 @@
     <div class="modal-actions">
       <button id="againBtn" class="btn primary" type="button">再來一局</button>
       <button id="homeBtn" class="btn" type="button">回首頁</button>
+    </div>
+  </div>
+</div>
+
+<div id="statsOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+  <div class="modal stats-modal">
+    <div class="stats-modal-head">
+      <h2 id="statsTitle">練習統計與歷史紀錄</h2>
+      <button id="closeStatsBtn" class="btn ghost small" type="button" aria-label="關閉統計視窗">✕</button>
+    </div>
+    <div id="statsOverview" class="stats-overview"></div>
+    <div class="stats-section-title">各模式個人最佳</div>
+    <div id="statsBestGrid" class="stats-best-grid"></div>
+    <div class="stats-section-title">最近練習紀錄</div>
+    <div id="statsHistWrap" class="stats-hist-wrap">
+      <div id="statsHistList" class="stats-hist-list"></div>
+    </div>
+    <div class="modal-actions stats-modal-foot">
+      <button id="closeStatsBtnBottom" class="btn primary" type="button">關閉</button>
     </div>
   </div>
 </div>

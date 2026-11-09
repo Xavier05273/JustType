@@ -181,6 +181,10 @@
   const onKeyboard = $("#onKeyboard");
   const layoutSelect = $("#layoutSelect");
   const cangjieHint = $("#cangjieHint");
+  const statsOverlay = $("#statsOverlay");
+  const statsBtn = $("#statsBtn");
+  const closeStatsBtn = $("#closeStatsBtn");
+  const closeStatsBtnBottom = $("#closeStatsBtnBottom");
 
   let DATA = null;
   let ZHUYIN = null;
@@ -234,6 +238,8 @@
     const text = $("#themeText");
     if (icon) icon.textContent = isDark ? "🌙" : "☀️";
     if (text) text.textContent = isDark ? "深色" : "淺色";
+    const metaTheme = $('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute("content", isDark ? "#0f172a" : "#2563eb");
   }
 
   function toggleTheme() {
@@ -325,30 +331,28 @@
         }
       });
     }
+
+    // 1. First fetch core question data (data.json) to render home view immediately
     const res = await fetch("data.json");
     DATA = await res.json();
-    try {
-      const zres = await fetch("zhuyin.json");
-      ZHUYIN = await zres.json();
-    } catch {
-      ZHUYIN = null;
-    }
-    try {
-      const cres = await fetch("cangjie.json");
-      CANGJIE = await cres.json();
-    } catch {
-      CANGJIE = null;
-    }
-    try {
-      const bres = await fetch("boshiamy.json");
-      BOSHIAMY = await bres.json();
-    } catch {
-      BOSHIAMY = null;
-    }
+
     decompMethod = ["cangjie", "boshiamy", "sucheng"].includes(loadJSON(LS_DECOMP, "cangjie"))
       ? loadJSON(LS_DECOMP, "cangjie") : "cangjie";
     renderHome();
     bindGlobal();
+
+    // 2. Fetch large dictionaries asynchronously in parallel in background
+    Promise.all([
+      fetch("zhuyin.json").then((r) => r.json()).then((d) => { ZHUYIN = d; }).catch(() => { ZHUYIN = null; }),
+      fetch("cangjie.json").then((r) => r.json()).then((d) => { CANGJIE = d; }).catch(() => { CANGJIE = null; }),
+      fetch("boshiamy.json").then((r) => r.json()).then((d) => { BOSHIAMY = d; }).catch(() => { BOSHIAMY = null; }),
+    ]).then(() => {
+      // If currently practicing, refresh key hints and decomposition wheel once dictionaries are loaded
+      if (state && !state.finished) {
+        paintOnKeyboard();
+        paintCangjieHint();
+      }
+    });
   }
 
   function renderHome() {
@@ -2113,7 +2117,16 @@
     }
     if (!isAnomalous) {
       const hist = loadHist();
-      hist.unshift({ mode: state.modeKey, wpm: cpm, acc, sec: Math.round(sec), id: state.item.id });
+      hist.unshift({
+        mode: state.modeKey,
+        wpm: cpm,
+        acc,
+        sec: Math.round(sec),
+        id: state.item.id,
+        typed: totalTyped,
+        correct: totalCorrect,
+        time: Date.now()
+      });
       saveJSON(LS_HIST, hist.slice(0, 50));
     }
 
@@ -2211,10 +2224,106 @@
       saveJSON(LS_FONT, e.target.value);
       applyFontSize(e.target.value);
     });
+    function openStatsModal() {
+      if (!statsOverlay) return;
+      renderStatsModal();
+      statsOverlay.classList.remove("hidden");
+    }
+
+    function closeStatsModal() {
+      if (!statsOverlay) return;
+      statsOverlay.classList.add("hidden");
+    }
+
+    function renderStatsModal() {
+      const hist = loadHist();
+      const best = loadBest();
+      const overviewEl = $("#statsOverview");
+      const bestGridEl = $("#statsBestGrid");
+      const histListEl = $("#statsHistList");
+
+      // 1. Calculate overview metrics
+      const totalRounds = hist.length;
+      let totalWpm = 0;
+      let totalAcc = 0;
+      let totalTypedChars = 0;
+      hist.forEach((h) => {
+        totalWpm += (h.wpm || 0);
+        totalAcc += (h.acc || 0);
+        totalTypedChars += (h.typed || h.correct || 0);
+      });
+      const avgWpm = totalRounds > 0 ? Math.round(totalWpm / totalRounds) : 0;
+      const avgAcc = totalRounds > 0 ? (totalAcc / totalRounds).toFixed(1) : "100";
+
+      if (overviewEl) {
+        overviewEl.innerHTML = `
+          <div class="cell"><div class="k">累計練習</div><div class="v">${totalRounds} <span style="font-size:12px;font-weight:normal;color:var(--muted)">局</span></div></div>
+          <div class="cell"><div class="k">平均速度</div><div class="v">${avgWpm} <span style="font-size:12px;font-weight:normal;color:var(--muted)">字/分</span></div></div>
+          <div class="cell"><div class="k">平均正確率</div><div class="v">${avgAcc}%</div></div>
+        `;
+      }
+
+      // 2. Render Personal Best for all modes
+      if (bestGridEl) {
+        bestGridEl.innerHTML = "";
+        MODES.forEach((m) => {
+          const b = best[m.key];
+          const card = document.createElement("div");
+          card.className = "stats-best-card";
+          card.innerHTML = `
+            <div class="mode-name">${m.title}</div>
+            <div class="best-wpm">${b ? b.wpm + " 字/分" : "—"}</div>
+            <div class="best-sub">${b ? `正確率 ${b.acc}% · 用時 ${fmtTime(b.sec)}` : "尚未挑戰"}</div>
+          `;
+          bestGridEl.appendChild(card);
+        });
+      }
+
+      // 3. Render recent history list
+      if (histListEl) {
+        if (!hist.length) {
+          histListEl.innerHTML = `<div class="stats-empty">目前尚無練習紀錄，開始一局練習吧！</div>`;
+        } else {
+          histListEl.innerHTML = hist.slice(0, 30).map((h) => {
+            const m = MODES.find((x) => x.key === h.mode);
+            const mTitle = m ? m.title : h.mode;
+            let timeStr = "";
+            if (h.time) {
+              const d = new Date(h.time);
+              const pad = (n) => String(n).padStart(2, "0");
+              timeStr = `${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            }
+            return `
+              <div class="stats-hist-item">
+                <span class="hist-mode">${mTitle}</span>
+                <span class="hist-wpm">${h.wpm} 字/分</span>
+                <span class="hist-meta">${h.acc}% · ${fmtTime(h.sec)}</span>
+                <span class="hist-meta">${timeStr}</span>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+    }
+
+    if (statsBtn) statsBtn.addEventListener("click", openStatsModal);
+    if (closeStatsBtn) closeStatsBtn.addEventListener("click", closeStatsModal);
+    if (closeStatsBtnBottom) closeStatsBtnBottom.addEventListener("click", closeStatsModal);
+    if (statsOverlay) {
+      statsOverlay.addEventListener("click", (e) => {
+        if (e.target === statsOverlay) closeStatsModal();
+      });
+    }
+
     $("#resetStatsBtn").addEventListener("click", () => {
-      localStorage.removeItem(LS_BEST);
-      localStorage.removeItem(LS_HIST);
-      renderHome();
+      if (confirm("確定要清除所有練習紀錄與個人最佳成績嗎？此動作無法復原。")) {
+        localStorage.removeItem(LS_BEST);
+        localStorage.removeItem(LS_HIST);
+        renderHome();
+        if (statsOverlay && !statsOverlay.classList.contains("hidden")) {
+          renderStatsModal();
+        }
+      }
     });
     $("#backHomeBtn").addEventListener("click", showHome);
     $("#restartBtn").addEventListener("click", () => startRound(state.modeKey));
