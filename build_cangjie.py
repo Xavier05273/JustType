@@ -20,6 +20,7 @@ import sys
 import urllib.request
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(ROOT, "data")
 SRC_URL = "https://raw.githubusercontent.com/Jackchows/Cangjie5/master/Cangjie5_TC.txt"
 
 
@@ -42,9 +43,9 @@ def load_table(path):
 
 
 def wanted_chars():
-    zhuyin = json.load(open(os.path.join(ROOT, "zhuyin.json"), encoding="utf-8"))
+    zhuyin = json.load(open(os.path.join(DATA_DIR, "zhuyin.json"), encoding="utf-8"))
     wanted = set((zhuyin.get("chars") or {}).keys())
-    data = json.load(open(os.path.join(ROOT, "data.json"), encoding="utf-8"))
+    data = json.load(open(os.path.join(DATA_DIR, "data.json"), encoding="utf-8"))
     for pool in data.values():
         for item in pool.get("texts", []):
             wanted.update(item.get("text", ""))
@@ -66,7 +67,7 @@ def main():
         # 依碼表原始順序輸出（按 code 再按字，僅為可重現性；查表不依賴順序）
         out = {ch: table[ch] for ch in table if ch in wanted}
         missing = sorted(ch for ch in wanted if ch not in table)
-        dest = os.path.join(ROOT, "cangjie.json")
+        dest = os.path.join(DATA_DIR, "cangjie.json")
         with open(dest, "w", encoding="utf-8") as f:
             json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
             f.write("\n")
@@ -74,7 +75,7 @@ def main():
         print(f"cangjie.json 寫入: {len(out)} 字, {os.path.getsize(dest)} bytes -> {dest}")
         print(f"未收錄（標點/英數/符號等，練習流程不需倉頡）: {len(missing)}: {''.join(missing)}")
         # 題庫覆蓋率自檢
-        data = json.load(open(os.path.join(ROOT, "data.json"), encoding="utf-8"))
+        data = json.load(open(os.path.join(DATA_DIR, "data.json"), encoding="utf-8"))
         used = set()
         for pool in data.values():
             for item in pool.get("texts", []):

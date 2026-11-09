@@ -6,10 +6,11 @@
   const LS_HIST = "tp-lite-history-v1";
   const LS_FONT = "tp-lite-font-v1";
   const LS_LAST = "tp-lite-last-v1";
-  const LS_AUTO_NEXT = "tp-lite-auto-next-v1";
   const LS_THEME = "tp-lite-theme-v1";
   const LS_ENDLESS = "tp-lite-endless-v1";
+  const LS_ENDLESS_DEFAULT_OFF_DONE = "tp-lite-endless-default-off-v2";
   const LS_ONKB = "tp-lite-onkb-v1";
+  const LS_ONKB_DEFAULT_OFF_DONE = "tp-lite-onkb-default-off-v1";
   const LS_DECOMP = "tp-lite-decomp-v1"; // 右上角拆字顯示: cangjie|boshiamy|sucheng
 
   // Standard ANSI Physical Keyboard Layout (5 rows, exact 15.0u width per row).
@@ -150,26 +151,71 @@
     "?": { key: "/", shift: true, label: "?" },
     ":": { key: ";", shift: true, label: ":" },
     ";": { key: ";", shift: false, label: ";" },
+    "(": { key: "9", shift: true, label: "(" },
+    ")": { key: "0", shift: true, label: ")" },
+    "%": { key: "5", shift: true, label: "%" },
+    "_": { key: "-", shift: true, label: "_" },
+    "-": { key: "-", shift: false, label: "-" },
+    "/": { key: "/", shift: false, label: "/" },
+    "\\": { key: "\\", shift: false, label: "\\" },
+    "<": { key: ",", shift: true, label: "<" },
+    ">": { key: ".", shift: true, label: ">" },
+    "=": { key: "=", shift: false, label: "=" },
+    "+": { key: "=", shift: true, label: "+" },
+    "'": { key: "'", shift: false, label: "'" },
+    "\"": { key: "'", shift: true, label: "\"" },
+    "*": { key: "8", shift: true, label: "*" },
+    "&": { key: "7", shift: true, label: "&" },
+    "@": { key: "2", shift: true, label: "@" },
+    "#": { key: "3", shift: true, label: "#" },
+    "$": { key: "4", shift: true, label: "$" },
+    "^": { key: "6", shift: true, label: "^" },
+    "|": { key: "\\", shift: true, label: "|" },
+    "{": { key: "[", shift: true, label: "{" },
+    "}": { key: "]", shift: true, label: "}" },
+    "~": { key: "`", shift: true, label: "~" },
+    "`": { key: "`", shift: false, label: "`" },
   };
 
-  // Finite round sizes: words settle after 10 items, sentences after 5.
-  // Articles are one item per round. Endless mode disables settlement.
-  // Endless is offered for every mode (words / sentences)
-  // but is always off by default (LS_ENDLESS only true if user set it).
+  // Finite round sizes (endless off): words settle after 10 items, sentences
+  // after 5. Every other mode (articles, long articles, life situations, mixed,
+  // classical, general/litigation legal docs) settles after 1 item.
+  // Endless mode disables settlement in every mode. It is off by default
+  // (LS_ENDLESS only true if the user explicitly checked it; legacy prefs are
+  // purged once on load so all modes start from the default-off state).
   const ROUND_TARGET = { words: 10, sentences: 5 };
+
+  // 抽題隊列（2026-11-09）：每模式一份 memory-only queue，進練習前就 Fisher-Yates
+  // 洗好整副不重複序列，整輪照序抽出，洗完才重洗。Queue 只活在記憶體，
+  // 重整網頁後全部清零、該模式首次進練習時重洗（刻意取捨：簡單、可隨時重整重洗）。
+  // Queue 生命週期：僅在 nextFromQueue 發現空 queue / cursor 超界時重洗。
+  // restartBtn、againBtn、無盡／有限輪自動跳題、回首頁一律不重洗——重洗只由 queue 吃完觸發。
+  // LS_LAST 只負責跨 queue 邊界擋連續重複（重洗後首題與上一題同 id 時 skip 一個）。
+  const QUEUE = {}; // modeKey -> { order: [itemId,...], cursor: n }
 
   const MODES = [
     { key: "words", title: "單字", desc: "萬丈高樓平地起", dataKey: "words", color: "blue" },
     { key: "sentences", title: "句子", desc: "小有所成，切勿驕縱", dataKey: "sentences", color: "emerald" },
     { key: "articles_punct", title: "小短文", desc: "萬水千山走遍", dataKey: "articles_punct", color: "violet" },
+    { key: "long_articles", title: "長文章", desc: "厚積薄發", dataKey: "long_articles", color: "amber" },
+    { key: "life_situations", title: "生活情境題", desc: "柴米油鹽", dataKey: "life_situations", color: "rose" },
+    { key: "mixed_zh_en", title: "中英雜燴", desc: "中西合璧", dataKey: "mixed_zh_en", color: "cyan" },
+    { key: "classical_texts", title: "文言文", desc: "文以載道", dataKey: "classical_texts", color: "red" },
+    { key: "general_legal_docs", title: "一般法律公文", desc: "法者，天子所與天下公共也", dataKey: "general_legal_docs", color: "slate" },
+    { key: "litigation_legal_docs", title: "訴訟法律公文", desc: "你的夢想是成為書記官嗎", dataKey: "litigation_legal_docs", color: "orange" },
   ];
+
+  // Pre-2026-11-09-restructure mode keys, kept only for history display.
+  const LEGACY_MODE_TITLES = {
+    legal_texts: "法律條文（舊）",
+    official_docs: "正式公文（舊）",
+  };
 
   const $ = (s) => document.querySelector(s);
   const homeView = $("#homeView");
   const practiceView = $("#practiceView");
   const modeGrid = $("#modeGrid");
   const resultOverlay = $("#resultOverlay");
-  const autoAdvanceCheck = $("#autoAdvanceCheck");
   const endlessCheck = $("#endlessCheck");
   const endlessLabel = $("#endlessLabel");
   const carouselViewport = $("#carouselViewport");
@@ -177,6 +223,7 @@
   const carouselPrev = $("#carouselPrev");
   const carouselNext = $("#carouselNext");
   const onKeyboardCheck = $("#onKeyboardCheck");
+  const layoutLabel = $("#layoutLabel");
   const onKeyboardWrap = $("#onKeyboardWrap");
   const onKeyboard = $("#onKeyboard");
   const layoutSelect = $("#layoutSelect");
@@ -225,6 +272,82 @@
     const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
     return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
   }
+  // ---- 生活情境題：LINE 回合動畫 ----
+  // Each level runs at least 2 opponent↔user cycles:
+  //   idle → opponent_entering → user_typing → (Enter) → user_sent
+  //        → pause_brief (typing dots) → opponent_entering → … → completed
+  const ANIMATION_PHASE = {
+    IDLE: "idle",
+    OPPONENT_ENTERING: "opponent_entering",
+    USER_TYPING: "user_typing",
+    USER_SENT: "user_sent",
+    PAUSE_BRIEF: "pause_brief",
+    COMPLETED: "completed",
+  };
+
+  function lifeSchedule(fn, ms) {
+    if (state.animTimer) clearTimeout(state.animTimer);
+    state.animTimer = setTimeout(() => {
+      state.animTimer = null;
+      if (!state || state.finished) return;
+      fn();
+    }, ms);
+  }
+
+  function lifeKick() {
+    if (!state || state.modeKey !== "life_situations") return;
+    state.animationPhase = ANIMATION_PHASE.IDLE;
+    renderPractice();
+    paint();
+    lifeSchedule(lifeOpponentEnter, 700);
+  }
+
+  function lifeOpponentEnter() {
+    const next = state.chatSegs[state.chatVisible];
+    if (next && !next.isMe) {
+      state.chatVisible++;
+      state.animationPhase = ANIMATION_PHASE.OPPONENT_ENTERING;
+      renderPractice();
+      paint();
+      lifeSchedule(lifeUserTyping, 1000);
+    } else {
+      lifeUserTyping();
+    }
+  }
+
+  function lifeUserTyping() {
+    if (state.lineIdx >= state.lines.length) { lifeCompleted(); return; }
+    state.animationPhase = ANIMATION_PHASE.USER_TYPING;
+    renderPractice();
+    paint();
+    focusCurrent();
+  }
+
+  // Called by the Enter handler once the current user bubble is fully typed.
+  function lifeUserSent() {
+    state.chatVisible++;
+    state.turnCycles++;
+    if (state.lineIdx + 1 < state.lines.length) state.lineIdx++;
+    else state.lineIdx = state.lines.length; // no more user turns: next typing phase completes
+    state.animationPhase = ANIMATION_PHASE.USER_SENT;
+    renderPractice();
+    paint();
+    lifeSchedule(lifePause, 1100);
+  }
+
+  function lifePause() {
+    state.animationPhase = ANIMATION_PHASE.PAUSE_BRIEF;
+    renderPractice();
+    paint();
+    lifeSchedule(lifeOpponentEnter, 1300);
+  }
+
+  function lifeCompleted() {
+    state.animationPhase = ANIMATION_PHASE.COMPLETED;
+    renderPractice();
+    paint();
+    maybeFinish();
+  }
 
   // Theme Management
   function getSavedTheme() {
@@ -253,7 +376,7 @@
   function loadBest() {
     const best = loadJSON(LS_BEST, {});
     let dirty = false;
-    for (const k of ["words", "sentences"]) {
+    for (const k of Object.keys(best)) {
       if (best[k] && (best[k].wpm > 450 || best[k].wpm <= 0 || !Number.isFinite(best[k].wpm))) {
         delete best[k];
         dirty = true;
@@ -270,25 +393,8 @@
     return cleaned;
   }
 
-  function isAutoNextEnabled(modeKey) {
-    const pref = loadJSON(LS_AUTO_NEXT, null);
-    if (pref && typeof pref[modeKey] === "boolean") {
-      return pref[modeKey];
-    }
-    // Default: words and sentences auto-advance without popup; articles show popup
-    return modeKey === "words" || modeKey === "sentences";
-  }
-
-  function setAutoNextEnabled(modeKey, val) {
-    const pref = loadJSON(LS_AUTO_NEXT, {});
-    pref[modeKey] = val;
-    saveJSON(LS_AUTO_NEXT, pref);
-  }
-
-  function syncAutoAdvanceCheck() {
-    if (!autoAdvanceCheck || !state) return;
-    autoAdvanceCheck.checked = isAutoNextEnabled(state.modeKey);
-  }
+  // 「自動跳下一題（不彈窗）」已移除：它的效果與「無盡模式」相同，只保留無盡模式。
+  // 有限輪（無盡關閉）一律在輪滿時結算：單字 10 題、句子 5 題、其他模式 1 題。
 
   function isShortMode(modeKey) {
     return modeKey === "words" || modeKey === "sentences";
@@ -316,12 +422,32 @@
     if (endlessLabel) {
       endlessLabel.style.display = show ? "" : "none";
       endlessLabel.title = show
-        ? "開啟後不結算，持續自動跳下一題（小短文亦同；預設關閉）"
+        ? "開啟後不結算，持續自動跳下一題（所有模式皆同；預設關閉）"
         : "無盡模式適用所有模式";
     }
   }
 
   async function init() {
+    // 一次性清除舊設定：移除已刪除的「自動跳下一題」偏好，並讓所有模式的
+    // 無盡模式回到預設關閉（此後使用者再勾選才會依模式存檔）。
+    // 同理讓鍵位提示回到預設關閉（版面選擇保留，只清 show 旗標）。
+    try {
+      if (!localStorage.getItem(LS_ENDLESS_DEFAULT_OFF_DONE)) {
+        localStorage.removeItem(LS_ENDLESS);
+        localStorage.setItem(LS_ENDLESS_DEFAULT_OFF_DONE, "1");
+      }
+      localStorage.removeItem("tp-lite-auto-next-v1");
+      if (!localStorage.getItem(LS_ONKB_DEFAULT_OFF_DONE)) {
+        try {
+          const pref = loadJSON(LS_ONKB, null);
+          if (pref && typeof pref === "object") {
+            delete pref.show;
+            saveJSON(LS_ONKB, pref);
+          }
+        } catch {}
+        localStorage.setItem(LS_ONKB_DEFAULT_OFF_DONE, "1");
+      }
+    } catch {}
     applyTheme(getSavedTheme());
     applyFontSize(loadJSON(LS_FONT, "md"));
     if (window.matchMedia) {
@@ -333,7 +459,7 @@
     }
 
     // 1. First fetch core question data (data.json) to render home view immediately
-    const res = await fetch("data.json");
+    const res = await fetch("data/data.json");
     DATA = await res.json();
 
     decompMethod = ["cangjie", "boshiamy", "sucheng"].includes(loadJSON(LS_DECOMP, "cangjie"))
@@ -343,9 +469,9 @@
 
     // 2. Fetch large dictionaries asynchronously in parallel in background
     Promise.all([
-      fetch("zhuyin.json").then((r) => r.json()).then((d) => { ZHUYIN = d; }).catch(() => { ZHUYIN = null; }),
-      fetch("cangjie.json").then((r) => r.json()).then((d) => { CANGJIE = d; }).catch(() => { CANGJIE = null; }),
-      fetch("boshiamy.json").then((r) => r.json()).then((d) => { BOSHIAMY = d; }).catch(() => { BOSHIAMY = null; }),
+      fetch("data/zhuyin.json").then((r) => r.json()).then((d) => { ZHUYIN = d; }).catch(() => { ZHUYIN = null; }),
+      fetch("data/cangjie.json").then((r) => r.json()).then((d) => { CANGJIE = d; }).catch(() => { CANGJIE = null; }),
+      fetch("data/boshiamy.json").then((r) => r.json()).then((d) => { BOSHIAMY = d; }).catch(() => { BOSHIAMY = null; }),
     ]).then(() => {
       // If currently practicing, refresh key hints and decomposition wheel once dictionaries are loaded
       if (state && !state.finished) {
@@ -600,19 +726,45 @@
     });
   }
 
-  function pick(modeKey) {
-    const items = DATA[MODES.find((m) => m.key === modeKey).dataKey].texts;
-    let idx = Math.floor(Math.random() * items.length);
-    const last = loadJSON(LS_LAST, {});
-    if (last[modeKey] != null && items.length > 1) {
-      let guard = 0;
-      while (items[idx].id === last[modeKey] && guard++ < 20) {
-        idx = Math.floor(Math.random() * items.length);
-      }
+  // Fisher-Yates 洗牌（in-place）：由尾往頭、含端點取 j ∈ [0..i]，均匀分布。
+  // 不用 arr.sort(() => Math.random() - 0.5)——偏置嚴重。
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    last[modeKey] = items[idx].id;
-    saveJSON(LS_LAST, last);
-    return items[idx];
+    return arr;
+  }
+
+  function buildQueue(modeKey) {
+    const mode = MODES.find((m) => m.key === modeKey);
+    const items = DATA[mode.dataKey].texts;
+    const order = shuffleArray(items.map((it) => it.id));
+    QUEUE[modeKey] = { order, cursor: 0 };
+    return order;
+  }
+
+  // 從 queue 取下一題：queue 空或吃完才重洗；跨 queue 邊界（或剛進練習的首題）
+  // 若與 LS_LAST 同 id，skip 一個再取，避免連續重複。
+  // 英文保護跳題（triggerEnglishProtection）亦走 startRound → 此函數，
+  // 被跳過的那題會佔據一個 cursor，佔位不補（見計畫 Tradeoffs）。
+  function nextFromQueue(modeKey) {
+    const mode = MODES.find((m) => m.key === modeKey);
+    const items = DATA[mode.dataKey].texts;
+    const byId = new Map(items.map((it) => [it.id, it]));
+    let q = QUEUE[modeKey];
+    if (!q || q.cursor >= q.order.length) buildQueue(modeKey);
+    q = QUEUE[modeKey];
+    let item = byId.get(q.order[q.cursor++]);
+    const last = loadJSON(LS_LAST, {});
+    if (item && items.length > 1 && last[modeKey] === item.id && q.cursor < q.order.length) {
+      item = byId.get(q.order[q.cursor++]);
+    }
+    if (item) {
+      last[modeKey] = item.id;
+      saveJSON(LS_LAST, last);
+    }
+    return item;
   }
 
   function startRound(modeKey) {
@@ -625,12 +777,16 @@
       clearTimeout(state.autoNextTimer);
       state.autoNextTimer = null;
     }
+    if (state && state.animTimer) {
+      clearTimeout(state.animTimer);
+      state.animTimer = null;
+    }
     if (resultTimeoutId) {
       clearTimeout(resultTimeoutId);
       resultTimeoutId = null;
     }
     const mode = MODES.find((m) => m.key === modeKey);
-    const item = pick(modeKey);
+    const item = nextFromQueue(modeKey);
     const sameMode = state && state.modeKey === modeKey;
     const prevCount = sameMode ? (state.sessionCompleted || 0) : 0;
     const prevRoundTyped = sameMode && prevCount > 0 ? (state.roundTotalTyped || 0) : 0;
@@ -665,11 +821,26 @@
       roundElapsed: prevRoundElapsed,
       roundStartedAt: prevRoundStartedAt,
       autoNextTimer: null,
+      animTimer: null,
+      chatSegs: null,
+      chatVisible: 0,
+      turnCycles: 0,      // how many full opponent↔user cycles completed
+      animationPhase: 'idle',   // idle | opponent_entering | user_typing | user_sent | pause_brief
     };
+    if (modeKey === "life_situations") {
+      const chat = buildChatState(item);
+      state.chatSegs = chat.segs;
+      state.lines = chat.userTurns;
+      state.chatVisible = 0;
+    }
     state.inputs = state.lines.map(() => "");
     showPractice();
-    renderPractice();
-    focusCurrent();
+    if (modeKey === "life_situations") {
+      lifeKick();
+    } else {
+      renderPractice();
+      focusCurrent();
+    }
   }
 
   function showPractice() {
@@ -689,6 +860,10 @@
     if (state && state.autoNextTimer) {
       clearTimeout(state.autoNextTimer);
       state.autoNextTimer = null;
+    }
+    if (state && state.animTimer) {
+      clearTimeout(state.animTimer);
+      state.animTimer = null;
     }
     // Keep overall theme in sync with the last selected mode instead of clearing it.
     // renderHome() below also re-asserts the mode from carouselIndex.
@@ -741,6 +916,42 @@
     }, 450);
   }
 
+  // ---- 生活情境題：只做 LINE ----
+  // Text is "阿哲：……我：……" bubbles. "我" is always the user's turns
+  // (typed in the input below); everyone else is the opponent (display only).
+  // Char spans keep their data-line/data-pos so paint() works unchanged.
+  const ME = "我";
+
+  function buildChatState(item) {
+    const segs = parseChatMessages(item.text).map((s) => ({
+      speaker: s.speaker,
+      isMe: s.speaker === ME,
+      text: Array.from(item.text).slice(s.contentStart, s.end).join(""),
+    }));
+    const userTurns = segs.filter((s) => s.isMe).map((s) => s.text);
+    return { segs, userTurns };
+  }
+
+  // Split "店員：…？我：…" into {speaker, start, contentStart, end} segments.
+  // Speaker = 1-4 CJK chars + fullwidth colon, right after start or 。？！
+  // Anything without that pattern becomes one anonymous bubble.
+  function parseChatMessages(text) {
+    const re = /(^|[。？！])([一-龥]{1,4})：/g;
+    const hits = [];
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const start = m.index + m[1].length;
+      hits.push({ speaker: m[2], start, contentStart: start + m[2].length + 1 });
+    }
+    const segs = [];
+    if (!hits.length) return [{ speaker: null, start: 0, contentStart: 0, end: text.length }];
+    if (hits[0].start > 0) segs.push({ speaker: null, start: 0, contentStart: 0, end: hits[0].start });
+    hits.forEach((h, i) => {
+      segs.push({ ...h, end: i + 1 < hits.length ? hits[i + 1].start : text.length });
+    });
+    return segs;
+  }
+
   function renderPractice() {
     clearKeyError();
     const box = $("#targetBox");
@@ -748,36 +959,129 @@
     box.innerHTML = "";
     inBox.innerHTML = "";
 
-    // 1. Render target lines (all lines visible for reading context)
-    state.lines.forEach((line, li) => {
-      const div = document.createElement("div");
-      div.className = "target-line" + (li === state.lineIdx ? " current-line" : "");
-      div.dataset.line = li;
-      Array.from(line).forEach((ch, ci) => {
+    // 1. 生活情境題 = LINE 回合聊天：對手氣泡（唯讀）→ 我打字（草稿泡）→ Enter 送出。
+    //    每回合只顯示已經出現的氣泡，空白開始、逐輪浮現。
+    const isChat = state.modeKey === "life_situations";
+    if (isChat) {
+      box.className = "target-box chat-target";
+      box.dataset.platform = "line";
+      const now = new Date();
+      const hhmm = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+      const segs = state.chatSegs || [];
+      const opp = segs.find((s) => !s.isMe);
+      const who = opp ? opp.speaker : "對方";
+      const header = document.createElement("div");
+      header.className = "chat-header";
+      header.innerHTML = `<span class="chat-back">‹</span><span class="chat-avatar">${who.slice(0, 1)}</span><span class="chat-name">${who}</span><span class="chat-icons">☎ ▸</span>`;
+      box.appendChild(header);
+      const body = document.createElement("div");
+      body.className = "chat-body";
+      box.appendChild(body);
+      const phase = state.animationPhase;
+      const visible = state.chatVisible || 0;
+      let ui = 0;
+      const lineOf = segs.map((s) => (s.isMe ? ui++ : -1));
+      const makeChar = (uiIdx, ci, ch) => {
         const s = document.createElement("span");
         s.className = "char pending";
-        s.dataset.line = li; s.dataset.pos = ci;
+        s.dataset.line = uiIdx; s.dataset.pos = ci;
         s.textContent = ch === " " ? "\u00a0" : ch;
-        div.appendChild(s);
+        return s;
+      };
+      const renderUserBubble = (seg, uiIdx, cls) => {
+        const msg = document.createElement("div");
+        msg.className = "chat-msg chat-right" + (cls ? " " + cls : "");
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble";
+        Array.from(seg.text).forEach((ch, ci) => bubble.appendChild(makeChar(uiIdx, ci, ch)));
+        msg.appendChild(bubble);
+        if (cls !== "chat-draft") {
+          const meta = document.createElement("div");
+          meta.className = "chat-meta";
+          meta.textContent = "已讀 " + hhmm;
+          msg.appendChild(meta);
+        }
+        body.appendChild(msg);
+      };
+      for (let si = 0; si < visible && si < segs.length; si++) {
+        const seg = segs[si];
+        const entering = si === visible - 1 && (phase === ANIMATION_PHASE.OPPONENT_ENTERING || phase === ANIMATION_PHASE.USER_SENT);
+        if (seg.isMe) {
+          renderUserBubble(seg, lineOf[si], entering ? "msg-enter" : "");
+        } else {
+          const msg = document.createElement("div");
+          msg.className = "chat-msg chat-left" + (entering ? " msg-enter" : "");
+          const name = document.createElement("div");
+          name.className = "chat-speaker";
+          name.textContent = seg.speaker;
+          msg.appendChild(name);
+          const bubble = document.createElement("div");
+          bubble.className = "chat-bubble chat-static";
+          bubble.textContent = seg.text;
+          msg.appendChild(bubble);
+          const meta = document.createElement("div");
+          meta.className = "chat-meta";
+          meta.textContent = hhmm;
+          msg.appendChild(meta);
+          body.appendChild(msg);
+        }
+      }
+      // Draft bubble: the message I'm typing right now.
+      if (phase === ANIMATION_PHASE.USER_TYPING && state.lineIdx < state.lines.length) {
+        renderUserBubble({ text: state.lines[state.lineIdx] }, state.lineIdx, "chat-draft");
+      }
+      // Opponent typing indicator during the pause.
+      if (phase === ANIMATION_PHASE.PAUSE_BRIEF) {
+        const msg = document.createElement("div");
+        msg.className = "chat-msg chat-left";
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble chat-typing";
+        bubble.innerHTML = "<span></span><span></span><span></span>";
+        msg.appendChild(bubble);
+        body.appendChild(msg);
+      }
+      body.scrollTop = body.scrollHeight;
+    } else {
+      box.className = "target-box";
+      box.removeAttribute("data-platform");
+      box.scrollTop = 0;
+      state.lines.forEach((line, li) => {
+        const div = document.createElement("div");
+        div.className = "target-line" + (li === state.lineIdx ? " current-line" : "");
+        div.dataset.line = li;
+        Array.from(line).forEach((ch, ci) => {
+          const s = document.createElement("span");
+          s.className = "char pending";
+          s.dataset.line = li; s.dataset.pos = ci;
+          s.textContent = ch === " " ? "\u00a0" : ch;
+          div.appendChild(s);
+        });
+        box.appendChild(div);
       });
-      box.appendChild(div);
-    });
+    }
 
     // 2. Render ONLY ONE active input bar at a time (even for multi-line articles)
     const li = state.lineIdx;
     const active = !state.finished;
     const inp = document.createElement("input");
     inp.type = "text";
-    inp.value = state.inputs[li] || "";
-    if (state.lines.length > 1) {
+    inp.value = (isChat && state.animationPhase !== ANIMATION_PHASE.USER_TYPING)
+      ? "" // in LINE turns the sent text lives in the bubble above, not the input
+      : (state.inputs[li] || "");
+    const lifeActive = !isChat || state.animationPhase === ANIMATION_PHASE.USER_TYPING;
+    if (state.lines.length > 1 && !isChat) {
       const isLastLine = li >= state.lines.length - 1;
       inp.placeholder = active
         ? `第 ${li + 1} / ${state.lines.length} 行：在此輸入…（${isLastLine ? "打對即完成" : "打對自動換行"}）`
         : "（已完成）";
+    } else if (isChat) {
+      inp.placeholder = active
+        ? (lifeActive ? "輸入訊息…（打滿按 Enter 送出）" : "等對方回覆…")
+        : "（已完成）";
     } else {
       inp.placeholder = active ? "在此輸入…" : "（已完成）";
     }
-    inp.disabled = !active;
+    inp.disabled = !active || !lifeActive;
     inp.autocomplete = "off"; inp.autocorrect = "off"; inp.autocapitalize = "off"; inp.spellcheck = false;
     inp.setAttribute("aria-label", `第 ${li + 1} 行輸入`);
     inp.dataset.line = li;
@@ -966,8 +1270,24 @@
       if (isEnter) {
         e.preventDefault();
         if (state.composing) return; // Enter during IME selection must not advance
+
+        const isLife = state.modeKey === "life_situations";
         const targetLen = Array.from(state.lines[li]).length;
         const cur = Array.from(state.inputs[li] || "").length;
+        if (isLife) {
+          if (state.animationPhase !== ANIMATION_PHASE.USER_TYPING) {
+            if (state.animationPhase === ANIMATION_PHASE.PAUSE_BRIEF) hint("對方正在輸入…");
+            else if (state.animationPhase === ANIMATION_PHASE.USER_SENT) hint("訊息送出中…");
+            else hint("等對方氣泡出現…");
+            return;
+          }
+          if (cur < targetLen) {
+            hint("這句還沒打完（" + cur + "/" + targetLen + "）。打滿按 Enter 送出。");
+            return;
+          }
+          lifeUserSent();
+          return;
+        }
         if (cur < targetLen) {
           hint("本行還沒打完（" + cur + "/" + targetLen + "）。打滿按 Enter。");
           return;
@@ -984,7 +1304,6 @@
 
     updateHud();
     setHintDefault();
-    syncAutoAdvanceCheck();
     syncEndlessCheck();
     renderOnKeyboard();
     paintCangjieHint();
@@ -1019,28 +1338,35 @@
         if (item.shift) key.dataset.shift = item.shift;
         if (item.mainZh) key.dataset.zh = item.mainZh;
 
-        if (isCangjie) {
-          // 倉頡版面：鍵面主字 = 字根（A=日 … Y=卜，X=難，Z=重），副字 = 英文字母；
+        if (isCangjie || isSucheng) {
+          // 倉頡／速成版面：鍵面主字 = 字根（A=日 … Y=卜，X=難，Z=重），
+          // 副字 = 英文字母。速成取倉頡首尾碼，鍵位與倉頡相同，故鍵面亦同樣
+          // 顯示部首（非只有英文字母）。
           // 非字母鍵（數字/標點）無字根，退回英數面；空白鍵副字為「選字」。
+          // 非字母鍵主字用未按 Shift 的記號（, . / 等），副字才是 Shift 後的記號
+          // （< > ? 等），避免打「，」時只看到 < 誤以為要按 Shift。
           if (item.isFn) {
             key.innerHTML = `<span class="k-main">${item.label || ""}</span>`;
           } else if (item.isSpace) {
             key.innerHTML = `<span class="k-main">${item.label}</span><span class="k-sub">選字</span>`;
           } else if (item.key && CANGJIE_RADICAL[item.key.toLowerCase()]) {
             key.innerHTML = `<span class="k-main">${CANGJIE_RADICAL[item.key.toLowerCase()]}</span><span class="k-sub">${item.key.toUpperCase()}</span>`;
+          } else if (item.key && /^[a-z]$/i.test(item.key)) {
+            key.innerHTML = `<span class="k-main">${item.shift || item.key.toUpperCase()}</span><span class="k-sub">${item.key || ""}</span>`;
           } else {
-            key.innerHTML = `<span class="k-main">${item.shift || (item.key || "").toUpperCase()}</span><span class="k-sub">${item.key || ""}</span>`;
+            key.innerHTML = `<span class="k-main">${item.key || ""}</span><span class="k-sub">${item.shift || ""}</span>`;
           }
-        } else if (isBoshiamy || isSucheng) {
-          // 嘸蝦米／速成版面：鍵面只顯示大寫英文字母（使用者要求：不要部首）。
-          // 嘸蝦米本來就只有 26 個英文字母鍵位；速成的鍵位與倉頡同（取首尾碼），
-          // 鍵面一樣只印字母，避免與右上角拆字混淆。空白鍵副字為「選字」。
+        } else if (isBoshiamy) {
+          // 嘸蝦米版面：鍵面只顯示大寫英文字母（使用者要求：不要部首）。
+          // 非字母鍵主字用未按 Shift 的記號，副字才是 Shift 後的記號（同倉頡）。
           if (item.isFn) {
             key.innerHTML = `<span class="k-main">${item.label || ""}</span>`;
           } else if (item.isSpace) {
             key.innerHTML = `<span class="k-main">${item.label}</span><span class="k-sub">選字</span>`;
-          } else {
+          } else if (item.key && /^[a-z]$/i.test(item.key)) {
             key.innerHTML = `<span class="k-main">${item.shift || (item.key || "").toUpperCase()}</span><span class="k-sub">${item.key || ""}</span>`;
+          } else {
+            key.innerHTML = `<span class="k-main">${item.key || ""}</span><span class="k-sub">${item.shift || ""}</span>`;
           }
         } else if (isBopomofo) {
           if (item.isFn) {
@@ -1051,13 +1377,15 @@
             key.innerHTML = `<span class="k-main">${item.mainZh || ""}</span><span class="k-sub">${item.sub || ""}</span>`;
           }
         } else {
-          // Fallback（舊值 qwerty 相容）：等同英數面
+          // Fallback（舊值 qwerty 相容）：等同英數面；非字母鍵主字用未按 Shift 記號
           if (item.isFn) {
             key.innerHTML = `<span class="k-main">${item.label || ""}</span>`;
           } else if (item.isSpace) {
             key.innerHTML = `<span class="k-main">Space</span>`;
-          } else {
+          } else if (item.key && /^[a-z]$/i.test(item.key)) {
             key.innerHTML = `<span class="k-main">${item.shift || item.key.toUpperCase()}</span><span class="k-sub">${item.key || ""}</span>`;
+          } else {
+            key.innerHTML = `<span class="k-main">${item.key || ""}</span><span class="k-sub">${item.shift || ""}</span>`;
           }
         }
 
@@ -1095,6 +1423,10 @@
     if (!onKeyboardWrap || !onKeyboard) return;
     const show = isOnKeyboardEnabled() && state && !state.finished;
     onKeyboardWrap.classList.toggle("hidden", !show);
+    // 版面下拉只跟鍵位提示一起出現：關閉時隱藏，開啟時顯示。
+    if (layoutLabel) layoutLabel.style.display = show ? "" : "none";
+    // 題目厚度：關閉鍵位提示時維持原本高度（不撐滿整屏），開啟時才撐滿。
+    if (practiceView) practiceView.classList.toggle("onkb-on", show);
     if (!show) return;
     const layout = (loadJSON(LS_ONKB, {}) || {}).layout || (layoutSelect ? layoutSelect.value : "bopomofo");
     if (onKeyboard.dataset.layout !== layout) buildOnKeyboard(layout);
@@ -1895,6 +2227,11 @@
           const shiftEl = onKeyboard.querySelector(`.on-kb-key[data-code="ShiftLeft"]`);
           if (shiftEl) shiftEl.classList.add("is-next");
         }
+        // 注音版全形標點「，」「。」除了亮標點鍵（ㄝ／ㄡ），還要一併亮 Ctrl 鍵
+        if (curChar === "，" || curChar === "。") {
+          const ctrlEl = onKeyboard.querySelector('.on-kb-key[data-code="ControlLeft"]');
+          if (ctrlEl) ctrlEl.classList.add("is-next");
+        }
       } else {
         // ASCII / other
         const lower = curChar.toLowerCase();
@@ -1913,6 +2250,17 @@
         keyEl = findOnKbKey(PUNCT_KEY_MAP[curChar].key);
       }
       setExpectedKey(keyEl, lower === " ", lower);
+      if (PUNCT_KEY_MAP[curChar] && PUNCT_KEY_MAP[curChar].shift) {
+        const shiftEl = onKeyboard.querySelector(`.on-kb-key[data-code="ShiftLeft"]`);
+        if (shiftEl) shiftEl.classList.add("is-next");
+      }
+    }
+
+    // 大寫英文字母需要 Shift（中英雜燴的工程／品牌／縮寫題大量使用）：
+    // 上面分支只亮字母鍵，這裡補亮 ShiftLeft，讓大小寫訓練點看得見。
+    if (/[A-Z]/.test(curChar)) {
+      const shiftEl = onKeyboard.querySelector('.on-kb-key[data-code="ShiftLeft"]');
+      if (shiftEl) shiftEl.classList.add("is-next");
     }
 
   }
@@ -1944,6 +2292,7 @@
   }
 
   function paint() {
+    const box = document.getElementById("targetBox");
     const tgtChars = [];
     state.lines.forEach((line, li) => {
       Array.from(line).forEach((ch, pos) => tgtChars.push({ ch, line: li, pos }));
@@ -1968,8 +2317,16 @@
     const el = state.currentInputEl;
     if (el) {
       const typed = Array.from(displayFor(state.lineIdx));
-      const tgt = Array.from(state.lines[state.lineIdx]);
+      const tgt = Array.from(state.lines[state.lineIdx] || "");
       el.classList.toggle("done", typed.length >= tgt.length);
+    }
+    // Keep the current char visible inside the (possibly scrolling)
+    // target box, so long items never hide the caret off-screen.
+    const curEl = document.querySelector(".char.current");
+    if (box && curEl && box.scrollHeight > box.clientHeight) {
+      const br = box.getBoundingClientRect(), cr = curEl.getBoundingClientRect();
+      if (cr.top < br.top + 18) box.scrollTop -= (br.top + 18 - cr.top);
+      else if (cr.bottom > br.bottom - 18) box.scrollTop += (cr.bottom - (br.bottom - 18));
     }
     updateHud();
     // Keep the on-screen key hint in sync while typing (fix: it used to
@@ -2021,6 +2378,10 @@
 
   function maybeFinish() {
     if (state.finished) return;
+    // In LINE turns, finish only when the animation itself reaches the end
+    // (trailing opponent bubble shown last). Typing the final character of
+    // the final turn must not cut the animation short.
+    if (state.modeKey === "life_situations" && state.animationPhase !== ANIMATION_PHASE.COMPLETED) return;
     const allFull = state.lines.every((line, i) => Array.from(state.inputs[i] || "").length >= Array.from(line).length);
     if (!allFull) return;
 
@@ -2029,13 +2390,17 @@
     stopTimer();
     paintCangjieHint(); // finished -> 右上角顯示「完成！」而非停在上一字
 
-    if (state.currentInputEl) state.currentInputEl.disabled = true;
+    if (state.currentInputEl) {
+      state.currentInputEl.disabled = true;
+      state.currentInputEl.value = "";
+    }
 
     state.sessionCompleted = (state.sessionCompleted || 0) + 1;
 
     const modeKey = state.modeKey;
-    const target = ROUND_TARGET[modeKey];
-    const finiteShort = isShortMode(modeKey) && !isEndlessEnabled(modeKey);
+    const target = ROUND_TARGET[modeKey] || 1;
+    const endless = isEndlessEnabled(modeKey);
+    const finiteShort = isShortMode(modeKey) && !endless;
 
     if (finiteShort) {
       state.roundTotalTyped = (state.roundTotalTyped || 0) + state.totalTyped;
@@ -2077,17 +2442,16 @@
     state.roundStartedAt = null;
     const stats = recordStats();
 
-    // Endless means "never settle, keep going" in every mode, so it forces
-    // auto-advance even if 「自動跳下一題」 is unchecked (articles default
-    // to popup, which would otherwise contradict endless).
-    const autoNext = isAutoNextEnabled(modeKey) || isEndlessEnabled(modeKey);
-    if (autoNext) {
+    if (endless) {
+      // 無盡模式：永不結算，只給回饋並自動跳下一題（所有模式皆同）。
       showAutoNextFeedback(stats);
       state.autoNextTimer = setTimeout(() => {
         state.autoNextTimer = null;
         startRound(state.modeKey);
       }, 300);
     } else {
+      // 有限輪（無盡關閉）：其他模式打完一個就結算彈窗；
+      // 單字／句子已在上面的 finiteShort 分支累積到 10／5 題才到達這裡的對應結算。
       resultTimeoutId = setTimeout(() => { resultTimeoutId = null; showResultModal(stats); }, 250);
     }
   }
@@ -2143,7 +2507,8 @@
     $("#hudTime").textContent = fmtTime(stats.sec);
     $("#hudWpm").textContent = stats.cpm;
     $("#hudAcc").textContent = stats.acc + "%";
-    $("#hudProg").textContent = "100%";
+    const hudProgEl = $("#hudProg");
+    if (hudProgEl) hudProgEl.textContent = "100%";
     $("#progressBar").style.width = "100%";
   }
 
@@ -2204,7 +2569,8 @@
     $("#hudAcc").textContent = acc + "%";
     const totalChars = state.lines.join("").replace(/\n/g, "").length;
     const typedProg = totalChars > 0 ? Math.min(100, Math.round((state.totalTyped / totalChars) * 100)) : 0;
-    $("#hudProg").textContent = typedProg + "%";
+    const hudProgEl = $("#hudProg");
+    if (hudProgEl) hudProgEl.textContent = typedProg + "%";
     $("#progressBar").style.width = typedProg + "%";
   }
 
@@ -2297,7 +2663,7 @@
         } else {
           histListEl.innerHTML = hist.slice(0, 30).map((h) => {
             const m = MODES.find((x) => x.key === h.mode);
-            const mTitle = m ? m.title : h.mode;
+            const mTitle = m ? m.title : (LEGACY_MODE_TITLES[h.mode] || h.mode);
             let timeStr = "";
             if (h.time) {
               const d = new Date(h.time);
@@ -2346,13 +2712,6 @@
     $("#againBtn").addEventListener("click", () => startRound(state.modeKey));
     $("#homeBtn").addEventListener("click", showHome);
     $("#targetBox").addEventListener("click", focusCurrent);
-    if (autoAdvanceCheck) {
-      autoAdvanceCheck.addEventListener("change", (e) => {
-        if (state) {
-          setAutoNextEnabled(state.modeKey, e.target.checked);
-        }
-      });
-    }
     if (endlessCheck) {
       endlessCheck.addEventListener("change", (e) => {
         if (!state) return;
@@ -2407,6 +2766,6 @@
 
   init().catch((e) => {
     document.body.insertAdjacentHTML("afterbegin",
-      `<div style="padding:12px 18px;background:#fee2e2;color:#7f1d1d">data.json 讀取失敗：${e.message}。請用 serve.py 開（直接開 index.html 的 fetch 可能被擋）。</div>`);
+      `<div style="padding:12px 18px;background:#fee2e2;color:#7f1d1d">data/data.json 讀取失敗：${e.message}。請用 serve.py 開（直接開 index.html 的 fetch 可能被擋）。</div>`);
   });
 })();

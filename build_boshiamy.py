@@ -26,6 +26,7 @@ import sys
 import urllib.request
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(ROOT, "data")
 SRC_URL = "https://raw.githubusercontent.com/fcitx/fcitx5-table-extra/master/tables/boshiamy.txt"
 
 
@@ -59,14 +60,14 @@ def main():
         cleanup = None
     try:
         table = load_table(src)
-        dest = os.path.join(ROOT, "boshiamy.json")
+        dest = os.path.join(DATA_DIR, "boshiamy.json")
         with open(dest, "w", encoding="utf-8") as f:
             json.dump(table, f, ensure_ascii=False, separators=(",", ":"))
             f.write("\n")
         print(f"碼表總字數: {len(table)}")
         print(f"boshiamy.json 寫入: {len(table)} 字, {os.path.getsize(dest)} bytes -> {dest}")
         # 題庫覆蓋率自檢
-        data = json.load(open(os.path.join(ROOT, "data.json"), encoding="utf-8"))
+        data = json.load(open(os.path.join(DATA_DIR, "data.json"), encoding="utf-8"))
         used = set()
         for pool in data.values():
             for item in pool.get("texts", []):

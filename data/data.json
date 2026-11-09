@@ -1,0 +1,4819 @@
+{
+  "words": {
+    "label": "單字",
+    "texts": [
+      {
+        "id": "cw_001",
+        "text": "早膳",
+        "category": "daily"
+      },
+      {
+        "id": "cw_002",
+        "text": "午膳",
+        "category": "daily"
+      },
+      {
+        "id": "cw_003",
+        "text": "醒來",
+        "category": "daily"
+      },
+      {
+        "id": "cw_004",
+        "text": "漱口",
+        "category": "daily"
+      },
+      {
+        "id": "cw_005",
+        "text": "沐浴",
+        "category": "daily"
+      },
+      {
+        "id": "cw_006",
+        "text": "離家",
+        "category": "daily"
+      },
+      {
+        "id": "cw_007",
+        "text": "返家",
+        "category": "daily"
+      },
+      {
+        "id": "cw_008",
+        "text": "歇息",
+        "category": "daily"
+      },
+      {
+        "id": "cw_009",
+        "text": "休假",
+        "category": "daily"
+      },
+      {
+        "id": "cw_010",
+        "text": "假期",
+        "category": "daily"
+      },
+      {
+        "id": "cw_011",
+        "text": "平常日",
+        "category": "daily"
+      },
+      {
+        "id": "cw_012",
+        "text": "周末",
+        "category": "daily"
+      },
+      {
+        "id": "cw_013",
+        "text": "平時",
+        "category": "daily"
+      },
+      {
+        "id": "cw_014",
+        "text": "習性",
+        "category": "daily"
+      },
+      {
+        "id": "cw_015",
+        "text": "時光",
+        "category": "daily"
+      },
+      {
+        "id": "cw_016",
+        "text": "繁忙",
+        "category": "daily"
+      },
+      {
+        "id": "cw_017",
+        "text": "空閒",
+        "category": "daily"
+      },
+      {
+        "id": "cw_018",
+        "text": "预约",
+        "category": "daily"
+      },
+      {
+        "id": "cw_019",
+        "text": "部署",
+        "category": "daily"
+      },
+      {
+        "id": "cw_020",
+        "text": "旅程",
+        "category": "daily"
+      },
+      {
+        "id": "cw_021",
+        "text": "計算機",
+        "category": "technology"
+      },
+      {
+        "id": "cw_022",
+        "text": "行動電話",
+        "category": "technology"
+      },
+      {
+        "id": "cw_023",
+        "text": "網際網路",
+        "category": "technology"
+      },
+      {
+        "id": "cw_024",
+        "text": "程式軟體",
+        "category": "technology"
+      },
+      {
+        "id": "cw_025",
+        "text": "應用程式",
+        "category": "technology"
+      },
+      {
+        "id": "cw_026",
+        "text": "鍵盤組",
+        "category": "technology"
+      },
+      {
+        "id": "cw_027",
+        "text": "滑鼠器",
+        "category": "technology"
+      },
+      {
+        "id": "cw_028",
+        "text": "顯示器",
+        "category": "technology"
+      },
+      {
+        "id": "cw_029",
+        "text": "列印機",
+        "category": "technology"
+      },
+      {
+        "id": "cw_030",
+        "text": "攝像機",
+        "category": "technology"
+      },
+      {
+        "id": "cw_031",
+        "text": "耳麥",
+        "category": "technology"
+      },
+      {
+        "id": "cw_032",
+        "text": "充電線",
+        "category": "technology"
+      },
+      {
+        "id": "cw_033",
+        "text": "蓄電池",
+        "category": "technology"
+      },
+      {
+        "id": "cw_034",
+        "text": "電纜",
+        "category": "technology"
+      },
+      {
+        "id": "cw_035",
+        "text": "無線路由器",
+        "category": "technology"
+      },
+      {
+        "id": "cw_036",
+        "text": "平板電腦",
+        "category": "technology"
+      },
+      {
+        "id": "cw_037",
+        "text": "智能手錶",
+        "category": "technology"
+      },
+      {
+        "id": "cw_038",
+        "text": "擴充插槽",
+        "category": "technology"
+      },
+      {
+        "id": "cw_039",
+        "text": "磁碟機",
+        "category": "technology"
+      },
+      {
+        "id": "cw_040",
+        "text": "光碟片",
+        "category": "technology"
+      },
+      {
+        "id": "cw_041",
+        "text": "學堂",
+        "category": "education"
+      },
+      {
+        "id": "cw_042",
+        "text": "教師",
+        "category": "education"
+      },
+      {
+        "id": "cw_043",
+        "text": "學員",
+        "category": "education"
+      },
+      {
+        "id": "cw_044",
+        "text": "課室",
+        "category": "education"
+      },
+      {
+        "id": "cw_045",
+        "text": "書袋",
+        "category": "education"
+      },
+      {
+        "id": "cw_046",
+        "text": "芯筆",
+        "category": "education"
+      },
+      {
+        "id": "cw_047",
+        "text": "橡皮",
+        "category": "education"
+      },
+      {
+        "id": "cw_048",
+        "text": "直尺",
+        "category": "education"
+      },
+      {
+        "id": "cw_049",
+        "text": "教科書",
+        "category": "education"
+      },
+      {
+        "id": "cw_050",
+        "text": "記事簿",
+        "category": "education"
+      },
+      {
+        "id": "cw_051",
+        "text": "家門",
+        "category": "family"
+      },
+      {
+        "id": "cw_052",
+        "text": "父親",
+        "category": "family"
+      },
+      {
+        "id": "cw_053",
+        "text": "母親",
+        "category": "family"
+      },
+      {
+        "id": "cw_054",
+        "text": "手足",
+        "category": "family"
+      },
+      {
+        "id": "cw_055",
+        "text": "姊妹淘",
+        "category": "family"
+      },
+      {
+        "id": "cw_056",
+        "text": "祖父",
+        "category": "family"
+      },
+      {
+        "id": "cw_057",
+        "text": "祖母",
+        "category": "family"
+      },
+      {
+        "id": "cw_058",
+        "text": "伯父",
+        "category": "family"
+      },
+      {
+        "id": "cw_059",
+        "text": "阿姨",
+        "category": "family"
+      },
+      {
+        "id": "cw_060",
+        "text": "堂哥",
+        "category": "family"
+      },
+      {
+        "id": "cw_061",
+        "text": "職事",
+        "category": "work"
+      },
+      {
+        "id": "cw_062",
+        "text": "企業",
+        "category": "work"
+      },
+      {
+        "id": "cw_063",
+        "text": "集會",
+        "category": "work"
+      },
+      {
+        "id": "cw_064",
+        "text": "彙報",
+        "category": "work"
+      },
+      {
+        "id": "cw_065",
+        "text": "計畫案",
+        "category": "work"
+      },
+      {
+        "id": "cw_066",
+        "text": "共事者",
+        "category": "work"
+      },
+      {
+        "id": "cw_067",
+        "text": "上司",
+        "category": "work"
+      },
+      {
+        "id": "cw_068",
+        "text": "報酬",
+        "category": "work"
+      },
+      {
+        "id": "cw_069",
+        "text": "超時",
+        "category": "work"
+      },
+      {
+        "id": "cw_070",
+        "text": "放假",
+        "category": "work"
+      },
+      {
+        "id": "cw_071",
+        "text": "春季",
+        "category": "nature"
+      },
+      {
+        "id": "cw_072",
+        "text": "夏季",
+        "category": "nature"
+      },
+      {
+        "id": "cw_073",
+        "text": "秋季",
+        "category": "nature"
+      },
+      {
+        "id": "cw_074",
+        "text": "冬季",
+        "category": "nature"
+      },
+      {
+        "id": "cw_075",
+        "text": "晴空",
+        "category": "nature"
+      },
+      {
+        "id": "cw_076",
+        "text": "陰雨",
+        "category": "nature"
+      },
+      {
+        "id": "cw_077",
+        "text": "雨季",
+        "category": "nature"
+      },
+      {
+        "id": "cw_078",
+        "text": "颱風天",
+        "category": "nature"
+      },
+      {
+        "id": "cw_079",
+        "text": "地動",
+        "category": "nature"
+      },
+      {
+        "id": "cw_080",
+        "text": "氣候",
+        "category": "nature"
+      },
+      {
+        "id": "cw_081",
+        "text": "微風",
+        "category": "nature"
+      },
+      {
+        "id": "cw_082",
+        "text": "落雪",
+        "category": "nature"
+      },
+      {
+        "id": "cw_083",
+        "text": "濃霧",
+        "category": "nature"
+      },
+      {
+        "id": "cw_084",
+        "text": "白雲",
+        "category": "nature"
+      },
+      {
+        "id": "cw_085",
+        "text": "霓虹",
+        "category": "nature"
+      },
+      {
+        "id": "cw_086",
+        "text": "繁星",
+        "category": "nature"
+      },
+      {
+        "id": "cw_087",
+        "text": "明月",
+        "category": "nature"
+      },
+      {
+        "id": "cw_088",
+        "text": "旭日",
+        "category": "nature"
+      },
+      {
+        "id": "cw_089",
+        "text": "峻嶺",
+        "category": "nature"
+      },
+      {
+        "id": "cw_090",
+        "text": "溪流",
+        "category": "nature"
+      },
+      {
+        "id": "cw_091",
+        "text": "汪洋",
+        "category": "nature"
+      },
+      {
+        "id": "cw_092",
+        "text": "湖泊",
+        "category": "nature"
+      },
+      {
+        "id": "cw_093",
+        "text": "小溪",
+        "category": "nature"
+      },
+      {
+        "id": "cw_094",
+        "text": "密林",
+        "category": "nature"
+      },
+      {
+        "id": "cw_095",
+        "text": "青草",
+        "category": "nature"
+      },
+      {
+        "id": "cw_096",
+        "text": "紅蘋果",
+        "category": "food"
+      },
+      {
+        "id": "cw_097",
+        "text": "香蕉果",
+        "category": "food"
+      },
+      {
+        "id": "cw_098",
+        "text": "大西瓜",
+        "category": "food"
+      },
+      {
+        "id": "cw_099",
+        "text": "提子",
+        "category": "food"
+      },
+      {
+        "id": "cw_100",
+        "text": "紅草莓",
+        "category": "food"
+      },
+      {
+        "id": "cw_101",
+        "text": "愛文芒果",
+        "category": "food"
+      },
+      {
+        "id": "cw_102",
+        "text": "黃梨",
+        "category": "food"
+      },
+      {
+        "id": "cw_103",
+        "text": "柑橘",
+        "category": "food"
+      },
+      {
+        "id": "cw_104",
+        "text": "車厘子",
+        "category": "food"
+      },
+      {
+        "id": "cw_105",
+        "text": "檸檬汁",
+        "category": "food"
+      },
+      {
+        "id": "cw_106",
+        "text": "白飯",
+        "category": "food"
+      },
+      {
+        "id": "cw_107",
+        "text": "麵",
+        "category": "food"
+      },
+      {
+        "id": "cw_108",
+        "text": "馒头",
+        "category": "food"
+      },
+      {
+        "id": "cw_109",
+        "text": "包子饅頭",
+        "category": "food"
+      },
+      {
+        "id": "cw_110",
+        "text": "水餃",
+        "category": "food"
+      },
+      {
+        "id": "cw_111",
+        "text": "燒餅油條",
+        "category": "food"
+      },
+      {
+        "id": "cw_112",
+        "text": "油炸鬼",
+        "category": "food"
+      },
+      {
+        "id": "cw_113",
+        "text": "無糖豆漿",
+        "category": "food"
+      },
+      {
+        "id": "cw_114",
+        "text": "粥",
+        "category": "food"
+      },
+      {
+        "id": "cw_115",
+        "text": "蛋煎餅",
+        "category": "food"
+      },
+      {
+        "id": "cw_116",
+        "text": "牛肉片",
+        "category": "food"
+      },
+      {
+        "id": "cw_117",
+        "text": "豬肉丁",
+        "category": "food"
+      },
+      {
+        "id": "cw_118",
+        "text": "雞胸肉",
+        "category": "food"
+      },
+      {
+        "id": "cw_119",
+        "text": "魚片",
+        "category": "food"
+      },
+      {
+        "id": "cw_120",
+        "text": "羊肉爐",
+        "category": "food"
+      },
+      {
+        "id": "cw_121",
+        "text": "大蝦",
+        "category": "food"
+      },
+      {
+        "id": "cw_122",
+        "text": "蟹",
+        "category": "food"
+      },
+      {
+        "id": "cw_123",
+        "text": "龍蝦尾",
+        "category": "food"
+      },
+      {
+        "id": "cw_124",
+        "text": "刺身",
+        "category": "food"
+      },
+      {
+        "id": "cw_125",
+        "text": "握壽司",
+        "category": "food"
+      },
+      {
+        "id": "cw_126",
+        "text": "時蔬",
+        "category": "food"
+      },
+      {
+        "id": "cw_127",
+        "text": "大白菜",
+        "category": "food"
+      },
+      {
+        "id": "cw_128",
+        "text": "捲心菜",
+        "category": "food"
+      },
+      {
+        "id": "cw_129",
+        "text": "菠菜葉",
+        "category": "food"
+      },
+      {
+        "id": "cw_130",
+        "text": "甕菜",
+        "category": "food"
+      },
+      {
+        "id": "cw_131",
+        "text": "椰菜花",
+        "category": "food"
+      },
+      {
+        "id": "cw_132",
+        "text": "白蘿蔔",
+        "category": "food"
+      },
+      {
+        "id": "cw_133",
+        "text": "胡蘿蔔",
+        "category": "food"
+      },
+      {
+        "id": "cw_134",
+        "text": "番茄醬",
+        "category": "food"
+      },
+      {
+        "id": "cw_135",
+        "text": "黃瓜",
+        "category": "food"
+      },
+      {
+        "id": "cw_136",
+        "text": "晚膳",
+        "category": "food"
+      },
+      {
+        "id": "cw_137",
+        "text": "夜宵",
+        "category": "food"
+      },
+      {
+        "id": "cw_138",
+        "text": "點菜",
+        "category": "food"
+      },
+      {
+        "id": "cw_139",
+        "text": "外賣",
+        "category": "food"
+      },
+      {
+        "id": "cw_140",
+        "text": "外帶打包",
+        "category": "food"
+      },
+      {
+        "id": "cw_141",
+        "text": "堂食",
+        "category": "food"
+      },
+      {
+        "id": "cw_142",
+        "text": "價目表",
+        "category": "food"
+      },
+      {
+        "id": "cw_143",
+        "text": "特色菜",
+        "category": "food"
+      },
+      {
+        "id": "cw_144",
+        "text": "小碟",
+        "category": "food"
+      },
+      {
+        "id": "cw_145",
+        "text": "主食",
+        "category": "food"
+      },
+      {
+        "id": "cw_146",
+        "text": "甜品",
+        "category": "food"
+      },
+      {
+        "id": "cw_147",
+        "text": "飲品",
+        "category": "food"
+      },
+      {
+        "id": "cw_148",
+        "text": "佐料",
+        "category": "food"
+      },
+      {
+        "id": "cw_149",
+        "text": "生抽",
+        "category": "food"
+      },
+      {
+        "id": "cw_150",
+        "text": "食鹽",
+        "category": "food"
+      },
+      {
+        "id": "cw_151",
+        "text": "白糖",
+        "category": "food"
+      },
+      {
+        "id": "cw_152",
+        "text": "辣椒醬",
+        "category": "food"
+      },
+      {
+        "id": "cw_153",
+        "text": "黑胡椒",
+        "category": "food"
+      },
+      {
+        "id": "cw_154",
+        "text": "咖啡豆",
+        "category": "food"
+      },
+      {
+        "id": "cw_155",
+        "text": "珍奶",
+        "category": "food"
+      },
+      {
+        "id": "cw_156",
+        "text": "龍井茶",
+        "category": "food"
+      },
+      {
+        "id": "cw_157",
+        "text": "阿薩姆",
+        "category": "food"
+      },
+      {
+        "id": "cw_158",
+        "text": "鮮榨果汁",
+        "category": "food"
+      },
+      {
+        "id": "cw_159",
+        "text": "蘇打水",
+        "category": "food"
+      },
+      {
+        "id": "cw_160",
+        "text": "地下鐵",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_161",
+        "text": "巴士",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_162",
+        "text": "鐵路",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_163",
+        "text": "高速鐵路",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_164",
+        "text": "航空",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_165",
+        "text": "的士",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_166",
+        "text": "自行車",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_167",
+        "text": "摩托車",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_168",
+        "text": "轎車",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_169",
+        "text": "渡輪",
+        "category": "transportation"
+      },
+      {
+        "id": "cw_170",
+        "text": "診療所",
+        "category": "health"
+      },
+      {
+        "id": "cw_171",
+        "text": "小診所",
+        "category": "health"
+      },
+      {
+        "id": "cw_172",
+        "text": "藥房",
+        "category": "health"
+      },
+      {
+        "id": "cw_173",
+        "text": "護理師",
+        "category": "health"
+      },
+      {
+        "id": "cw_174",
+        "text": "大夫",
+        "category": "health"
+      },
+      {
+        "id": "cw_175",
+        "text": "患者",
+        "category": "health"
+      },
+      {
+        "id": "cw_176",
+        "text": "風寒",
+        "category": "health"
+      },
+      {
+        "id": "cw_177",
+        "text": "熱度",
+        "category": "health"
+      },
+      {
+        "id": "cw_178",
+        "text": "頭疼",
+        "category": "health"
+      },
+      {
+        "id": "cw_179",
+        "text": "腹痛",
+        "category": "health"
+      },
+      {
+        "id": "cw_180",
+        "text": "紅色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_181",
+        "text": "橙色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_182",
+        "text": "黃色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_183",
+        "text": "綠色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_184",
+        "text": "藍色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_185",
+        "text": "紫色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_186",
+        "text": "黑色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_187",
+        "text": "白色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_188",
+        "text": "灰色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_189",
+        "text": "粉紅色",
+        "category": "colors"
+      },
+      {
+        "id": "cw_190",
+        "text": "一個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_191",
+        "text": "兩個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_192",
+        "text": "三個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_193",
+        "text": "四個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_194",
+        "text": "五個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_195",
+        "text": "六個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_196",
+        "text": "七個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_197",
+        "text": "八個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_198",
+        "text": "九個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_199",
+        "text": "十個",
+        "category": "numbers"
+      },
+      {
+        "id": "cw_200",
+        "text": "星期一",
+        "category": "time"
+      },
+      {
+        "id": "cw_201",
+        "text": "星期二",
+        "category": "time"
+      },
+      {
+        "id": "cw_202",
+        "text": "星期三",
+        "category": "time"
+      },
+      {
+        "id": "cw_203",
+        "text": "星期四",
+        "category": "time"
+      },
+      {
+        "id": "cw_204",
+        "text": "星期五",
+        "category": "time"
+      },
+      {
+        "id": "cw_205",
+        "text": "星期六",
+        "category": "time"
+      },
+      {
+        "id": "cw_206",
+        "text": "星期日",
+        "category": "time"
+      },
+      {
+        "id": "cw_207",
+        "text": "今天",
+        "category": "time"
+      },
+      {
+        "id": "cw_208",
+        "text": "明天",
+        "category": "time"
+      },
+      {
+        "id": "cw_209",
+        "text": "昨天",
+        "category": "time"
+      },
+      {
+        "id": "cw_210",
+        "text": "一月",
+        "category": "time"
+      },
+      {
+        "id": "cw_211",
+        "text": "二月",
+        "category": "time"
+      },
+      {
+        "id": "cw_212",
+        "text": "三月",
+        "category": "time"
+      },
+      {
+        "id": "cw_213",
+        "text": "四月",
+        "category": "time"
+      },
+      {
+        "id": "cw_214",
+        "text": "五月",
+        "category": "time"
+      },
+      {
+        "id": "cw_215",
+        "text": "六月",
+        "category": "time"
+      },
+      {
+        "id": "cw_216",
+        "text": "七月",
+        "category": "time"
+      },
+      {
+        "id": "cw_217",
+        "text": "八月",
+        "category": "time"
+      },
+      {
+        "id": "cw_218",
+        "text": "九月",
+        "category": "time"
+      },
+      {
+        "id": "cw_219",
+        "text": "十月",
+        "category": "time"
+      },
+      {
+        "id": "cw_220",
+        "text": "上午",
+        "category": "time"
+      },
+      {
+        "id": "cw_221",
+        "text": "中午",
+        "category": "time"
+      },
+      {
+        "id": "cw_222",
+        "text": "下午",
+        "category": "time"
+      },
+      {
+        "id": "cw_223",
+        "text": "傍晚",
+        "category": "time"
+      },
+      {
+        "id": "cw_224",
+        "text": "晚上",
+        "category": "time"
+      },
+      {
+        "id": "cw_225",
+        "text": "半夜",
+        "category": "time"
+      },
+      {
+        "id": "cw_226",
+        "text": "凌晨",
+        "category": "time"
+      },
+      {
+        "id": "cw_227",
+        "text": "早上",
+        "category": "time"
+      },
+      {
+        "id": "cw_228",
+        "text": "黃昏",
+        "category": "time"
+      },
+      {
+        "id": "cw_229",
+        "text": "深夜",
+        "category": "time"
+      },
+      {
+        "id": "cw_230",
+        "text": "起居室",
+        "category": "home"
+      },
+      {
+        "id": "cw_231",
+        "text": "臥房",
+        "category": "home"
+      },
+      {
+        "id": "cw_232",
+        "text": "灶房",
+        "category": "home"
+      },
+      {
+        "id": "cw_233",
+        "text": "浴間",
+        "category": "home"
+      },
+      {
+        "id": "cw_234",
+        "text": "涼台",
+        "category": "home"
+      },
+      {
+        "id": "cw_235",
+        "text": "睡房",
+        "category": "home"
+      },
+      {
+        "id": "cw_236",
+        "text": "書齋",
+        "category": "home"
+      },
+      {
+        "id": "cw_237",
+        "text": "飯廳",
+        "category": "home"
+      },
+      {
+        "id": "cw_238",
+        "text": "車房",
+        "category": "home"
+      },
+      {
+        "id": "cw_239",
+        "text": "地窖",
+        "category": "home"
+      },
+      {
+        "id": "cw_240",
+        "text": "案桌",
+        "category": "home"
+      },
+      {
+        "id": "cw_241",
+        "text": "座椅",
+        "category": "home"
+      },
+      {
+        "id": "cw_242",
+        "text": "長椅",
+        "category": "home"
+      },
+      {
+        "id": "cw_243",
+        "text": "睡床",
+        "category": "home"
+      },
+      {
+        "id": "cw_244",
+        "text": "衣櫥",
+        "category": "home"
+      },
+      {
+        "id": "cw_245",
+        "text": "書櫃",
+        "category": "home"
+      },
+      {
+        "id": "cw_246",
+        "text": "電冰箱",
+        "category": "home"
+      },
+      {
+        "id": "cw_247",
+        "text": "電視機",
+        "category": "home"
+      },
+      {
+        "id": "cw_248",
+        "text": "空調",
+        "category": "home"
+      },
+      {
+        "id": "cw_249",
+        "text": "扇子",
+        "category": "home"
+      },
+      {
+        "id": "cw_250",
+        "text": "清掃",
+        "category": "home"
+      },
+      {
+        "id": "cw_251",
+        "text": "洗衣",
+        "category": "home"
+      },
+      {
+        "id": "cw_252",
+        "text": "晾衣",
+        "category": "home"
+      },
+      {
+        "id": "cw_253",
+        "text": "疊衣",
+        "category": "home"
+      },
+      {
+        "id": "cw_254",
+        "text": "熨衣",
+        "category": "home"
+      },
+      {
+        "id": "cw_255",
+        "text": "拖地板",
+        "category": "home"
+      },
+      {
+        "id": "cw_256",
+        "text": "掃除",
+        "category": "home"
+      },
+      {
+        "id": "cw_257",
+        "text": "吸塵機",
+        "category": "home"
+      },
+      {
+        "id": "cw_258",
+        "text": "洗餐具",
+        "category": "home"
+      },
+      {
+        "id": "cw_259",
+        "text": "抹桌",
+        "category": "home"
+      },
+      {
+        "id": "cw_260",
+        "text": "丟垃圾",
+        "category": "home"
+      },
+      {
+        "id": "cw_261",
+        "text": "分類回收",
+        "category": "home"
+      },
+      {
+        "id": "cw_262",
+        "text": "炊煮",
+        "category": "home"
+      },
+      {
+        "id": "cw_263",
+        "text": "烹調",
+        "category": "home"
+      },
+      {
+        "id": "cw_264",
+        "text": "蒸煮",
+        "category": "home"
+      },
+      {
+        "id": "cw_265",
+        "text": "煎炸",
+        "category": "home"
+      },
+      {
+        "id": "cw_266",
+        "text": "油炸",
+        "category": "home"
+      },
+      {
+        "id": "cw_267",
+        "text": "烘烤",
+        "category": "home"
+      },
+      {
+        "id": "cw_268",
+        "text": "微波爐具",
+        "category": "home"
+      },
+      {
+        "id": "cw_269",
+        "text": "電炊鍋",
+        "category": "home"
+      },
+      {
+        "id": "cw_270",
+        "text": "灌籃",
+        "category": "sports"
+      },
+      {
+        "id": "cw_271",
+        "text": "踢球",
+        "category": "sports"
+      },
+      {
+        "id": "cw_272",
+        "text": "壘球",
+        "category": "sports"
+      },
+      {
+        "id": "cw_273",
+        "text": "網球賽",
+        "category": "sports"
+      },
+      {
+        "id": "cw_274",
+        "text": "乒乓球",
+        "category": "sports"
+      },
+      {
+        "id": "cw_275",
+        "text": "羽球",
+        "category": "sports"
+      },
+      {
+        "id": "cw_276",
+        "text": "撲水",
+        "category": "sports"
+      },
+      {
+        "id": "cw_277",
+        "text": "慢跑",
+        "category": "sports"
+      },
+      {
+        "id": "cw_278",
+        "text": "靜坐",
+        "category": "sports"
+      },
+      {
+        "id": "cw_279",
+        "text": "重訓",
+        "category": "sports"
+      },
+      {
+        "id": "cw_280",
+        "text": "影集",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_281",
+        "text": "歌曲",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_282",
+        "text": "長篇小說",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_283",
+        "text": "連環畫",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_284",
+        "text": "卡通",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_285",
+        "text": "電玩",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_286",
+        "text": "遠足",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_287",
+        "text": "拍照",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_288",
+        "text": "下廚",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_289",
+        "text": "栽種",
+        "category": "hobbies"
+      },
+      {
+        "id": "cw_290",
+        "text": "歡喜",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_291",
+        "text": "難過",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_292",
+        "text": "惱怒",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_293",
+        "text": "恐懼",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_294",
+        "text": "詫異",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_295",
+        "text": "不安",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_296",
+        "text": "雀躍",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_297",
+        "text": "乏味",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_298",
+        "text": "心滿意足",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_299",
+        "text": "沮喪",
+        "category": "emotions"
+      },
+      {
+        "id": "cw_300",
+        "text": "俊美",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_301",
+        "text": "英俊",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_302",
+        "text": "討喜",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_303",
+        "text": "機伶",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_304",
+        "text": "用功",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_305",
+        "text": "仁厚",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_306",
+        "text": "坦白",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_307",
+        "text": "大膽",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_308",
+        "text": "專心",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_309",
+        "text": "奮鬥",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_310",
+        "text": "要緊",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_311",
+        "text": "簡易",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_312",
+        "text": "吃力",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_313",
+        "text": "輕鬆",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_314",
+        "text": "繁複",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_315",
+        "text": "明白",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_316",
+        "text": "含糊",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_317",
+        "text": "顯著",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_318",
+        "text": "特殊",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_319",
+        "text": "平凡",
+        "category": "adjectives"
+      },
+      {
+        "id": "cw_320",
+        "text": "步行",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_321",
+        "text": "縱身",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_322",
+        "text": "就座",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_323",
+        "text": "佇立",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_324",
+        "text": "臥倒",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_325",
+        "text": "就寢",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_326",
+        "text": "用餐",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_327",
+        "text": "飲水",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_328",
+        "text": "言談",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_329",
+        "text": "啟程",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_330",
+        "text": "收終",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_331",
+        "text": "延續",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_332",
+        "text": "中止",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_333",
+        "text": "轉變",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_334",
+        "text": "精進",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_335",
+        "text": "得勝",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_336",
+        "text": "挫敗",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_337",
+        "text": "試探",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_338",
+        "text": "保持",
+        "category": "verbs"
+      },
+      {
+        "id": "cw_339",
+        "text": "臺北",
+        "category": "places"
+      },
+      {
+        "id": "cw_340",
+        "text": "臺中",
+        "category": "places"
+      },
+      {
+        "id": "cw_341",
+        "text": "臺南",
+        "category": "places"
+      },
+      {
+        "id": "cw_342",
+        "text": "高雄市",
+        "category": "places"
+      },
+      {
+        "id": "cw_343",
+        "text": "新竹市",
+        "category": "places"
+      },
+      {
+        "id": "cw_344",
+        "text": "桃園市",
+        "category": "places"
+      },
+      {
+        "id": "cw_345",
+        "text": "基隆市",
+        "category": "places"
+      },
+      {
+        "id": "cw_346",
+        "text": "嘉義市",
+        "category": "places"
+      },
+      {
+        "id": "cw_347",
+        "text": "花蓮縣",
+        "category": "places"
+      },
+      {
+        "id": "cw_348",
+        "text": "臺東",
+        "category": "places"
+      },
+      {
+        "id": "cw_349",
+        "text": "百貨商場",
+        "category": "places"
+      },
+      {
+        "id": "cw_350",
+        "text": "便利超商",
+        "category": "places"
+      },
+      {
+        "id": "cw_351",
+        "text": "超市",
+        "category": "places"
+      },
+      {
+        "id": "cw_352",
+        "text": "傳統市場",
+        "category": "places"
+      },
+      {
+        "id": "cw_353",
+        "text": "夜間市場",
+        "category": "places"
+      },
+      {
+        "id": "cw_354",
+        "text": "咖啡吧",
+        "category": "places"
+      },
+      {
+        "id": "cw_355",
+        "text": "戲院",
+        "category": "places"
+      },
+      {
+        "id": "cw_356",
+        "text": "綠地",
+        "category": "places"
+      },
+      {
+        "id": "cw_357",
+        "text": "金融機構",
+        "category": "places"
+      },
+      {
+        "id": "cw_358",
+        "text": "郵政局",
+        "category": "places"
+      },
+      {
+        "id": "cw_359",
+        "text": "警局",
+        "category": "places"
+      },
+      {
+        "id": "cw_360",
+        "text": "消防隊",
+        "category": "places"
+      },
+      {
+        "id": "cw_361",
+        "text": "區公所",
+        "category": "places"
+      },
+      {
+        "id": "cw_362",
+        "text": "司法機關",
+        "category": "places"
+      },
+      {
+        "id": "cw_363",
+        "text": "稅關",
+        "category": "places"
+      },
+      {
+        "id": "cw_364",
+        "text": "車站大樓",
+        "category": "places"
+      },
+      {
+        "id": "cw_365",
+        "text": "航空站",
+        "category": "places"
+      },
+      {
+        "id": "cw_366",
+        "text": "碼頭",
+        "category": "places"
+      },
+      {
+        "id": "cw_367",
+        "text": "農曆新年",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_368",
+        "text": "燈會",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_369",
+        "text": "掃墓節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_370",
+        "text": "五月節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_371",
+        "text": "月餅節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_372",
+        "text": "重陽節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_373",
+        "text": "聖誕節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_374",
+        "text": "跨年",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_375",
+        "text": "情人節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_376",
+        "text": "母親節",
+        "category": "festivals"
+      },
+      {
+        "id": "cw_377",
+        "text": "狒狒",
+        "category": "animals"
+      },
+      {
+        "id": "cw_378",
+        "text": "花豹",
+        "category": "animals"
+      },
+      {
+        "id": "cw_379",
+        "text": "犀牛",
+        "category": "animals"
+      },
+      {
+        "id": "cw_380",
+        "text": "斑馬",
+        "category": "animals"
+      },
+      {
+        "id": "cw_381",
+        "text": "浣熊",
+        "category": "animals"
+      },
+      {
+        "id": "cw_382",
+        "text": "猩猩",
+        "category": "animals"
+      },
+      {
+        "id": "cw_383",
+        "text": "松鼠",
+        "category": "animals"
+      },
+      {
+        "id": "cw_384",
+        "text": "小鴨",
+        "category": "animals"
+      },
+      {
+        "id": "cw_385",
+        "text": "小雞",
+        "category": "animals"
+      },
+      {
+        "id": "cw_386",
+        "text": "小鴿",
+        "category": "animals"
+      },
+      {
+        "id": "cw_387",
+        "text": "新春愉快",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_388",
+        "text": "恭喜",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_389",
+        "text": "萬事順遂",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_390",
+        "text": "健康平安",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_391",
+        "text": "心願達成",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_392",
+        "text": "平安快樂",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_393",
+        "text": "吉祥如意",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_394",
+        "text": "事事順遂",
+        "category": "greetings"
+      },
+      {
+        "id": "cw_395",
+        "text": "上衣",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_396",
+        "text": "下身",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_397",
+        "text": "連身裙",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_398",
+        "text": "大衣",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_399",
+        "text": "針織衫",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_400",
+        "text": "恤衫",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_401",
+        "text": "牛仔長褲",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_402",
+        "text": "沙灘褲",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_403",
+        "text": "長洋裝",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_404",
+        "text": "套裝",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_405",
+        "text": "腳踏",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_406",
+        "text": "拖鞋",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_407",
+        "text": "球鞋",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_408",
+        "text": "細跟鞋",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_409",
+        "text": "室內拖",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_410",
+        "text": "正裝鞋",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_411",
+        "text": "遮陽帽",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_412",
+        "text": "棉手套",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_413",
+        "text": "圍脖",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_414",
+        "text": "後背包",
+        "category": "clothing"
+      },
+      {
+        "id": "cw_415",
+        "text": "難題",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_416",
+        "text": "解法",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_417",
+        "text": "手段",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_418",
+        "text": "緣故",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_419",
+        "text": "後果",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_420",
+        "text": "歷程",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_421",
+        "text": "標的",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_422",
+        "text": "方案",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_423",
+        "text": "抉擇",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_424",
+        "text": "取捨",
+        "category": "abstract"
+      },
+      {
+        "id": "cw_425",
+        "text": "超級市場",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_426",
+        "text": "櫃檯",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_427",
+        "text": "付帳",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_428",
+        "text": "付錢",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_429",
+        "text": "找錢",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_430",
+        "text": "減價",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_431",
+        "text": "特惠",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_432",
+        "text": "VIP卡",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_433",
+        "text": "提袋",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_434",
+        "text": "購物車",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_435",
+        "text": "試衣室",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_436",
+        "text": "收據",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_437",
+        "text": "證明",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_438",
+        "text": "信用卡",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_439",
+        "text": "現鈔",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_440",
+        "text": "散錢",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_441",
+        "text": "退回",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_442",
+        "text": "交換",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_443",
+        "text": "列隊",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_444",
+        "text": "推廣",
+        "category": "shopping"
+      },
+      {
+        "id": "cw_445",
+        "text": "信號燈",
+        "category": "transport"
+      },
+      {
+        "id": "cw_446",
+        "text": "行人穿越道",
+        "category": "transport"
+      },
+      {
+        "id": "cw_447",
+        "text": "走道",
+        "category": "transport"
+      },
+      {
+        "id": "cw_448",
+        "text": "交叉口",
+        "category": "transport"
+      },
+      {
+        "id": "cw_449",
+        "text": "泊車場",
+        "category": "transport"
+      },
+      {
+        "id": "cw_450",
+        "text": "加油區",
+        "category": "transport"
+      },
+      {
+        "id": "cw_451",
+        "text": "駕駛執照",
+        "category": "transport"
+      },
+      {
+        "id": "cw_452",
+        "text": "座椅安全帶",
+        "category": "transport"
+      },
+      {
+        "id": "cw_453",
+        "text": "軚盤",
+        "category": "transport"
+      },
+      {
+        "id": "cw_454",
+        "text": "反光鏡",
+        "category": "transport"
+      },
+      {
+        "id": "cw_455",
+        "text": "轉向",
+        "category": "transport"
+      },
+      {
+        "id": "cw_456",
+        "text": "直行",
+        "category": "transport"
+      },
+      {
+        "id": "cw_457",
+        "text": "後退",
+        "category": "transport"
+      },
+      {
+        "id": "cw_458",
+        "text": "停放",
+        "category": "transport"
+      },
+      {
+        "id": "cw_459",
+        "text": "交通堵塞",
+        "category": "transport"
+      },
+      {
+        "id": "cw_460",
+        "text": "站牌",
+        "category": "transport"
+      },
+      {
+        "id": "cw_461",
+        "text": "站台",
+        "category": "transport"
+      },
+      {
+        "id": "cw_462",
+        "text": "車票卡",
+        "category": "transport"
+      },
+      {
+        "id": "cw_463",
+        "text": "電子票證",
+        "category": "transport"
+      },
+      {
+        "id": "cw_464",
+        "text": "轉交",
+        "category": "transport"
+      },
+      {
+        "id": "cw_465",
+        "text": "您早",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_466",
+        "text": "午間好",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_467",
+        "text": "哈囉",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_468",
+        "text": "再見啦",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_469",
+        "text": "下次見",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_470",
+        "text": "慢行",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_471",
+        "text": "請入內",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_472",
+        "text": "請就座",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_473",
+        "text": "請用茶",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_474",
+        "text": "歡迎蒞臨",
+        "category": "greeting"
+      },
+      {
+        "id": "cw_475",
+        "text": "借道",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_476",
+        "text": "叨擾",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_477",
+        "text": "告辭",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_478",
+        "text": "久候",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_479",
+        "text": "歉意",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_480",
+        "text": "不用謝",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_481",
+        "text": "請益",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_482",
+        "text": "賜教",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_483",
+        "text": "見笑啦",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_484",
+        "text": "珍重",
+        "category": "courtesy"
+      },
+      {
+        "id": "cw_485",
+        "text": "感恩",
+        "category": "daily"
+      },
+      {
+        "id": "cw_486",
+        "text": "應該的",
+        "category": "daily"
+      },
+      {
+        "id": "cw_487",
+        "text": "拜託",
+        "category": "daily"
+      },
+      {
+        "id": "cw_488",
+        "text": "請幫忙",
+        "category": "daily"
+      },
+      {
+        "id": "cw_489",
+        "text": "辛勞了",
+        "category": "daily"
+      },
+      {
+        "id": "cw_490",
+        "text": "拼搏",
+        "category": "daily"
+      },
+      {
+        "id": "cw_491",
+        "text": "好啊",
+        "category": "daily"
+      },
+      {
+        "id": "cw_492",
+        "text": "沒事",
+        "category": "daily"
+      },
+      {
+        "id": "cw_493",
+        "text": "自然",
+        "category": "daily"
+      },
+      {
+        "id": "cw_494",
+        "text": "太好了",
+        "category": "daily"
+      }
+    ]
+  },
+  "sentences": {
+    "label": "短句子",
+    "texts": [
+      {
+        "id": "ss_001",
+        "text": "你明天早上要出門前記得帶傘，天氣預報說下午會下雨。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_002",
+        "text": "我今天下午的會議改到三點半，資料我已經準備好了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_003",
+        "text": "你手機有充電嗎？我這邊電量只剩一格了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_004",
+        "text": "晚上回家要買菜，家裡冰箱剩的蔬菜不多了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_005",
+        "text": "週末要不要去看一場電影？我好久沒進電影院了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_006",
+        "text": "我剛收到的包裹放在管理室，下班再去領。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_007",
+        "text": "冷氣遙控器沒反應，可能是電池沒電了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_008",
+        "text": "我明天要早起趕飛機，今晚得早一點休息。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_009",
+        "text": "外面風好大，我把陽台的盆栽都搬進來了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_010",
+        "text": "今天去市場買了不少菜，提得我手好酸。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_011",
+        "text": "我剛搬了新家，歡迎你有空過來坐坐。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_012",
+        "text": "下班後要一起去吃飯嗎？我知道一家新開的餐廳。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_013",
+        "text": "這部影集很好看，你有空可以追一下。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_014",
+        "text": "我把車送去保養了，明天再去牽回來。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_015",
+        "text": "家裡的燈泡壞了，我等一下去便利商店買。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_016",
+        "text": "你有看到我的鑰匙嗎？我怎麼找都找不到。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_017",
+        "text": "我訂了週六晚上的餐廳，別忘了要準時到。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_018",
+        "text": "最近天氣變化大，你要記得添加衣服。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_019",
+        "text": "我剛剛在公司樓下看到流浪貓，占據了停車位。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_020",
+        "text": "你等一下有空嗎？我有件事想跟你商量。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_021",
+        "text": "我要去寄信，郵局就在捷運站旁邊。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_022",
+        "text": "今天的晚餐我來煮，你先休息一下吧。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_023",
+        "text": "電梯壞掉了，我得爬樓梯回八樓了。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_024",
+        "text": "我昨天遺失的東西找到了，就在書包的夾層裡。",
+        "category": "daily"
+      },
+      {
+        "id": "ss_025",
+        "text": "不好意思，可以麻煩你讓一下嗎？",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_026",
+        "text": "謝謝你特地過來，真是太感謝了。",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_027",
+        "text": "抱歉讓你久等了，剛才路上塞車。",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_028",
+        "text": "請問洗手間在哪一樓？我有點找不到。",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_029",
+        "text": "打擾了，我想問一下今天有新生報到嗎？",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_030",
+        "text": "別客氣，這點小事不用放在心上。",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_031",
+        "text": "久等了，資料我剛剛才印好。",
+        "category": "courtesy"
+      },
+      {
+        "id": "ss_032",
+        "text": "你好，歡迎來到我們公司參觀。",
+        "category": "greeting"
+      },
+      {
+        "id": "ss_033",
+        "text": "早安，今天也是元氣滿滿的一天。",
+        "category": "greeting"
+      },
+      {
+        "id": "ss_034",
+        "text": "午安，要不要一起去吃午餐？",
+        "category": "greeting"
+      },
+      {
+        "id": "ss_035",
+        "text": "新年快樂，祝你在新的一年心想事成。",
+        "category": "greeting"
+      },
+      {
+        "id": "ss_036",
+        "text": "久仰大名，終於見到你本人了。",
+        "category": "greeting"
+      },
+      {
+        "id": "ss_037",
+        "text": "歡迎光臨，有需要可以隨時找我。",
+        "category": "greeting"
+      },
+      {
+        "id": "ss_038",
+        "text": "時間是最安靜的老師，默默教我們成長。",
+        "category": "wisdom"
+      },
+      {
+        "id": "ss_039",
+        "text": "讀書不一定要讀很多，讀得進去才重要。",
+        "category": "wisdom"
+      },
+      {
+        "id": "ss_040",
+        "text": "每一天的努力，都會在未來的某個時刻回報你。",
+        "category": "wisdom"
+      },
+      {
+        "id": "ss_041",
+        "text": "這家麵店的牛肉麵很有名，你要不要試試？",
+        "category": "food"
+      },
+      {
+        "id": "ss_042",
+        "text": "我想點一份套餐，可以先給我看菜單嗎？",
+        "category": "food"
+      },
+      {
+        "id": "ss_043",
+        "text": "今天想吃點清淡的，幫我把醬料分開放。",
+        "category": "food"
+      },
+      {
+        "id": "ss_044",
+        "text": "這個湯很好喝，是用什麼食材熬的？",
+        "category": "food"
+      },
+      {
+        "id": "ss_045",
+        "text": "我不吃辣的，麻煩幫我做不辣的。",
+        "category": "food"
+      },
+      {
+        "id": "ss_046",
+        "text": "請問有沒有外帶服務？我趕時間。",
+        "category": "food"
+      },
+      {
+        "id": "ss_047",
+        "text": "可以給我一杯冰水嗎？謝謝。",
+        "category": "food"
+      },
+      {
+        "id": "ss_048",
+        "text": "這份便當有多少熱量？我有點擔心。",
+        "category": "food"
+      },
+      {
+        "id": "ss_049",
+        "text": "老闆，這個要多少錢？我現金不夠。",
+        "category": "food"
+      },
+      {
+        "id": "ss_050",
+        "text": "你有沒有吃過他們家的臭豆腐？超級酥脆。",
+        "category": "food"
+      },
+      {
+        "id": "ss_051",
+        "text": "我點的餐可以去辣嗎？我不太能吃辣。",
+        "category": "food"
+      },
+      {
+        "id": "ss_052",
+        "text": "請問你們營業到幾點？我剛下班。",
+        "category": "food"
+      },
+      {
+        "id": "ss_053",
+        "text": "這杯手搖飲料微糖去冰，謝謝。",
+        "category": "food"
+      },
+      {
+        "id": "ss_054",
+        "text": "我對堅果過敏，點餐時要特別注意。",
+        "category": "food"
+      },
+      {
+        "id": "ss_055",
+        "text": "你最近氣色不太好，是不是沒睡好？",
+        "category": "health"
+      },
+      {
+        "id": "ss_056",
+        "text": "醫生說要多喝水，我每天都有提醒自己。",
+        "category": "health"
+      },
+      {
+        "id": "ss_057",
+        "text": "我最近去做健康檢查，報告下週才出來。",
+        "category": "health"
+      },
+      {
+        "id": "ss_058",
+        "text": "你有沒有去打流感疫苗？我今天剛打完。",
+        "category": "health"
+      },
+      {
+        "id": "ss_059",
+        "text": "運動之後要記得拉筋，不然明天會很痠。",
+        "category": "health"
+      },
+      {
+        "id": "ss_060",
+        "text": "我有點頭痛，可能是昨晚吹風吹太多了。",
+        "category": "health"
+      },
+      {
+        "id": "ss_061",
+        "text": "學習新技能需要耐心，每天進步一點就好。",
+        "category": "learning"
+      },
+      {
+        "id": "ss_062",
+        "text": "這首歌我從大學聽到現在，還是很喜歡。",
+        "category": "music"
+      },
+      {
+        "id": "ss_063",
+        "text": "好朋友不用天天聯絡，想到彼此就好。",
+        "category": "friendship"
+      },
+      {
+        "id": "ss_064",
+        "text": "每天練習打字十分鐘，速度慢慢就上來了。",
+        "category": "typing"
+      },
+      {
+        "id": "ss_065",
+        "text": "我剛更新了手機系統，感覺速度變快了。",
+        "category": "technology"
+      },
+      {
+        "id": "ss_066",
+        "text": "請問這件外套有大一點的尺寸嗎？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_067",
+        "text": "這個包包今天有打折嗎？會員有優惠嗎？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_068",
+        "text": "我想退換這件商品，請問要怎麼處理？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_069",
+        "text": "結帳在這邊嗎？我要用信用卡付款。",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_070",
+        "text": "請給我一個紙袋，我買的東西有點多。",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_071",
+        "text": "這件衣服的材質看起來很好，可以摸一下嗎？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_072",
+        "text": "我要找一雙適合走路的鞋，請問在哪一區？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_073",
+        "text": "不好意思，我想請問一下價格是多少？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_074",
+        "text": "請問可以刷卡分期嗎？金額有點高。",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_075",
+        "text": "我剛買的電子產品有問題，可以換嗎？",
+        "category": "shopping"
+      },
+      {
+        "id": "ss_076",
+        "text": "請問去機場要坐哪一班車？",
+        "category": "transport"
+      },
+      {
+        "id": "ss_077",
+        "text": "捷運末班車是幾點？我怕趕不上。",
+        "category": "transport"
+      },
+      {
+        "id": "ss_078",
+        "text": "請問這班公車有到火車站嗎？",
+        "category": "transport"
+      },
+      {
+        "id": "ss_079",
+        "text": "我要搭高鐵去台中，請問哪個班次人少？",
+        "category": "transport"
+      },
+      {
+        "id": "ss_080",
+        "text": "前面塞車了，我們要不要改走另一條路？",
+        "category": "transport"
+      },
+      {
+        "id": "ss_081",
+        "text": "請問停車場在哪裡？我找不到入口。",
+        "category": "transport"
+      },
+      {
+        "id": "ss_082",
+        "text": "下一班火車幾點開？還有空位嗎？",
+        "category": "transport"
+      },
+      {
+        "id": "ss_083",
+        "text": "紅燈了，我們先停在這裡等一下。",
+        "category": "transport"
+      },
+      {
+        "id": "ss_084",
+        "text": "請問悠遊卡要在哪裡買？我剛來台北。",
+        "category": "transport"
+      },
+      {
+        "id": "ss_085",
+        "text": "我要去醫院，搭哪一班公車最快？",
+        "category": "transport"
+      },
+      {
+        "id": "ss_086",
+        "text": "機場捷運要多久？我只剩一小時了。",
+        "category": "transport"
+      },
+      {
+        "id": "ss_087",
+        "text": "這份報告我明天要交，今天得加班趕完。",
+        "category": "work"
+      },
+      {
+        "id": "ss_088",
+        "text": "請問專案的截止日期是下週五嗎？",
+        "category": "work"
+      },
+      {
+        "id": "ss_089",
+        "text": "我有個提案想跟你討論，你現在方便嗎？",
+        "category": "work"
+      },
+      {
+        "id": "ss_090",
+        "text": "電腦當機了，我還沒存檔，資料怎麼辦？",
+        "category": "work"
+      },
+      {
+        "id": "ss_091",
+        "text": "印表機沒紙了，可以幫我補一下嗎？",
+        "category": "work"
+      },
+      {
+        "id": "ss_092",
+        "text": "這個功能有點問題，需要工程師來看一下。",
+        "category": "work"
+      },
+      {
+        "id": "ss_093",
+        "text": "我明天要出差，週二才會回來。",
+        "category": "work"
+      },
+      {
+        "id": "ss_094",
+        "text": "這位客戶對公司很重要，我們需要仔細準備。",
+        "category": "work"
+      },
+      {
+        "id": "ss_095",
+        "text": "今天下午的會議延到四點，別忘了喔。",
+        "category": "work"
+      },
+      {
+        "id": "ss_096",
+        "text": "請問我要跟誰申請假單？我第一次請假。",
+        "category": "work"
+      },
+      {
+        "id": "ss_097",
+        "text": "這場電影的特效很逼真，值得一看。",
+        "category": "entertainment"
+      },
+      {
+        "id": "ss_098",
+        "text": "我最近在追一部韓劇，你有看過嗎？",
+        "category": "entertainment"
+      },
+      {
+        "id": "ss_099",
+        "text": "這個遊戲的畫面很精美，你有玩過嗎？",
+        "category": "entertainment"
+      },
+      {
+        "id": "ss_100",
+        "text": "週末要去看演唱會嗎？我有兩張票。",
+        "category": "entertainment"
+      },
+      {
+        "id": "ss_101",
+        "text": "家裡的洗衣機壞了，我得叫人來修理。",
+        "category": "home"
+      },
+      {
+        "id": "ss_102",
+        "text": "冰箱裡沒什麼菜了，等一下去買。",
+        "category": "home"
+      },
+      {
+        "id": "ss_103",
+        "text": "週末要大掃除，你可以幫我一起整理嗎？",
+        "category": "home"
+      },
+      {
+        "id": "ss_104",
+        "text": "我想學做菜，你可以教我嗎？",
+        "category": "home"
+      },
+      {
+        "id": "ss_105",
+        "text": "我剛買了新的床單，你覺得顏色怎麼樣？",
+        "category": "home"
+      },
+      {
+        "id": "ss_106",
+        "text": "你的中文講得很好，是在哪裡學的？",
+        "category": "compliment"
+      },
+      {
+        "id": "ss_107",
+        "text": "你今天穿的衣服很好看，顏色很適合你。",
+        "category": "compliment"
+      },
+      {
+        "id": "ss_108",
+        "text": "你的報告寫得很有條理，老闆一定會滿意。",
+        "category": "compliment"
+      },
+      {
+        "id": "ss_109",
+        "text": "你煮的菜好好吃，可以教我嗎？",
+        "category": "compliment"
+      },
+      {
+        "id": "ss_110",
+        "text": "今天的簡報你講得非常清楚，謝謝你。",
+        "category": "compliment"
+      },
+      {
+        "id": "ss_111",
+        "text": "媽媽今天煮了很多菜，快回來吃飯吧！",
+        "category": "family"
+      },
+      {
+        "id": "ss_112",
+        "text": "爸爸下班回來了，記得跟他打個招呼。",
+        "category": "family"
+      },
+      {
+        "id": "ss_113",
+        "text": "奶奶今天來看我們，大家早點回家。",
+        "category": "family"
+      },
+      {
+        "id": "ss_114",
+        "text": "弟弟的功課寫完了嗎？記得檢查一下。",
+        "category": "family"
+      },
+      {
+        "id": "ss_115",
+        "text": "週末全家人要去阿姨家吃飯，別忘了！",
+        "category": "family"
+      }
+    ]
+  },
+  "articles_punct": {
+    "label": "小短文（含標點）",
+    "texts": [
+      {
+        "id": "awp_001",
+        "text": "清晨六點半，鬧鐘準時響起。我掀開被子坐起身，伸了個懶腰，感覺全身的骨頭都在抱怨。走進浴室洗漱鏡前，先用冷水潑了把臉，人立刻清醒過來。廚房電鍋剛好跳到保溫，我掀開鍋蓋，白色的蒸氣混合著糙飯香。簡單配了點醃菜和一顆水煮蛋，匆匆吃完早餐，背起書包趕往捷運站。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_002",
+        "text": "下午三點的咖啡時光，是我一天中最期待的時刻。會議室的窗簾半掩著，陽光從百葉窗的縫隙斜切進來，在桌面上打出整齊的條紋。我沖了一壺手沖咖啡，熱水緩緩淋在咖啡粉上，香氣一下子充滿了整個空間。同事也泡了杯茶，我們靠在窗邊聊了幾句，才各自回到崗位。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_003",
+        "text": "週六下午我喜歡去住家附近的傳統市場逛逛。老闆們的招呼聲此起彼落，魚販正擺著新鮮的海水魚，賣菜的阿婆熟練地把青蔥捆成一束束，賣豆腐的攤位前豆漿的香氣陣陣飄來。我通常會先買點新鮮的菜，再到熟食區瞧瞧。這一帶的滷味攤特別受歡迎，紅燒肉和滷蛋的香味總讓人走不開。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_004",
+        "text": "每天下班回家的路上，我總會經過一間小小的書店。書店的老闆娘大概六十多歲，總是坐在門口的椅子上看一本書，店裡很安靜，只有偶爾翻書頁的聲音。有一次我好奇問她：「為什麼從不覺得累？」她笑著說，看書是她一輩子的習慣，怎麼會累呢？",
+        "category": "daily"
+      },
+      {
+        "id": "awp_005",
+        "text": "媽媽的廚藝是我和哥哥共同的童年回憶。她總說做菜最重要的是火候，火太旺東西會焦，火太小又不入味。小時候我們常常在廚房門口看她做菜，媽媽一邊忙手邊的功夫，就一邊喊我們去洗手、準備碗筷。現在我偶爾自己下廚，才知道一鍋家常湯裡面藏著多少功夫。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_006",
+        "text": "去年公司換上了新的專案管理軟體，一開始大家都很不適應。舊的使用習慣用了三四年，突然要全部改過來，難免有些怨聲載道。不過一個月下來，團隊反而慢慢上軌。任務的分配變得透明，誰負責什麼、進度到哪裡，一目了然。主管也不再開冗長的進度會，大家在系統上更新就好。",
+        "category": "technology"
+      },
+      {
+        "id": "awp_007",
+        "text": "我最近在學習用智慧工具整理會議記錄。以前開完會要花半小時回顧，現在把錄音丟進工具裡，幾分鐘都有條理的摘要。剛開始我有點擔心品質，仔細比對了幾次，發現它抓的重點還挺準的。當然最後的決定還是要由人來做，智慧只是把瑣碎的整理工作加速了。",
+        "category": "technology"
+      },
+      {
+        "id": "awp_008",
+        "text": "辦公室對面的空地最近在蓋新大樓。每天早上八點整，怪手的第一聲轟鳴，彷彿就是整條街的起床號。工地揚起的灰塵讓我們不得不每週擦一次窗，被噪音困擾到開會時講話要大聲一點。工程預計明年夏天完工，那時候我們可能已經換位置了。",
+        "category": "technology"
+      },
+      {
+        "id": "awp_009",
+        "text": "在台北生活這麼多年，我最念念不忘的還是家鄉夜市攤位上的那碗蚵仔煎。煎得恰到好處的蛋皮包著新鮮的蚵仔，再淋上那鍋獨家甜辣醬，配一口熱湯。每年寒假，媽媽總會帶我去同一個攤位，老闆娘頭髮白了一些，笑臉一樣燦爛。她認得我們，臨走時還多塞了一片泡菜給我。",
+        "category": "food"
+      },
+      {
+        "id": "awp_010",
+        "text": "同事老林自從上個月開始帶便當，節省了不少開銷，體重也跟著慢慢往下掉。他說過去每天中午都要花十五分鐘等餐廳排隊，現在打開便當盒直接吃，時間省下來可以去操場走一走。他的便當菜色很簡單，蒸蛋、白菜、雞腿肉，有時還會自己做一點沙拉。",
+        "category": "food"
+      },
+      {
+        "id": "awp_011",
+        "text": "家裡陽台上種了幾盆香草，迷迭香、薄荷、還有我也不知道名字的那種。最先種的是迷迭香，買來時只是一株兩寸盆的小苗。現在它長得快跟我手臂一樣高，枝條上掛滿了細長的葉子，稍微碰到就會散發出特殊的香氣。薄荷更誇張，栽下去沒幾個月，已經從一盆長到差點爆盆。",
+        "category": "food"
+      },
+      {
+        "id": "awp_012",
+        "text": "上回和朋友去花蓮，搭的是早上七點的自強號。車子剛離開台北時窗外還飄著細雨，過了基隆，雨停了，雲層也散開了。列車行經北迴鐵路那段，左邊是山，右邊是海，天氣好得不像話。我們一路用相機紀錄，看到海面上的浪花被陽光照得發亮，看到隧道口的形狀像拱門一樣整齊。",
+        "category": "travel"
+      },
+      {
+        "id": "awp_013",
+        "text": "公司今年的員工旅遊選在台中，兩天一夜的行程不遠，但大家都玩得很開心。第一天先去了漁港，吹了海風，晚餐在海產店吃得很滿足；第二天去了美術館，氣氛安靜優雅，很多人難得放下手機，慢慢在展廳裡走。第二天回程的車上，大家紛紛在倒數下一次。",
+        "category": "travel"
+      },
+      {
+        "id": "awp_014",
+        "text": "捷運的列車到站聲響是我每天熟悉的背景音樂。小時候剛來台北時，我會在月台上先數好幾班列車才敢上車，深怕上錯方向。現在閉著眼睛都認得哪一站是哪一站。晚尖峰時段有時會擠得滿滿的，我學會了一件事，就是把背包轉到前面，避免不小心碰撞到別人。",
+        "category": "transport"
+      },
+      {
+        "id": "awp_015",
+        "text": "爸爸剛剛從職場退休，開始了慢下來的生活。以前他總是匆匆出門、深夜才回家，現在每天早起去河濱公園健走，中午回家自己煮一碗麵。媽媽說她看著爸爸的背影總覺得有點不一樣，做事忽然變得慢條斯理，到菜市場也學會了慢慢挑菜。昨天他忽然問我，週末要不要一起去河邊釣魚？",
+        "category": "family"
+      },
+      {
+        "id": "awp_016",
+        "text": "奶奶在廚房裡做粿的時候，總是整間屋子都香得不得了。糯米粉混水揉成團，再包好餡料，蒸熟後軟軟黏黏，吃起來甜甜的。我們幾個小孩會圍在桌子邊看，奶奶一邊做一邊笑我們沒耐心，說這裡面要靜靜的想，急不得。她的手上全是細小的皺紋，可是揉粿的時候，又穩又快一點都不抖。",
+        "category": "family"
+      },
+      {
+        "id": "awp_017",
+        "text": "表姐在上個月底生了個寶寶，全家人圍著嬰兒車打轉。媽媽總是第一個衝過去，抱在懷裡輕輕晃著，嘴裡還念著搖籃曲。寶寶不太怕生，會睜著眼睛看我們笑，哭起來的時候全家一起停下，等待她自己安靜下來。表姐不太給寶寶多抱，說想讓她習慣自己躺著，慢慢學會自己入睡。",
+        "category": "family"
+      },
+      {
+        "id": "awp_018",
+        "text": "三個月前醫生說我的血壓有點偏高，建議我每天運動半小時。我開始在住家附近的河濱公園跑步，一開始只能跑十分鐘就喘。現在能連續跑個四十分鐘不休息，體力比以前好很多。特別的是，跑步以後睡眠品質變好了，半夜醒來的次數也少了。醫生在複診時點了點頭，說數值下降了。",
+        "category": "health"
+      },
+      {
+        "id": "awp_019",
+        "text": "公司推行了每周一次的健走運動，規定午休時間大家要出外活動。我跟同事約好一起去學校操場，他走得比我快，我在後面慢慢跟。他說走了三年，膝蓋反而越來越有力氣。我原本有點懷疑，但三個月下來，好像真的有差。現在走樓梯不再爬到三樓就喘氣，下班回家會順便買個菜。",
+        "category": "health"
+      },
+      {
+        "id": "awp_020",
+        "text": "今年初我給自己定的目標，是把英文從看得懂進步到開口能講。每週三的晚上，我會去社區大學的教室上課，老師是位退休的外師，口音很清晰，講話慢而清楚。班上有十幾個學生，年齡層很廣，有退休的阿公阿嬤，也有剛進職場的年輕人。",
+        "category": "learning"
+      },
+      {
+        "id": "awp_021",
+        "text": "我一直想學吉他，斷斷續續學了三年，現在總算能完整的彈一首歌。老師教的第一個和弦是哆大調，一開始我怎麼按手指都酸。後來老師說，指法位置要正確，不能因為痛就偷懶，不然手勢全亂了。每天我會花十分鐘練指法，累積下來，手指的繭也長出來了，不再會刺痛。",
+        "category": "learning"
+      },
+      {
+        "id": "awp_022",
+        "text": "部門的資深同事老王剛剛在我們部門做了二十五年。他說剛開始他也不會用試算表，後來自己請教同事，一點一點學。他說當年公司要導入電子郵件系統時，很多人反對，怕自己跟不上。最後大家也就過了。事情在當時看來都很大，回頭看，都只是過程中的一個轉折。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_023",
+        "text": "上週末我騎腳踏車去了坪林，一條很長的河貫穿過去，水是那種被大樹包圍的深綠色。茶園躺在山坡上，一層層像波浪一樣，我騎著騎著就停下來拍照。空氣裡有一種淡淡的茶葉香。朋友說，坪林以前是茶鄉，現在遊客多了，不過還是比其他觀光景點安靜許多。",
+        "category": "nature"
+      },
+      {
+        "id": "awp_024",
+        "text": "颱風天來的那個晚上，聽著外面的雨聲拍著窗我無法入睡。風一陣一陣的吹，有時雨聲變大，鐵窗會發出輕輕的嗚嗚聲。手機連續傳來好幾則停班停課的訊息。第二天早上，社區裡的水溝蓋被吹起來的樹枝堵住了，我出門幫忙和鄰居一起清理。路上到處都是斷枝，店鋪有的招牌被吹壞了。",
+        "category": "nature"
+      },
+      {
+        "id": "awp_025",
+        "text": "我家樓下的小賣店養了一隻虎斑貓，店員說牠叫小虎。我每次買飲料，牠都會在門口睡覺，聽到塑料袋的聲音就抬頭看我一眼，再回去睡。店員說小虎以前是流浪貓，來了三年，連店裡的阿婆都給牠準備了個紙箱。現在牠的脖子上掛了個紅鈴鐺，走路的時候人聽得到叮噹的聲音。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_026",
+        "text": "念大學時，我跟室友約好從宿舍步行去音樂廳看一場台北愛樂的表演。第一次進音樂廳，座位是木頭椅，聲音一出來，感覺整個人被往上抬起來。曲子演奏到一半，出現非常安靜的段落，後排有人輕輕咳嗽，彷彿都被放大了。那一次的經驗，讓我開始每年都至少去看一兩次表演。",
+        "category": "music"
+      },
+      {
+        "id": "awp_027",
+        "text": "我爺爺以前是學校的圖書館管理員，退休後還常常回去幫忙。圖書館有一面很大的玻璃窗，他說下午的陽光灑進來會照在每一排書架上。因為玻璃反光，他在窗邊放了茶杯，他說工作累了就看著窗外休息一下再繼續。爺爺在的時候，圖書館的書本都排得很整齊。",
+        "category": "family"
+      },
+      {
+        "id": "awp_028",
+        "text": "電梯的公告欄上貼了一張新的通知：社區要辦中元普渡，時間是這個星期六。住戶們紛紛報名，管理室準備了一張長桌，桌子上有水果、零食、還有幾包米。社區裡的老太太們很早就到了，帶著自己做的零錢去拜。她們一邊拜一邊閒聊，被這一點點儀式感，變得有一點溫暖起來。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_029",
+        "text": "在便利商店的吧台前，我看到一個大學生正在練習用英文跟店員溝通。她點了一個飯糰，店員問她要不要加熱，她用英文回了：請給我一杯中杯熱咖啡。店員忍不住笑了一下，她也跟著笑了。我默默的想，人家平時應該也有很努力的使用外語。",
+        "category": "daily"
+      },
+      {
+        "id": "awp_030",
+        "text": "高鐵的車廂有點吵，旁邊有位爸爸在教小朋友讀繪本。小朋友是個大約四、五歲的孩子，對著繪本一邊指一邊讀，爸爸在旁邊輕輕的提醒。我記得我小時候，媽媽也是這樣坐在書桌旁陪我看書，一本書要花兩個小時看完，她還要一邊改我的作業一邊聽。",
+        "category": "daily"
+      }
+    ]
+  },
+  "long_articles": {
+    "texts": [
+      {
+        "id": "la_001",
+        "text": "清晨五點半，天還沒有全亮，市場的燈已經一盞接一盞亮起來。攤商們把菜擺得整整齊齊，青江菜上還帶著露水，番茄紅得像一顆顆小燈籠。我推著菜籃慢慢往裡走，聽見攤販招呼客人的聲音，也聞到剛出爐的豆漿香氣。有人在試吃新鮮的水果，有人在挑魚，市場裡的早上總是特別熱鬧。我買了兩斤地瓜和一把蔥，老闆還多送我一根蘿蔔，笑著說今天的蘿蔔份外甜。回家的路上，太陽剛好從巷口升起來，菜籃裡的青菜隨著腳步晃呀晃，像是也在開心地跳舞。這一天的早上，就從一籃新鮮的菜開始了。回家後我把菜一樣一樣洗好放進冰箱，樓下的早餐店剛好飄來煎蛋的香氣，整條巷子都慢慢醒了過來。",
+        "category": "daily"
+      },
+      {
+        "id": "la_002",
+        "text": "下午兩點，我走進圖書館的閱覽室，空氣裡有一種安靜的味道。管理員在門口輕聲提醒大家把手機調成靜音，我點了點頭，找了一個靠窗的位子坐下。窗外有一棵大榕樹，葉子被風吹得輕輕響，像是有人在耳邊低語。我攤開借來的三本小說，先從最薄的那一本開始讀。時間在書頁之間走得特別慢，寫字的人、看書的人、整理書架的人，每個人都專心做著自己的事。到了四點半，我合上書本，把書輕輕放回推車。走出圖書館時，夕陽正好落在屋頂上，整天的疲勞都像被書香洗乾淨了。離開圖書館前，我把借書證壓平放回口袋，決定下週再來借另一本。窗外的雲已經散了，天空藍得像剛洗過一樣。",
+        "category": "daily"
+      },
+      {
+        "id": "la_003",
+        "text": "火車緩緩進站的時候，我把背包抱緊在胸前，怕裡面的相機被人撞到。車廂裡有點冷，可是窗外的風景卻熱熱鬧鬧地跑過去。田野一塊一塊的，像是誰把大地切成了格子，偶爾還有一小片水塘閃著光。對面的老先生抱著一個紙箱，裡面裝著滿滿的橘子，他分給我兩顆，說這是自己家種的。我說了一聲謝謝，橘子皮的香氣一下子把整個車廂都變甜了。兩個小時的車程，書只看了十頁，風景卻看了整整一路。下車的時候，月亮已經升起來了，站台的燈把影子拉得好長。下車後我深吸了一口氣，站台邊的便當店還在賣熱騰騰的排骨飯。走出車站時，迎面吹來的風帶著一點泥土的味道。",
+        "category": "daily"
+      },
+      {
+        "id": "la_004",
+        "text": "巷口的麵包店每天早上七點準時開門，門一推開，奶油和烤麵粉的香氣就飄了出來。我是店裡的常客，店員都認得我，知道我喜歡買剛出爐的起司麵包。今天我來的時候，烤箱剛好打開，熱氣撲了我滿臉。我挑了兩個麵包和一杯牛奶，坐在店門口的小椅子上慢慢吃。第一口咬下去，外皮酥酥的，裡面的起司還會拉出細細的絲。路過的孩子停下來看櫥窗，媽媽笑著拉他走，說回家再買。吃完之後，我把包裝紙折好丟進垃圾桶，整個人也像剛烤出來的麵包一樣，暖烘烘的。吃完之後，我把包裝紙折好丟進垃圾桶，店員笑著跟我說明天見。騎上自行車，車把上掛著的麵包袋輕輕晃著。",
+        "category": "daily"
+      },
+      {
+        "id": "la_005",
+        "text": "下午三點，天空突然暗了下來，烏雲像一塊巨大的布蓋住整座城市。我趕緊從包包裡拿出摺疊傘，剛撐開，第一滴雨就打在傘面上，啪答啪答響個不停。路上的人都加快了腳步，公車站擠滿了等車的人，每個人都抱著包包深怕淋濕。我慢慢走在人行道上，看雨水在水溝裡排成長長的隊伍。路邊的店家把貨物往裡收，雨棚下躲著一隻小貓，牠縮成一團，眼睛亮亮地看著我。我走過去把傘稍微傾了一點，小貓沒有跑開，只是安心地睡著了。回到家時，雨也停了，客廳的窗玻璃上，掛著一串亮亮的水珠。回到家時，雨也停了，客廳的窗玻璃上掛著一串亮亮的水珠。我把濕掉的外套掛在椅背上，泡了一杯熱茶，暖暖地喝完。",
+        "category": "daily"
+      },
+      {
+        "id": "la_006",
+        "text": "暑假的第一個週末，我們全家開車去海邊。車子在山路上開了四十分鐘，轉過最後一個彎，海就忽然出現在眼前。沙灘上的人不多，浪一波一波拍在沙子上，留下白色的泡泡。爸爸租了遮陽傘，媽媽忙著把防曬乳分給大家，我和弟弟第一個衝進水裡。海水比想像中涼，浪花打在小腿上，癢癢的，弟弟忍不住大笑。午餐我們在海邊的攤子吃烤魷魚和芒果冰，芒果冰甜得讓人眼睛都瞇起來。太陽快下山的時候，海面變成金色的，爸爸說這叫夕陽跳海。我把腳埋進濕濕的沙子，決定明年夏天還要再來。回程的車上，弟弟抱著一顆貝殼不肯放，說要帶回去做書籤。海浪的聲音在耳邊慢慢遠去，心裡卻留著一整天的鹹味。",
+        "category": "daily"
+      },
+      {
+        "id": "la_007",
+        "text": "山路蜿蜒，車子開了半個小時才看到半山腰的那間小屋。屋頂是紅色的，門前掛著一串風鈴，風一吹就叮叮噹噹響。屋主是一位老奶奶，她請我們喝自己種的茶，茶香淡淡的，喝一口整個人都放鬆下來。我們在院子裡幫忙撿掉地上的落葉，又把水缸都裝滿。午飯是老奶奶煮的麵，湯裡放了很多青菜，簡單卻特別暖。吃完飯，我們坐在竹椅上看雲，雲在山與山之間慢慢走，好像時間也跟著慢了下來。下山的時候，我回頭看小屋，紅屋頂在綠山裡閃著光，像是山上的一顆小星星。下山前，老奶奶把一小包茶葉塞進我手裡，說路上喝了不累。車子慢慢往山下開，樹影在車窗上晃來晃去。",
+        "category": "daily"
+      },
+      {
+        "id": "la_008",
+        "text": "老街的房子大多是兩層樓，木頭的窗框已經有點發黑，可是門口的招牌還亮著。我們一家特地來這裡走走，爸爸說他小時候常來這條街買糖葫蘆。第一間店是彈珠店，老闆把彈珠一顆一顆排在布上，顏色亮得像玻璃。我挑了三顆透明的，裡面有小小的圖案，老闆還送我一顆星星形狀的。街尾有家豆花店，豆花淋上薑汁，甜甜的，配上碎冰，夏天吃最舒服。爸爸站在店門口說，這條街變了樣，可是味道還是跟小時候一樣。走回停車場的時候，夕陽把老街照得金亮亮的。走回停車場的時候，夕陽把老街照得金亮亮的，爸爸的影子被拉得很長。我們約好下次還要來，順便帶老家的親戚一起逛。",
+        "category": "daily"
+      },
+      {
+        "id": "la_009",
+        "text": "我喜歡的書店不算大，卻有一面整整牆面的漫畫區。店員把新書都擺在入口，旁邊還放了一張小紙條，寫著編輯推薦的理由。我總是先在新書區逛一圈，再鑽進靠窗的那個舊書角落。那裡有一張舊沙發，坐下去會發出輕輕的聲音，沙發旁邊放了一盆蘭花。老闆說，書店不一定要大，重要的是有人願意慢慢看。我在角落站了快一小時，挑了兩本散文，結帳的時候老闆還用書籤夾在書裡。走出書店，街道的燈剛亮起來，書包裡的書，感覺也跟著變重了，是一件開心的重量。走出書店，街道的燈剛亮起來，書包裡的書感覺也跟著變重了，是一件開心的重量。夜裡的風吹過書頁，發出輕輕的響聲。",
+        "category": "daily"
+      },
+      {
+        "id": "la_010",
+        "text": "晚飯後，我們照例去公園散步。公園的繞圈步道剛好一公里，很多人帶著小狗一起走，小狗跑得比主人還快。湖邊的長椅是我們最喜歡的位置，坐下來可以看見有人在划小船，船槳一下一下撥開水面。媽媽說她的心情不好時，總會來這裡坐一會兒，看著水面發呆。我沒有說話，只是跟著她一起看。湖上的雲倒映在水裡，風一吹，雲就碎成一片一片的。走回家的路上，路燈一盞一盞亮著，公園的夜晚安安靜靜的，連蟲叫都變得好聽了。走回家的路上，路燈一盞一盞亮著，公園的夜晚安安靜靜的，連蟲叫都變得好聽了。我把外套拉緊，期待明天的天氣也一樣晴朗。",
+        "category": "daily"
+      },
+      {
+        "id": "la_011",
+        "text": "早上八點整，學校的鐘聲準時響起，提醒大家回到教室。走廊裡一下子變得熱鬧，書包撞在一起，笑聲和說話聲混成一片。我抱著作業本往教室走，同學們三三兩兩地討論著今天的考試。教室的窗戶朝東，陽光照進來時，黑板上的字都亮了起來，老師在黑板上寫下今天的課文標題。我們齊聲朗讀，聲音從窗戶傳出去，飛到操場上空。課間，我們在走廊的欄杆邊看樓下的人打球，球一下子飛過圍牆，大家一起尖叫。放學鐘聲響起時，我把書包背好，走向校門口，今天也是充實的一天。放學鐘聲響起時，我把書包背好，走向校門口，夕陽正好落在操場的跑道上。明天還會有一樣的鐘聲，和一樣充實的早晨。",
+        "category": "daily"
+      },
+      {
+        "id": "la_012",
+        "text": "晚上六點，夜市的燈一盞一盞亮起來，攤子也都掀開了布幕。空氣裡混著烤肉的香氣和果汁的甜味，熱鬧得像一場不用門票的表演。我們先去排了鹽酥雞，雞塊炸得金黃，旁邊的攤子在賣珍珠奶茶，杯子一杯一杯排得整整齊齊。弟弟最喜歡射氣球，射中了就大聲歡呼，沒射中就嘟著嘴，媽媽抱著他笑個不停。走道盡頭有個賣棉花糖的攤子，糖絲繞在紙棒上，轉眼就變成一朵粉紅色的雲。我咬了一口，糖一下子在嘴裡化開。逛完夜市，我們提著大包小包回家，腳步都變輕了。逛完夜市，我們提著大包小包回家，腳步都變輕了。路邊的計程車一輛一輛開過去，燈光在地上拉出一道道亮線。",
+        "category": "daily"
+      },
+      {
+        "id": "la_013",
+        "text": "早上我陪奶奶去郵局寄信，她要寄一封手寫的信給遠在北部的伯伯。奶奶的字寫得很慢，一筆一畫，像在雕刻。到了郵局，她把信裝進信封，貼上郵票，又在信封角落畫了一朵小花。她說，這朵花是給伯伯的，看到花就知道是奶奶寄的。櫃台的阿姨把信收進投遞箱，鐵門咣當一聲合上。奶奶站在門口看了很久，才慢慢往回走。回家的路上，奶奶說以前的人沒有手機，一封信要等好幾天，收到信的人卻會開心一整天。我想，下次我也要寫一封信，寄給好久不見的朋友。回家的路上，奶奶說以前的人沒有手機，一封信要等好幾天，收到信的人卻會開心一整天。我決定下週就動筆，寫給國中的好朋友。",
+        "category": "daily"
+      },
+      {
+        "id": "la_014",
+        "text": "外婆家在農村，田裡一年四季都有不一樣的顏色。春天種下秧苗，田裡是一片嫩綠，水面亮亮的，像一面大鏡子。夏天水稻長得高高的，風一吹，整片田都像在點頭。秋天稻子熟了，黃澄澄的，收割機在田裡來來回回，空氣裡都是稻草的香。冬天田裡休耕，農夫在田邊種大蒜和青蔥，綠油油的，看了就讓人安心。我每次回去都要去田邊走走，聽風吹過稻浪的聲音。外婆說，土地不會說話，卻用收成告訴人們，認真種，就會有好結果。外婆說，土地不會說話，卻用收成告訴人們，認真種，就會有好結果。離開鄉下之前，我在田邊站了很久，把這句話記在心裡。",
+        "category": "daily"
+      },
+      {
+        "id": "la_015",
+        "text": "週末的早上，我們租了自行車去河濱騎。自行車道沿著河岸，兩旁種滿了木麻黃，風吹過來會發出沙沙聲。我們騎得很慢，一邊騎一邊看河面上的船，船後拖出一道白白的水痕。路上有人在跑步，有人在遛狗，也有人推著嬰兒車慢慢走，大家都悠悠哉哉的。騎到半路，我們在涼亭休息，買了豆漿和飯糰，坐在長椅上看對岸的山。太陽慢慢爬上山頭，河水也變亮了。我把豆漿喝完，把垃圾帶走，踩著自行車往回騎，心裡有一種說不出的舒服。我把豆漿喝完，把垃圾帶走，踩著自行車往回騎，心裡有一種說不出的舒服。河風吹得外套輕輕鼓起，像一面小小的旗子。",
+        "category": "daily"
+      },
+      {
+        "id": "la_016",
+        "text": "這間咖啡館開到半夜十二點，是我寫作業時最喜歡的地方。店裡放著輕輕的音樂，咖啡機的蒸氣聲一下一下的，像是有人在打拍子。店員是一位戴眼鏡的哥哥，他總是記得我不加糖，默默把咖啡放在我桌上。我在這個角落寫過無數次作業，筆尖在紙上沙沙響，時間也好像變得容易拖長。深夜十一點半，店裡只剩下幾個人，玻璃窗上倒映著燈光。最後一杯咖啡喝完，哥哥把燈調暗，微笑著說晚安。我背起書包走出店門，夜裡的風涼涼的，整條街道都安安靜靜的，只剩下路燈亮著。我背起書包走出店門，夜裡的風涼涼的，整條街道都安安靜靜的，只剩下路燈亮著。走回宿舍時，天邊還有一點點亮光。",
+        "category": "daily"
+      },
+      {
+        "id": "la_017",
+        "text": "冬天最想吃的一碗麵，是媽媽煮的。麵條是細細的，湯裡放了白菜和魚丸，熱氣一上來，整個廚房都香了。我抱著碗坐在餐桌邊，慢慢吸著麵條，湯燙得我直吐舌頭。爸爸說，吃麵不能吃太快，要慢慢品味熱湯的味道。窗外下著小雨，雨滴打在窗玻璃上，發出規律的聲音。我們一邊吃一邊聊今天發生的事，笑聲把寒冷都趕走了。吃完之後，我把碗洗好，靠在沙發上看電視。冬天的夜晚有熱湯和家人的陪伴，再冷也變得暖暖的。吃完之後，我把碗洗好，靠在沙發上看電視，心裡暖暖的。窗外的雨停了，遠處傳來貓頭鷹的叫聲，冬天的夜晚也顯得不那麼孤單了。",
+        "category": "daily"
+      },
+      {
+        "id": "la_018",
+        "text": "整理房間的時候，我在抽屜底下發現了一封信，是我去年寫給自己的。信上我寫著，希望今年能讀完二十本書、學會騎自行車、每天早起半小時。看著自己歪歪扭扭的字，我忍不住笑了。回想這一年，我讀了十五本書，自行車也騎得比以前好，只是早起還做不到。我把信重新折好，放回抽屜，又寫了一封新的，放在信封上寫著明年再打開。新的一年，我希望自己還是像以前一樣，給自己留下一點小小的心願。新的一年，我希望自己還是像以前一樣，給自己留下一點小小的心願。把信放回抽屜，關上門，窗外的天色正好。",
+        "category": "daily"
+      },
+      {
+        "id": "la_019",
+        "text": "牙醫診所的椅子有點硬，我躺在上面，頭頂的燈亮得讓人睜不開眼睛。護士姐姐先幫我戴上圍巾，又在我嘴巴旁邊放了一個小小的吸管，說是防止口水太多。醫生拿起鏡子，一邊看一邊輕輕敲我的牙齒，敲到一顆的時候，他停下來問我會不會酸。我點點頭，他就說那顆牙齒有點蛀掉，要先把黑黑的地方清乾淨，再補起來。治療的時候會有點痠，可是護士姐姐一直在旁邊幫我吸口水，感覺也沒那麼可怕。結束之後，醫生提醒我回家先不要吃太燙的東西。走出診所，太陽正好，我摸摸剛補好的牙齒，決定以後刷牙要更認真一點。回家路上，我路過藥局，順便買了一支新的牙膏，提醒自己下次一定要把牙齒刷乾淨。",
+        "category": "daily"
+      },
+      {
+        "id": "la_020",
+        "text": "理髮店的阿姨問我今天要剪成什麼樣子，我指著雜誌上的一張照片，說只要把兩邊修短一點就好。她先用噴霧把我的頭髮噴濕，再拿剪刀慢慢剪，剪下來的頭髮落在肩膀上，有點癢。剪到一半，店裡進來一個小弟弟，他一直扭來扭去，理髮的叔叔只好一邊哄他一邊剪。阿姨說小孩子最難剪，因為他們坐不住，我聽了忍不住笑了。等頭髮剪好，阿姨還幫我把脖子旁邊的碎髮掃乾淨，又噴了一點香香的東西。結帳的時候，阿姨還提醒我下次兩三個星期再來修剪，頭髮長了才不會亂翹。最後她舉起鏡子在後面照給我看，我覺得整個人看起來清爽多了，連心情都變輕鬆了。",
+        "category": "daily"
+      },
+      {
+        "id": "la_021",
+        "text": "週末我抱著一大袋髒衣服，推開自助洗衣店的玻璃門。店裡已經有兩台機器在轉，運轉的聲音嗡嗡的，空氣裡有淡淡的洗衣粉香味。我把衣服分成兩類，深色的放一台，淺色的放另一台，再照著說明把洗衣粉倒進適當的格子。機器啟動之後，我坐在等候區的椅子上滑手機，時間過得比想像中快。烘乾的過程最療癒，衣服在玻璃門後面翻滾，慢慢變得蓬鬆。取出來的時候，短袖和毛巾都暖暖的，還帶著一點陽光的味道。店裡的阿婆看我折得有點歪，還過來幫我把毛巾壓平，說折整齊了帶回家才好看。我把衣服一件件折好放進袋子，推門出去的時候，天氣也正好放晴了。",
+        "category": "daily"
+      },
+      {
+        "id": "la_022",
+        "text": "路過花店的時候，我被門口一桶向日葵吸引住了。花瓣黃黃的，整齊得像一排小太陽，店員阿姨正在把花枝上的葉子一片片摘掉。她看我站在門口看了很久，就走過來問我要不要買一束。我想起媽媽的生日快到了，就挑了幾朵向日葵，再加一點白色的小花。阿姨用牛皮紙把花束包起來，還在外面綁了一個麻繩做的蝴蝶結，看起來很樸素，卻很好看。回家的路上，我抱著花束，忍不住低頭聞了聞，味道淡淡的。她還提醒我回家先把花腳剪短，用水養著，花就能開得久一點。媽媽打開門看到花的時候，眼睛亮了一下，我也跟著開心了起來。",
+        "category": "daily"
+      },
+      {
+        "id": "la_023",
+        "text": "家裡的橘貓最近不太吃飯，媽媽說要帶它去動物醫院看看。醫院的等候區有椅子，還有一個魚缸，裡面有幾條小魚慢慢游。我抱著貓咪坐在椅子上，它一直在提籠裡面叫，聲音小小的。輪到我們的時候，獸醫先輕輕摸它的肚子，又拿聽診器聽他的心跳。他說貓咪只是腸胃有點不舒服，打了一針，又開了幾天份的藥。獸醫還教媽媽怎麼餵藥，說藥水要用針筒慢慢推。回家的路上，貓咪靠在我腿上，已經安靜睡著了。獸醫說回家要讓它多休息，水也要換成溫的，觀察幾天看看食慾有沒有恢復。希望它快點好起來，下次就不用再跑醫院了。",
+        "category": "daily"
+      },
+      {
+        "id": "la_024",
+        "text": "游泳課的地方在社區運動中心的地下室，泳池的水看起來藍藍的。教練先叫我們在池邊做暖身運動，再下水練習踢水。我一開始很怕，雙手一直抓著池邊，教練說先讓身體放鬆，浮起來就不會沉。練習了幾次之後，我發現真的可以浮在水面上，踢一踢水還能往前移動一點點。旁邊有個小妹妹學得比我快，她已經可以自己游一小段了。課程結束時，教練說下次要練習換氣。教練還說回家要把頭髮吹乾，泳衣也要掛好，不然下次穿起來會不舒服。換好衣服走出來，我覺得全身都有點痠，可是心裡蠻有成就感的，決定下週繼續來。",
+        "category": "daily"
+      },
+      {
+        "id": "la_025",
+        "text": "社區發展協會開了一堂免費的廚藝課，地點就在活動中心的廚房。老師教我們做最家常的滷肉飯，先把肉塊切好，再下鍋煎到表面金黃，加醬油和冰糖慢慢滷。教室裡油油亮亮的，看起來有點亂，可是大家都圍著鍋子，邊看邊記。輪到我動手的時候，熱油一下子噴起來，我嚇了一跳，老師趕緊叫我把鍋蓋先蓋上。滷好的肉香得不得了，配上白飯，連平常不愛吃飯的同學都多吃了一碗。老師說回家也可以照這個步驟做。老師還說滷肉剛做好最入味，隔天再加熱一次會更香，叫我們記得週末試試。回家之後，我決定這個週末就試著自己滷一鍋。",
+        "category": "daily"
+      },
+      {
+        "id": "la_026",
+        "text": "早上去戶政事務所辦身分證，門口已經排了十幾個人。櫃台小姐先幫我抽號碼牌，又叫我坐在等候區看著螢幕。等到號碼跳到我的時候，我把舊的身分證和戶口名簿遞過去。她先核對我的資料，再叫我到旁邊的機器拍照。機器會自動調整燈光，我照著指示把頭抬起來，眼睛看著鏡頭，閃光燈一亮就完成了。接著她印了一張新的身分證，仔細核對之後才交到我手上。整個過程大概二十分鐘，比我想像中快。旁邊有個阿婆也在辦新證件，櫃台小姐教她怎麼填表格，兩個人聊了好一會兒。拿到新證件的時候，我檢查了兩次，確認資料都正確，才安心地走出大門。",
+        "category": "daily"
+      },
+      {
+        "id": "la_027",
+        "text": "學校的戶外教學帶我們去自然科學博物館，恐龍廳是大家最期待的地方。一走進去，就看到一副巨大的暴龍骨架，旁邊還有説明牌，寫著它的身高和體重。老師說這副骨架是真的化石，已經有幾千萬年了，我聽了忍不住哇了一聲。同學們都在旁邊拍照，我也拿出手機，可惜角度怎麼拍都拍不下整隻。後面還有一區展示恐龍的腳印化石，導覽員說保存得非常完整。我在那裡站了好久，想像那些動物活著的時候，到底長什麼樣子。老師說展場裡的化石還有很多是新發現的，科學家們每年都還在挖掘新的恐龍。離開之前，我在紀念品店買了一隻小恐龍，準備帶回家當作這次的紀念。",
+        "category": "daily"
+      },
+      {
+        "id": "la_028",
+        "text": "便利商店的夜班從晚上十一點開始，店裡通常沒什麼客人，只剩下冰箱運轉的聲音。我先把貨架上的餅乾和泡麵補齊，再把地拖一拖。凌晨一點多，進來一位送報紙的先生，他買了一杯熱咖啡，說今天的份比平常多。我一邊結帳一邊跟他聊了幾句，他趕著去下一條街，付完錢就匆匆離開。到了三點，外面開始有零星的計程車經過。快天亮的時候，我把早餐的三明治擺到架子上，牛奶也一瓶瓶排好。天亮之後，我把垃圾倒了，門口的水溝也沖乾淨，整間店看起來清清爽爽的。交班的同事來了之後，我換下制服，騎著機車回家，路上已經開始熱鬧了。",
+        "category": "daily"
+      },
+      {
+        "id": "la_029",
+        "text": "健身房的跑步機排成一整排，早上人最多。我先在教練的指導下做十分鐘暖身，再慢慢上跑步機走路。教練說跑步的時候腳步要輕，身體挺直，不要一直低頭看手機。我照著他說的調整姿勢，走了十分鐘之後，額頭開始冒汗。旁邊有個阿伯跑得比我快，配速穩定，看起來一點都不喘，我忍不住多看了他幾眼。跑完之後，教練叫我們做簡單的伸展，拉拉小腿和大腿。走出健身房的時候，腿有點痠，可是整個人覺得很清爽。教練說只要固定來，體力一定會慢慢變好。回家的路上，我經過公園，看到有人在晨跑，忍不住想自己下次也要早一點起床。",
+        "category": "daily"
+      },
+      {
+        "id": "la_030",
+        "text": "社區菜園的土地是大家一起整理的，入口有個小小的木頭標示。我們這一家分到一小塊地，老師先教我們把土翻鬆，再把小苗一棵棵種下去。媽媽負責澆水，我負責把土輕輕壓實，爸爸則在旁邊搭一個小棚子，免得太陽太毒。每個週末我們都去菜園看看，番茄苗長得很快，沒幾星期就開了小花。有一天早上，我發現枝頭結了一顆綠綠的小番茄，興奮得趕快叫媽媽來看。後來番茄慢慢變紅，我摘下第一顆的時候，咬了一口，酸酸甜甜的，比市場買的好吃。媽媽說下次要多帶一點水來，菜園的水管有點遠，澆水要花不少時間。我決定下次換種小黃瓜。",
+        "category": "daily"
+      },
+      {
+        "id": "la_031",
+        "text": "週末晚上我們去電影院看一部動畫片，門口排隊買票的人還不少。柜台的小姐姐問我們要不要加購爆米花，我說好，順便買了一杯大杯的冷飲。進影廳的時候，燈光慢慢變暗，大家都安靜下來，螢幕上開始放映。電影的音樂很好聽，故事也很有趣，看到一半，後排有個小朋友忍不住跟著唱起主題曲。散場之後，電梯特別擠，我們爬樓梯走下去，一邊走一邊討論劇情。出影廳的時候，我還聽到後面有人在討論剛才的音樂，說那首主題曲回家要去找來聽。走到停車場的時候，爸媽還在爭論剛才那個角色到底是不是壞人，我在旁邊聽著，覺得今晚特別開心。",
+        "category": "daily"
+      },
+      {
+        "id": "la_032",
+        "text": "一直想去動物園看看，今天終於成行了。先去看的是企鵝館，企鵝走路搖搖擺擺的，有一隻還不斷往水裡跳。接著我們去看大象，牠的耳朵好大，飼養員還給牠餵菜葉。最讓我印象深刻的是無尾熊，牠抱著樹幹睡覺，睡得非常熟，怎麼叫都睡不醒。園區裡有賣冰淇淋的攤子，我們一人買了一支，坐在樹蔭下休息。下午開始下起小雨，動物們也慢慢回到休息的山洞。離開之前，我們還在紀念品店停了一下，媽媽買了一隻企鵝玩偶，說要送給隔壁的小表妹。回家的路上，我整理手機裡的照片，企鵝和大象都在裡面，這一趟真的很值得。",
+        "category": "daily"
+      },
+      {
+        "id": "la_033",
+        "text": "天氣熱得不得了，我們決定去吃一碗消暑的刨冰。店門口放著一輛小推車，老闆娘正在忙著切水果。她先把冰塊放進機器，機器轟隆轟隆地轉，碎冰一下子就好了。她把冰堆成一座小山，再淋上滿滿的黑糖漿，上面還放了紅豆、粉圓和切好的芒果。我選了加仙草，老闆娘說這樣會更清爽。我們坐在店門口的塑膠椅子上吃，冰冰涼涼的，沒幾分鐘就見了底。老闆娘看我們吃得開心，還多送了我們一小碟醃梅。吃完之後，我們把垃圾收一收，老闆娘笑著說下次夏天再回來，她會準備新的口味。吃完走回家，熱氣好像也跟著少了一半。",
+        "category": "daily"
+      },
+      {
+        "id": "la_034",
+        "text": "要回老家，我得先到公車總站坐長途公車。總站裡面人來人往，廣播不停報著班次。我照著指標走到第三月台，前面已經排了十幾個人。公車慢慢開進來，車門一打開，大家拎著行李上車。我找了一個靠窗的位置坐下，把背包抱在腿上。車子開出市區之後，窗外的景色越來越鄉下，田野一片片退到後面。車上有人在睡覺，有人在滑手機，車廂裡很安靜。下車的時候，媽媽已經在站口等我，看了我一眼就笑著說，瘦了。到站之後，我先去便利商店買了一小瓶水，慢慢走在回家的路上，風景還是那麼熟悉。回家的感覺，一下子就回來了。",
+        "category": "daily"
+      },
+      {
+        "id": "la_035",
+        "text": "上週末我們去山上露營，車子開了快兩個小時才到達營地。大家先合力把帳篷搭起來，爸爸負責撐骨架，我幫忙拉繩子，媽媽在旁邊準備晚餐。營地旁邊有一條小溪，水很清，幾個小朋友在溪邊玩石頭。晚上我們在營火旁邊烤肉，火光照在臉上，感覺特別溫暖。有人拿出吉他彈了幾首老歌，大家跟著一起唱。夜裡的山上很安靜，只有蟲子叫的聲音。早上起來，帳篷外面掛著露水，遠處的山看起來霧濛濛的。收拾帳篷的時候，爸爸說下次要帶多一點飲用水，山上買東西可不比平地方便。這次露營沒有訊號，反而讓人放鬆了下來。",
+        "category": "daily"
+      },
+      {
+        "id": "la_036",
+        "text": "清晨五點半，我跟外公提著魚竿來到河邊。外公先選了一個陰涼的位子，他說魚比較喜歡躲在陰影裡。他把魚餌捏成一小團，輕輕丟進水裡，再把魚線慢慢放下去。我學著他的樣子也釣了一根，可是等了好久都沒動靜。外公說釣魚要有耐心，不能一直動來動去，魚會被嚇跑。大概半小時之後，我的浮標忽然沉了一下，我趕緊拉起來，是一條小小的吳郭魚。外公幫我把魚鉤拿下來，他說這種魚可以放回去，我們今天就當作體驗。太陽慢慢升起來，河面亮亮的，我們收拾東西回家了。回家路上，外公還教我認了幾種常見的魚，說下次再來要安靜一點，魚才會靠近。",
+        "category": "daily"
+      }
+    ]
+  },
+  "mixed_zh_en": {
+    "texts": [
+      {
+        "id": "mx_001",
+        "text": "請先確認 PR 裡面的 status code 是否為 200，不要直接 push 到 main branch。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_002",
+        "text": "先跑 npm run build，檢查 package.json 有沒有 update 到 v2.1.0。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_003",
+        "text": "這個 getUserById 函數回傳了 undefined，請幫我看 user_id 欄位是不是沒傳進來。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_004",
+        "text": "伺服器回了 404，不是 500，所以應該是 config.json 路徑寫錯了。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_005",
+        "text": "昨天 push 的程式有 bug，rollback 到上一版 v1.9.3 再重 deploy 一次。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_006",
+        "text": "請把 api_key 換掉，剛剛不小心 commit 到 git history 裡面了。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_007",
+        "text": "我在 local 用 docker compose up 起服務，port 8080 一直被佔住。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_008",
+        "text": "這個 isLoading 狀態卡住了，可能是 setTimeout 沒有 clear 掉。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_009",
+        "text": "先執行 pip install -r requirements.txt，再跑 python main.py 測試。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_010",
+        "text": "今天的 Jenkins build 掛了，錯誤訊息顯示 DATABASE_URL 沒設定。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_011",
+        "text": "請把這段 SQL 改成 parameterized query，避免 injection 攻擊。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_012",
+        "text": "我們把舊的 callback 改成 async/await，程式碼就乾淨多了。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_013",
+        "text": "升級到 Node.js 20 之後，舊版的 fs.readFile 要換成 fs/promises。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_014",
+        "text": "這個 CSS class 叫 btn-primary，手機版要另外加一個 media query。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_015",
+        "text": "凌晨三點的 cron job 失敗了，請查一下 server.log 最後 50 行。",
+        "category": "code",
+        "sub": "工程日常"
+      },
+      {
+        "id": "mx_016",
+        "text": "proposal 下班前 sync 給 PM，記得確認 timeline 和 deliverable 有 conflict。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_017",
+        "text": "下午的 meeting 要 reschedule，客戶那邊的 deadline 提前到週五了。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_018",
+        "text": "麻煩幫我 review 這份 budget，重點看 Q3 的 marketing 預算有沒有超支。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_019",
+        "text": "這個 feature 還在 testing 階段，預計下週 Monday 才會 launch。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_020",
+        "text": "請把最新的 final deck 傳給客戶，裡面的 roadmap 要和上次版本一致。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_021",
+        "text": "新人 onboarding 第一週不用急著接案，先跟 team 熟悉 workflow 和工具。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_022",
+        "text": "昨天的 standup 大家都有 update 進度，今天換我報告 blocker。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_023",
+        "text": "這個案子的 scope 一直改，記得要先 sign off 才能加新功能。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_024",
+        "text": "法務那邊說 contract 要改，改完再寄給 vendor 和 legal 審核。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_025",
+        "text": "客戶 feedback 還沒回來，我們先把介面改成 beta demo 給內部看。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_026",
+        "text": "這個週末要準備週一的 pitch，簡報內容要加入 user research 的結論。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_027",
+        "text": "年度 budget 要砍掉 10%，各部門的 headcount 先凍結，recruiting 也暫停。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_028",
+        "text": "農曆年前的 release date 卡在 QA，工程師說要多留三天緩衝。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_029",
+        "text": "這封 email 要 CC 老闆和 HR，附件是上個月的 KPI 報表。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_030",
+        "text": "會議記錄要寫成 action items，負責人和 due date 都要標清楚。",
+        "category": "corporate",
+        "sub": "職場辦公"
+      },
+      {
+        "id": "mx_031",
+        "text": "我剛剛在 iPhone 上配對了新的 AirPods Pro，順便去 7-Eleven 買了一杯 Americano。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_032",
+        "text": "我的 MacBook Pro 是 M3 Max，跑影片剪輯比舊的快很多。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_033",
+        "text": "這支 Dyson 吹風機 Supersonic 折扣到月底，想換一台新的。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_034",
+        "text": "週末去台北101逛街，在 Nike 買了一雙 Air Max 90。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_035",
+        "text": "我在蝦皮買的 Nintendo Switch 遊戲片今天到了，晚上要開一局 Mario Kart。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_036",
+        "text": "這家 Starbucks 新推的冰淇淋鬆餅，配一杯 Cafe Latte 剛剛好。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_037",
+        "text": "我換了 Samsung Galaxy S24 Ultra，電池可以撐整天不用帶行動電源。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_038",
+        "text": "這件 Lululemon 瑜伽褲是 Yoga Fast Track 2.0，穿起來很舒服。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_039",
+        "text": "我在 Muji 買的 Aroma Diffuser 配 UNIQLO 的精油，房間味道變好聞了。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_040",
+        "text": "他買了 Tesla Model Y 長程版，續航力號稱有 600 公里。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_041",
+        "text": "這次去日本玩，我們用 JR Pass 訂了 Shinkansen 新幹線的車票。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_042",
+        "text": "我在 Netflix 重看 Wednesday Season 2，女主角的髮型也太搶眼了。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_043",
+        "text": "家裡的 iRobot Roomba 900 系列又卡住了，掃地機器人需要換滾刷了。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_044",
+        "text": "我在 Adidas 買了 Ultraboost 5，跑步鞋的緩震讓腳不太累。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_045",
+        "text": "這杯 50 Lan 的 Large 珍珠鮮奶茶是少冰半糖，珍珠要剛剛煮好的。",
+        "category": "lifestyle",
+        "sub": "生活品牌"
+      },
+      {
+        "id": "mx_046",
+        "text": "根據最新 WHO 的報告，該演算法的 Accuracy 提升了約 3.5% (p-value < 0.01)。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_047",
+        "text": "這份 dataset 的 sample size 有 2,500，平均年齡是 34.2 歲，標準差 5.1。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_048",
+        "text": "實驗結果顯示，A 組的平均分數是 82.6 分，比 B 組高 4.3 分 (p < 0.05)。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_049",
+        "text": "這篇論文引用了 Smith et al. (2023) 的研究，方法部分寫得很清楚。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_050",
+        "text": "這根管子長 120 cm，重 2.5 kg，耐壓上限是 10 MPa。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_051",
+        "text": "Python 跑的 logistic regression 模型，在 test set 的 AUC 是 0.92。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_052",
+        "text": "問卷回收率只有 68%（n = 340），所以結果可能有 selection bias。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_053",
+        "text": "這張圖的 X 軸是時間 (year)，Y 軸是人數 (count)，趨勢很明顯。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_054",
+        "text": "根據 OECD 的統計，台灣的 GDP 成長率在 2024 年是 3.1%（見表 2）。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_055",
+        "text": "AI 的 training accuracy 98.7%，validation accuracy 只有 85.2%。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_056",
+        "text": "實驗組 sample 的血壓平均下降了 12 mmHg，安慰劑組只下降 2 mmHg。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_057",
+        "text": "引言先交代 background，方法寫 hypothesis 的檢驗方式，結論再回扣 RQ1。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_058",
+        "text": "這個 class 的男生平均身高 172.4 cm，女生平均身高 160.8 cm。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_059",
+        "text": "報告的附錄有 Table 3 和 Figure 2，記得要標上資料來源 (source)。",
+        "category": "academic",
+        "sub": "學術數據"
+      },
+      {
+        "id": "mx_060",
+        "text": "survey 有 1,024 人，response rate 78.5% (margin of error < 3%)。",
+        "category": "academic",
+        "sub": "學術數據"
+      }
+    ]
+  },
+  "life_situations": {
+    "texts": [
+      {
+        "id": "ls_001",
+        "text": "阿哲：中午一起吃午餐嗎？我：好啊，我想吃麵喔。阿哲：樓下新開的那間可以嗎？我：可以喔，我十二點過去。",
+        "category": "food"
+      },
+      {
+        "id": "ls_002",
+        "text": "媽媽：要不要回家吃飯？我：好啊，我五點下班。媽媽：那我煮你愛吃的滷肉飯。我：太好了，記得加一顆滷蛋喔。",
+        "category": "food"
+      },
+      {
+        "id": "ls_003",
+        "text": "小雨：高鐵票訂了嗎？我：訂好了，是早上八點的車。小雨：我要靠窗的位置喔。我：沒問題，我幫你留靠窗。",
+        "category": "transport"
+      },
+      {
+        "id": "ls_004",
+        "text": "阿爸：幾點回來吃晚飯？我：大概六點左右到家。阿爸：路上小心喔，最近很塞。我：好喔，我改搭捷運回去。",
+        "category": "transport"
+      },
+      {
+        "id": "ls_005",
+        "text": "小雨：你看這件外套好看嗎？我：很好看呢，多少錢？小雨：特價八折，只剩一件了。我：幫我留著，我現在去拿。",
+        "category": "shopping"
+      },
+      {
+        "id": "ls_006",
+        "text": "阿珍：圍巾區在幾樓？我：在二樓喔，電扶梯旁邊。阿珍：有藍色的嗎？我：有兩種藍喔，你慢慢看。",
+        "category": "shopping"
+      },
+      {
+        "id": "ls_007",
+        "text": "櫃台：請問預約姓名是？我：姓陳，電話尾號三四五六。櫃台：訂房已確認，押金明天付就好。我：好的，請問幾點可以入住？櫃台：下午三點後都可以進房喔。",
+        "category": "hotel"
+      },
+      {
+        "id": "ls_008",
+        "text": "阿哲：訂到房間了嗎？我：訂到了，是含早餐的房型。阿哲：早餐幾點開始？我：六點半到十點，在一樓喔。",
+        "category": "hotel"
+      },
+      {
+        "id": "ls_009",
+        "text": "護士：請問你哪裡不舒服？我：喉嚨痛三天，還有點發燒。護士：有吃什麼藥嗎？我：有吃退燒的，昨晚吃的。",
+        "category": "hospital"
+      },
+      {
+        "id": "ls_010",
+        "text": "阿嬤：我的預約是幾點？我：下午三點喔，你在大廳等。阿嬤：要帶什麼證件？我：帶健保卡和身分證就好。",
+        "category": "hospital"
+      },
+      {
+        "id": "ls_011",
+        "text": "行員：請問你要辦什麼業務？我：我想開一個新的帳戶。行員：請出示身分證和印章。我：好的，這裡是我的證件。行員：好了，帳戶開通了喔。",
+        "category": "bank"
+      },
+      {
+        "id": "ls_012",
+        "text": "阿哲：匯款手續費多少？我：國內匯款三十元喔。阿哲：今天匯今天會到嗎？我：下午三點前匯就好。",
+        "category": "bank"
+      },
+      {
+        "id": "ls_013",
+        "text": "館員：想借書的話要辦證嗎？我：要喔，帶身分證就能辦。館員：可以在現場辦好嗎？我：可以喔，五分鐘就好。",
+        "category": "library"
+      },
+      {
+        "id": "ls_014",
+        "text": "同學：書還到哪裡？我：在服務台喔，早上九點開。同學：可以請別人代還嗎？我：最好本人還，代還要委託書。",
+        "category": "library"
+      },
+      {
+        "id": "ls_015",
+        "text": "設計師：今天想剪什麼樣子？我：稍微修一下，不要剪太短。設計師：好，我幫你修短一點點。我：可以再修齊一點嗎？設計師：沒問題，馬上幫你弄好。",
+        "category": "hair"
+      },
+      {
+        "id": "ls_016",
+        "text": "阿美：洗頭要加錢嗎？我：包含在剪髮價錢裡喔。阿美：那護髮呢？我：一罐護髮是兩百喔。",
+        "category": "hair"
+      },
+      {
+        "id": "ls_017",
+        "text": "維修員：手機怎麼壞了？我：螢幕裂開了，觸控還算是正常。維修員：今天這樣可以修好喔。我：請問多久可以拿？維修員：今天下午四點左右喔。",
+        "category": "repair"
+      },
+      {
+        "id": "ls_018",
+        "text": "阿斌：電池耗電很快喔。我：可以換電池喔，半小時。阿斌：多少錢？我：材料費八百，含工資。",
+        "category": "repair"
+      },
+      {
+        "id": "ls_019",
+        "text": "阿翔：請問有兒童椅嗎？我：有的喔，馬上幫你拿過來。阿翔：需要寶寶副食品嗎？我：不用了，謝謝。",
+        "category": "restaurant"
+      },
+      {
+        "id": "ls_020",
+        "text": "阿翔：今天的湯是什麼？我：是番茄蔬菜湯，口味清淡。阿翔：可以再續一碗嗎？我：可以喔，續碗是免費的。",
+        "category": "restaurant"
+      },
+      {
+        "id": "ls_021",
+        "text": "園工：先生，需要幫忙嗎？我：請問洗手間要往哪裡走？園工：沿著湖邊走，看到涼亭就到了。我：好的，謝謝你喔。",
+        "category": "park"
+      },
+      {
+        "id": "ls_022",
+        "text": "阿嬤：公園的溜滑梯在哪裡？我：在大樹的旁邊喔。阿嬤：大不大啊？我：蠻大的，小朋友最愛玩。",
+        "category": "park"
+      },
+      {
+        "id": "ls_023",
+        "text": "老師：請問明天的活動要帶什麼？我：要帶水壺和午餐，記得穿運動服。老師：記得帶雨傘喔。我：好的老師，我會提醒大家。",
+        "category": "school"
+      },
+      {
+        "id": "ls_024",
+        "text": "學生：老師，我的作業忘記帶了。我：沒關係，下次記得放好。學生：對不起老師。我：不打緊，快坐下吧。",
+        "category": "school"
+      },
+      {
+        "id": "ls_025",
+        "text": "郵局員：請問寄到國外要幾天？我：大概五到七個工作天喔。郵局員：要掛號嗎？我：要的呢，掛號比較保險。",
+        "category": "post"
+      },
+      {
+        "id": "ls_026",
+        "text": "阿華：掛號信要怎麼領？我：帶身分證到櫃台領取。阿華：假日有開嗎？我：週六早上八點到十二點。",
+        "category": "post"
+      },
+      {
+        "id": "ls_027",
+        "text": "藥師：請問這個藥飯前還是飯後吃？我：飯後吃喔，記得多喝水。藥師：可以配牛奶嗎？我：水最好喔，牛奶先不要。",
+        "category": "pharmacy"
+      },
+      {
+        "id": "ls_028",
+        "text": "阿梅：喉嚨痛可以買什麼？我：可以買潤喉糖喔，少喝冰飲。阿梅：喉糖真的有效嗎？我：含片也行，嚴重就去看醫生。",
+        "category": "pharmacy"
+      },
+      {
+        "id": "ls_029",
+        "text": "教練：請問新手要怎麼開始？我：先從跑步機慢走十分鐘熱身。教練：要先拉筋嗎？我：對喔，熱身後再拉筋。",
+        "category": "gym"
+      },
+      {
+        "id": "ls_030",
+        "text": "教練：今天有團體課喔。我：下午幾點呢？教練：下午六點有瑜伽。我：好喔，我會準時到。",
+        "category": "gym"
+      },
+      {
+        "id": "ls_031",
+        "text": "攤商：新鮮的青菜剛收回來喔！我：給我兩斤，再加一把蔥。攤商：好喔，總共一百五。我：我掃碼付款可以嗎？攤商：可以喔，你慢慢來。",
+        "category": "market"
+      },
+      {
+        "id": "ls_032",
+        "text": "攤商：芒果很甜喔，要試吃看看嗎？我：可以試吃嗎？攤商：可以啊，這顆特別甜。我：好甜喔，我要買兩公斤。",
+        "category": "market"
+      },
+      {
+        "id": "ls_033",
+        "text": "店員：請問要熱的還是冰的？我：我要熱的，順便幫我外帶。店員：要加珍珠嗎？我：不用了，謝謝。",
+        "category": "cafe"
+      },
+      {
+        "id": "ls_034",
+        "text": "店員：下午好，要點什麼？我：提拉米蘇還有嗎？店員：只剩最後一份了喔。我：幫我留著喔。",
+        "category": "cafe"
+      },
+      {
+        "id": "ls_035",
+        "text": "司機：需要幫忙嗎？我：請問這班車到市區嗎？司機：是的喔，上車請刷卡。我：多久一班車？司機：十分鐘一班喔。",
+        "category": "bus"
+      },
+      {
+        "id": "ls_036",
+        "text": "司機：下一站是圖書館喔。我：我剛剛差點睡過頭。司機：還好你醒了喔。我：謝謝司機，我會注意。",
+        "category": "bus"
+      },
+      {
+        "id": "ls_037",
+        "text": "醫師：請問你最近睡得好嗎？我：不太好，常常半夜醒來。醫師：失眠多久了？我：大概一個多月喔。醫師：下次回診我再看狀況。",
+        "category": "clinic"
+      },
+      {
+        "id": "ls_038",
+        "text": "醫師：不好意思，請稍等。我：請問報告要等多久？醫師：明天早上就出來了。我：要怎麼拿？醫師：來櫃台領，或用手機查。",
+        "category": "clinic"
+      },
+      {
+        "id": "ls_039",
+        "text": "獸醫：請問狗狗要打什麼疫苗？我：先打狂犬病疫苗喔。獸醫：多久追打一次？我：每年一次，記得帶手冊。",
+        "category": "pet"
+      },
+      {
+        "id": "ls_040",
+        "text": "獸醫：狗狗最近怎麼了？我：牠最近不太吃東西。獸醫：先觀察兩天看看。我：會很嚴重嗎？獸醫：不吃超過三天要回來喔。",
+        "category": "pet"
+      }
+    ]
+  },
+  "general_legal_docs": {
+    "texts": [
+      {
+        "id": "lg_001",
+        "text": "憲法第九條 人民除現役軍人外，不受軍事審判。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_002",
+        "text": "憲法第十條 人民有居住及遷徙之自由。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_003",
+        "text": "憲法第十一條 人民有言論、講學、著作及出版之自由。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_004",
+        "text": "憲法第十二條 人民有秘密通訊之自由。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_005",
+        "text": "憲法第十四條 人民有集會及結社之自由。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_006",
+        "text": "憲法第十五條 人民之生存權、工作權及財產權，應予保障。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_007",
+        "text": "憲法第十六條 人民有請願、訴願及訴訟之權。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_008",
+        "text": "憲法第十七條 人民有選舉、罷免、創制及複決之權。",
+        "category": "憲法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_009",
+        "text": "民法第一條 民事，法律所未規定者，依習慣；無習慣者，依法理。",
+        "category": "民法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_010",
+        "text": "民法第二條 民事所適用之習慣，以不背於公共秩序或善良風俗者為限。",
+        "category": "民法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_011",
+        "text": "民法第十五條 受監護宣告之人，無行為能力。",
+        "category": "民法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_012",
+        "text": "民法第十六條 權利能力及行為能力，不得拋棄。",
+        "category": "民法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_013",
+        "text": "民法第十九條 姓名權受侵害者，得請求法院除去其侵害，並得請求損害賠償。",
+        "category": "民法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_014",
+        "text": "民法第一千零七十二條 收養他人之子女為子女時，其收養者為養父或養母，被收養者為養子或養女。",
+        "category": "民法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_015",
+        "text": "刑法第一條 行為之處罰，以行為時之法律有明文規定者為限。拘束人身自由之保安處分，亦同。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_016",
+        "text": "刑法第三條 本法於在中華民國領域內犯罪者，適用之。在中華民國領域外之中華民國船艦或航空器內犯罪者，以在中華民國領域內犯罪論。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_017",
+        "text": "刑法第四條 犯罪之行為或結果，有一在中華民國領域內者，為在中華民國領域內犯罪。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_018",
+        "text": "刑法第十一條 本法總則於其他法律有刑罰、保安處分或沒收之規定者，亦適用之。但其他法律有特別規定者，不在此限。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_019",
+        "text": "刑法第十六條 除有正當理由而無法避免者外，不得因不知法律而免除刑事責任。但按其情節，得減輕其刑。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_020",
+        "text": "刑法第十八條 未滿十四歲人之行為，不罰。十四歲以上未滿十八歲人之行為，得減輕其刑。滿八十歲人之行為，得減輕其刑。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_021",
+        "text": "刑法第二十條 瘖啞人之行為，得減輕其刑。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_022",
+        "text": "刑法第二十六條 行為不能發生犯罪之結果，又無危險者，不罰。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_023",
+        "text": "刑法第二十八條 二人以上共同實行犯罪之行為者，皆為正犯。",
+        "category": "刑法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_024",
+        "text": "著作權法第九條第一項第一款 憲法、法律、命令或公文，不得為著作權之標的。",
+        "category": "著作權法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_025",
+        "text": "著作權法第十條 著作人於著作完成時享有著作權。但本法另有規定者，從其規定。",
+        "category": "著作權法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_026",
+        "text": "個人資料保護法第一條 為規範個人資料之蒐集、處理及利用，以避免人格權受侵害，並促進個人資料之合理利用，特制定本法。",
+        "category": "個人資料保護法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_027",
+        "text": "道路交通管理處罰條例第一條 為加強道路交通管理，維護交通秩序，確保交通安全，制定本條例。",
+        "category": "道路交通管理處罰條例",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_028",
+        "text": "家庭暴力防治法第一條 為防治家庭暴力行為及保護被害人權益，特制定本法。",
+        "category": "家庭暴力防治法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_029",
+        "text": "行政程序法第一條 為使行政行為遵循公正、公開與民主之程序，確保依法行政之原則，以保障人民權益，提高行政效能，增進人民對行政之信賴，特制定本法。",
+        "category": "行政程序法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_030",
+        "text": "消費者保護法第一條 為保護消費者權益，促進國民消費生活安全，提昇國民消費生活品質，特制定本法。有關消費者之保護，依本法之規定，本法未規定者，適用其他法律。",
+        "category": "消費者保護法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_057",
+        "text": "公務員服務法第一條 公務員應恪守誓言，忠心努力，依法律、命令所定，執行其職務。",
+        "category": "公務員服務法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_058",
+        "text": "公務員服務法第二條 本法適用於受有俸給之文武職公務員，及公營事業機構純勞工以外之人員。前項適用對象，不包括中央研究院未兼任行政職務之研究人員、研究技術人員。",
+        "category": "公務員服務法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "lg_059",
+        "text": "公務員服務法第六條 公務員應公正無私、誠信清廉、謹慎勤勉，不得有損害公務員名譽及政府信譽之行為。",
+        "category": "公務員服務法",
+        "sub": "一般法律"
+      },
+      {
+        "id": "od_019",
+        "text": "函範例機關函文號範例文第一號中華民國一百十四年一月十九日主旨：洽商業務聯繫乙件說明：一、為辦理業務銜接事宜，請貴機關指派人員參加會議。二、會議時間另行通知。三、倘有不明之處請逕洽承辦人。",
+        "category": "函",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_020",
+        "text": "公告範例機關公告文號範例文第二號中華民國一百十四年二月二十日主旨：公告廳舍修繕期間乙件說明：一、修繕期間為中華民國一百十四年三月一日至三月十五日。二、修繕期間洽公請至臨時辦公處。三、造成不便敬請見諒。",
+        "category": "公告",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_021",
+        "text": "會議通知範例機關函文號範例文第三號中華民國一百十四年三月二十一日主旨：通知召開業務會議乙次說明：一、會議時間為中華民國一百十四年三月二十八日上午十時。二、會議地點為範例機關會議室。三、請攜帶相關資料準時與會。",
+        "category": "會議通知",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_022",
+        "text": "交接通知範例機關函文號範例文第四號中華民國一百十四年四月二十二日主旨：通知業務交接乙件說明：一、交接日期為中華民國一百十四年五月二日。二、交接事項如交接清冊所載。三、交接完成後函覆以憑查核。",
+        "category": "交接通知",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_023",
+        "text": "歸檔通知範例機關函文號範例文第五號中華民國一百十四年五月二十三日主旨：通知公文歸檔乙件說明：一、本年度公文已依檔案分類表歸檔。二、歸檔清冊乙份送檔案室備查。三、逾期未歸檔者請儘速補辦。",
+        "category": "歸檔通知",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_024",
+        "text": "函覆範例機關函文號範例文第六號中華民國一百十四年六月二十四日主旨：復陳情人陳情乙件說明：一、陳情事項已轉請權責單位辦理。二、辦理情形將另行通知。三、陳情人如有補充請逕洽承辦人。",
+        "category": "函覆",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_025",
+        "text": "補正通知範例機關函文號範例文第七號中華民國一百十四年七月二十五日主旨：通知補正申請文件乙件說明：一、申請文件有欠缺，請依補正通知單補正。二、補正期間為十四日。三、逾期未補正者視為未提出申請。",
+        "category": "補正通知",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_026",
+        "text": "公告範例機關公告文號範例文第八號中華民國一百十四年八月二十六日主旨：公告標案招標乙件說明：一、標案名稱如招標公告所載。二、投標期間為公告日起至中華民國一百十四年九月九日。三、投標廠商請依招標文件辦理。",
+        "category": "公告",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_027",
+        "text": "管制通知範例機關函文號範例文第九號中華民國一百十四年九月二十七日主旨：通知停車管制乙件說明：一、停車場部分區域管制乙日。二、管制期間請改停他處。三、造成不便敬請見諒。",
+        "category": "管制通知",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_028",
+        "text": "宣導函範例機關函文號範例文第十號中華民國一百十四年十月二十八日主旨：宣導資訊安全乙件說明：一、請勿開啟來路不明之電子郵件附件。二、公文傳輸請使用機關核准之系統。三、發現異常請立即通知資訊單位。",
+        "category": "宣導函",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_029",
+        "text": "稽催函範例機關函文號範例文第十一號中華民國一百十四年十一月二十九日主旨：稽催公文乙件說明：一、貴單位承辦之公文逾期未覆。二、請於三日內函覆辦理情形。三、逾期未覆者將列入稽催。",
+        "category": "稽催函",
+        "sub": "普通公文"
+      },
+      {
+        "id": "od_030",
+        "text": "交接紀錄範例機關函文號範例文第十二號中華民國一百十四年十二月三十日主旨：檢送印信交接紀錄乙件說明：一、印信交接已於中華民國一百十四年十二月三十日辦理完竣。二、交接人均已簽名確認。三、紀錄乙份存卷備查。",
+        "category": "交接紀錄",
+        "sub": "普通公文"
+      }
+    ]
+  },
+  "litigation_legal_docs": {
+    "texts": [
+      {
+        "id": "lg_031",
+        "text": "民事訴訟法第四十條 有權利能力者，有當事人能力。胎兒，關於其可享受之利益，有當事人能力。非法人之團體，設有代表人或管理人者，有當事人能力。中央或地方機關，有當事人能力。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_032",
+        "text": "民事訴訟法第七十一條 訴訟代理人有二人以上者，均得單獨代理。當事人違反前項之規定而為委任者，對於他造不生效力。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_033",
+        "text": "民事訴訟法第八十條 被告對於原告關於訴訟標的之主張，逕行認諾，並能證明其無庸起訴者，訴訟費用由原告負擔。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_034",
+        "text": "民事訴訟法第一百三十三條 當事人或代理人，經指定送達代收人，向受訴法院陳明者，應向該代收人為送達。原告、聲請人、上訴人或抗告人，於中華民國無送達處所者，應指定送達處所在中華民國之送達代收人。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_035",
+        "text": "民事訴訟法第一百九十二條 言詞辯論，以當事人聲明應受裁判之事項為始。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_036",
+        "text": "民事訴訟法第一百九十八條 審判長開閉及指揮言詞辯論，並宣示法院之裁判。審判長對於不從其命者，得禁止發言。言詞辯論須續行者，審判長應速定其期日。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_037",
+        "text": "民事訴訟法第三百七十七條 法院不問訴訟程度如何，得隨時試行和解。受命法官或受託法官，亦得為之。第三人經法院之許可，得參加和解。法院認為必要時，亦得通知第三人參加。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_038",
+        "text": "民事訴訟法第三百八十一條 訴訟達於可為裁判之程度者，法院應為終局判決。命合併辯論之數宗訴訟，其一達於可為裁判之程度者，應先為終局判決。但應適用第二百零五條第三項之規定者，不在此限。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_039",
+        "text": "民事訴訟法第四百四十條 提起上訴，應於第一審判決送達後二十日之不變期間內為之。但宣示或公告後送達前之上訴，亦有效力。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_040",
+        "text": "民事訴訟法第五百二十二條 債權人就金錢請求或得易為金錢請求之請求，欲保全強制執行者，得聲請假扣押。前項聲請，就附條件或期限之請求，亦得為之。",
+        "category": "民事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_041",
+        "text": "刑事訴訟法第二條 實施刑事訴訟程序之公務員，就該管案件，應於被告有利及不利之情形，一律注意。被告得請求前項公務員，為有利於己之必要處分。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_042",
+        "text": "刑事訴訟法第三條 本法稱當事人者，謂檢察官、自訴人及被告。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_043",
+        "text": "刑事訴訟法第四條 地方法院於刑事案件，有第一審管轄權。但左列案件，第一審管轄權屬於高等法院：一、內亂罪。二、外患罪。三、妨害國交罪。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_044",
+        "text": "刑事訴訟法第五條 案件由犯罪地或被告之住所、居所或所在地之法院管轄。在中華民國領域外之中華民國船艦或航空機內犯罪者，船艦本籍地、航空機出發地或犯罪後停泊地之法院，亦有管轄權。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_045",
+        "text": "刑事訴訟法第七條 有左列情形之一者，為相牽連之案件：一、一人犯數罪者。二、數人共犯一罪或數罪者。三、數人同時在同一處所各別犯罪者。四、犯與本罪有關係之藏匿人犯、湮滅證據、偽證、贓物各罪者。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_046",
+        "text": "刑事訴訟法第八條 同一案件繫屬於有管轄權之數法院者，由繫屬在先之法院審判之。但經共同之直接上級法院裁定，亦得由繫屬在後之法院審判。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_047",
+        "text": "刑事訴訟法第二十三條 聲請法官迴避，經裁定駁回者，得提起抗告。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_048",
+        "text": "刑事訴訟法第七十二條 對於到場之被告，經面告以下次應到之日時、處所，及如不到場得命拘提，並記明筆錄者，與已送達傳票有同一之效力。被告經以書狀陳明屆期到場者，亦同。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_049",
+        "text": "刑事訴訟法第七十三條 傳喚在監獄或看守所之被告，應通知該監所長官。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_050",
+        "text": "刑事訴訟法第七十四條 被告因傳喚到場者，除確有不得已之事故外，應按時訊問之。",
+        "category": "刑事訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_051",
+        "text": "行政訴訟法第一條 行政訴訟以保障人民權益、確保國家行政權之合法行使、增進司法功能為宗旨。",
+        "category": "行政訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_052",
+        "text": "行政訴訟法第二條 公法上之爭議，除法律別有規定外，得依本法提起行政訴訟。",
+        "category": "行政訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_053",
+        "text": "行政訴訟法第三條 前條所稱之行政訴訟，指撤銷訴訟、確認訴訟及給付訴訟。",
+        "category": "行政訴訟法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_054",
+        "text": "法院組織法第一條 本法所稱法院，分左列三級：一、地方法院。二、高等法院。三、最高法院。",
+        "category": "法院組織法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_055",
+        "text": "法院組織法第二條 法院審判民事、刑事及其他法律規定訴訟案件，並依法管轄非訟事件。",
+        "category": "法院組織法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_056",
+        "text": "法院組織法第三條 地方法院審判案件，以法官一人獨任或三人合議行之。高等法院審判案件，以法官三人合議行之。最高法院審判案件，除法律另有規定外，以法官五人合議行之。",
+        "category": "法院組織法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_060",
+        "text": "行政執行法第一條 行政執行，依本法之規定。本法未規定者，適用其他法律之規定。",
+        "category": "行政執行法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_061",
+        "text": "行政執行法第二條 本法所稱行政執行，指公法上金錢給付義務、行為或不行為義務之強制執行，及即時強制。",
+        "category": "行政執行法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_062",
+        "text": "訴願法第六條 對於二以上不同隸屬或不同層級之機關，共為之行政處分，應向其共同之上級機關提起訴願。",
+        "category": "訴願法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "lg_063",
+        "text": "訴願法第十條 依法受中央或地方機關委託行使公權力之團體或個人，以其團體或個人名義所為之行政處分，其訴願之管轄，向原委託機關提起訴願。",
+        "category": "訴願法",
+        "sub": "訴訟法律"
+      },
+      {
+        "id": "od_001",
+        "text": "開庭通知範例機關函文號範例字第一號中華民國一百十三年六月一日主旨：通知當事人甲乙應於中華民國一百十三年六月二十日上午九時三十分到庭應訊說明：一、案號範例字第一號民事事件，應於前揭期日到庭。二、到庭時請攜帶身分證件及委任狀。三、無故不到庭者，依法處理。",
+        "category": "開庭通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_002",
+        "text": "開庭通知範例機關函文號範例字第二號中華民國一百十三年七月二日主旨：通知當事人甲應於中華民國一百十三年七月十八日下午二時到庭說明：一、案號範例字第二號事件，定於前揭期日開庭。二、請於開庭前三十分鐘至書記官室辦理報到。三、到庭時請勿攜帶危險物品。",
+        "category": "開庭通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_003",
+        "text": "送達證書範例機關函文號範例字第三號中華民國一百十三年八月三日主旨：本機關送達文件乙件受領人已於送達簿簽名受領說明：一、送達標的為開庭通知正本乙件。二、受領人為當事人乙之成年家屬。三、送達證書乙份存卷備查。",
+        "category": "送達證書",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_004",
+        "text": "判決送達通知範例機關函文號範例字第四號中華民國一百十三年九月四日主旨：通知當事人甲乙判決正本已送達說明：一、案號範例字第四號民事事件判決業已送達。二、判決主文為原告之訴駁回，訴訟費用由原告負擔。三、不服判決者得於收受送達後依法上訴。",
+        "category": "判決送達通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_005",
+        "text": "執行命令範例機關函文號範例字第五號中華民國一百十三年十月五日主旨：命債務人提出財產清單說明：一、案號範例字第五號給付事件執行中。二、債務人應於收受本命令後七日內提出財產清單。三、無正當理由不提出者，依法處理。",
+        "category": "執行命令",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_006",
+        "text": "函覆範例機關函文號範例字第六號中華民國一百十三年十一月六日主旨：復貴機關函請調閱卷宗乙件說明：一、案號範例字第六號卷宗准予調閱。二、調閱期間為七日，逾期請即歸還。三、調閱之卷宗不得拆封、外帶或污損。",
+        "category": "函覆",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_007",
+        "text": "移送函範例機關函文號範例字第七號中華民國一百十三年十二月七日主旨：移送案號範例字第七號卷宗乙宗說明：一、卷宗移送貴機關辦理。二、移送清冊乙份隨函附送。三、請收受後函覆以憑查核。",
+        "category": "移送函",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_008",
+        "text": "回函範例機關函文號範例字第八號中華民國一百十四年一月八日主旨：復貴單位申請借閱檔案乙件說明：一、所申請之檔案准予借閱。二、借閱期限為十四日，不得轉借他人。三、借閱完畢請送回歸檔。",
+        "category": "回函",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_009",
+        "text": "書狀收受證明範例機關函文號範例字第九號中華民國一百十四年二月九日主旨：證明本機關收受書狀乙件說明：一、收受日期為中華民國一百十四年二月九日。二、書狀名稱為民事陳報狀乙件。三、收受後連同卷宗陳送法官閱核。",
+        "category": "書狀收受證明",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_010",
+        "text": "開庭筆錄範例機關函文號範例字第十號中華民國一百十四年三月十日主旨：檢送案號範例字第十號開庭筆錄節本乙件說明：一、開庭日期為中華民國一百十四年三月十日。二、筆錄內容經當事人朗讀確認無誤。三、節本乙份陳送法官閱核。",
+        "category": "開庭筆錄",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_011",
+        "text": "期日變更通知範例機關函文號範例字第十一號中華民國一百十四年四月十一日主旨：通知案號範例字第十一號事件期日變更說明：一、原定期日因故變更。二、新期日為中華民國一百十四年四月二十五日上午十時。三、請當事人依新期日到庭。",
+        "category": "期日變更通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_012",
+        "text": "催告函範例機關函文號範例字第十二號中華民國一百十四年五月十二日主旨：催告送達回證乙件說明：一、案號範例字第十二號文件已於送達。二、送達回證迄今尚未送回。三、請於七日內送回以便存卷。",
+        "category": "催告函",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_013",
+        "text": "閱卷通知範例機關函文號範例字第十三號中華民國一百十四年六月十三日主旨：通知閱卷申請准許說明：一、案號範例字第十三號卷宗准予閱卷。二、閱卷時間為閱卷室開放時間。三、閱卷時不得攝錄或攜出卷宗。",
+        "category": "閱卷通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_014",
+        "text": "繳納通知範例機關函文號範例字第十四號中華民國一百十四年七月十四日主旨：通知繳納訴訟費用乙筆說明：一、案號範例字第十四號應繳費用如繳納通知單所載。二、請於收受後十四日內繳納。三、逾期未繳者依法處理。",
+        "category": "繳納通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_015",
+        "text": "領取通知範例機關函文號範例字第十五號中華民國一百十四年八月十五日主旨：通知領取保管金乙筆說明：一、案號範例字第十五號保管金准予領取。二、請攜帶身分證件及印章至書記官室辦理。三、逾期未領取者轉入保管。",
+        "category": "領取通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_016",
+        "text": "庭期通知範例機關函文號範例字第十六號中華民國一百十四年九月十六日主旨：通知庭期分配乙件說明：一、案號範例字第十六號定於中華民國一百十四年九月二十六日開庭。二、法庭為範例第一法庭。三、書記官請提前備妥卷宗及筆錄用紙。",
+        "category": "庭期通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_017",
+        "text": "送達不能通知範例機關函文號範例字第十七號中華民國一百十四年十月十七日主旨：通知送達不能乙件說明：一、案號範例字第十七號文件送達不能。二、受送達人遷徙不明，經查無此人。三、請當事人提供受送達人之最新地址。",
+        "category": "送達不能通知",
+        "sub": "訴訟公文"
+      },
+      {
+        "id": "od_018",
+        "text": "函覆範例機關函文號範例字第十八號中華民國一百十四年十一月十八日主旨：復貴機關函詢訴訟救助乙件說明：一、案號範例字第十八號訴訟救助申請准予酌核。二、應備文件如救助申請須知所載。三、文件補齊後再行陳送法官審核。",
+        "category": "函覆",
+        "sub": "訴訟公文"
+      }
+    ]
+  },
+  "classical_texts": {
+    "texts": [
+      {
+        "id": "cl_001a",
+        "text": "晉太元中，武陵人捕魚為業。緣溪行，忘路之遠近。忽逢桃花林，夾岸數百步，中無雜樹，芳草鮮美，落英繽紛。漁人甚異之。復前行，欲窮其林。",
+        "category": "桃花源記"
+      },
+      {
+        "id": "cl_002",
+        "text": "古之學者必有師。師者，所以傳道受業解惑也。人非生而知之者，孰能無惑？惑而不從師，其為惑也終不解矣。生乎吾前，其聞道也固先乎吾，吾從而師之；生乎吾後，其聞道也亦先乎吾，吾從而師之。吾師道也，夫庸知其年之先後生於吾乎？是故無貴、無賤、無長、無少，道之所存，師之所存也。",
+        "category": "師說"
+      },
+      {
+        "id": "cl_003",
+        "text": "山不在高，有仙則名。水不在深，有龍則靈。斯是陋室，惟吾德馨。苔痕上階綠，草色入簾青。談笑有鴻儒，往來無白丁。可以調素琴，閱金經。無絲竹之亂耳，無案牘之勞形。南陽諸葛廬，西蜀子雲亭。孔子云：何陋之有？",
+        "category": "陋室銘"
+      },
+      {
+        "id": "cl_004a",
+        "text": "水陸草木之花，可愛者甚蕃。晉陶淵明獨愛菊。自李唐來，世人盛愛牡丹。予獨愛蓮之出淤泥而不染，濯清漣而不妖，中通外直，不蔓不枝，香遠益清，亭亭淨植，可遠觀而不可褻玩焉。",
+        "category": "愛蓮說"
+      },
+      {
+        "id": "cl_005",
+        "text": "君子曰：學不可以已。青，取之於藍而青於藍；冰，水為之而寒於水。木直中繩，輮以為輪，其曲中規，雖有槁暴，不復挺者，輮使之然也。故木受繩則直，金就礪則利，君子博學而日參省乎己，則知明而行無過矣。",
+        "category": "勸學"
+      },
+      {
+        "id": "cl_006",
+        "text": "臣本布衣，躬耕於南陽，苟全性命於亂世，不求聞達於諸侯。先帝不以臣卑鄙，猥自枉屈，三顧臣於草廬之中，諮臣以當世之事，由是感激，遂許先帝以驅馳。後值傾覆，受任於敗軍之際，奉命於危難之間，爾來二十有一年矣。先帝知臣謹慎，故臨崩寄臣以大事也。",
+        "category": "出師表"
+      },
+      {
+        "id": "cl_007a",
+        "text": "孟子曰：「魚，我所欲也，熊掌，亦我所欲也；二者不可得兼，舍魚而取熊掌者也。生亦我所欲也，義亦我所欲也；二者不可得兼，捨生而取義者也。生亦我所欲，所欲有甚於生者，故不為苟得也；死亦我所惡，所惡有甚於死者，故患有所不辟也。」",
+        "category": "魚我所欲也"
+      },
+      {
+        "id": "cl_008",
+        "text": "元豐六年十月十二日夜，解衣欲睡，月色入戶，欣然起行。念無與為樂者，遂至承天寺尋張懷民。懷民亦未寢，相與步於中庭。庭下如積水空明，水中藻、荇交橫，蓋竹柏影也。何夜無月？何處無竹柏？但少閒人如吾兩人者耳。",
+        "category": "記承天寺夜遊"
+      },
+      {
+        "id": "cl_009",
+        "text": "慶曆四年春，滕子京謫守巴陵郡。越明年，政通人和，百廢具興，乃重修岳陽樓，增其舊制，刻唐賢今人詩賦於其上；屬予作文以記之。",
+        "category": "岳陽樓記"
+      },
+      {
+        "id": "cl_010",
+        "text": "子曰：「為政以德，譬如北辰，居其所而眾星共之。」",
+        "category": "論語"
+      },
+      {
+        "id": "cl_011",
+        "text": "子曰：「君子成人之美，不成人之惡；小人反是。」",
+        "category": "論語"
+      },
+      {
+        "id": "cl_012",
+        "text": "子曰：「詩三百，一言以蔽之，曰思無邪。」",
+        "category": "論語"
+      },
+      {
+        "id": "cl_013",
+        "text": "陳嬰者，東陽人。少脩德行，箸稱鄉黨。秦末大亂，東陽人慾奉嬰為主，母曰：「不可。自我為汝家婦，少見貧賤；一旦富貴，不祥！不如以兵屬人：事成，少受其利；不成，禍有所歸。」",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_014",
+        "text": "郄太傅在京口，遣門生與王丞相書，求女婿。丞相語郄信：「君往東廂，任意選之。」門生歸，白郄曰：「王家諸郎亦皆可嘉。聞來覓婿，鹹自矜持；唯有一郎在東床上袒腹臥，如不聞。」郄公云：「正此好！」訪之，乃是逸少，因嫁女與焉。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_015a",
+        "text": "許允為吏部郎，多用其鄉里，魏明帝遣虎賁收之。其婦出誡允曰：「明主可以理奪，難以情求。」既至，帝覈問之。允對曰：「舉爾所知：臣之鄉人，臣所知也。陛下檢校為稱職與不；若不稱職，臣受其罪。」既檢校，皆官得其人，於是乃釋；允衣服敗壞，詔賜新衣。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_016",
+        "text": "趙母嫁女，女臨去，敕之曰：「慎勿為好！」女曰：「不為好，可為惡邪？」母曰：「好尚不可為，其況惡乎？」",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_017",
+        "text": "謝太傅寒雪日，內集，與兒女講論文義。俄而雪驟，公欣然曰：「白雪紛紛何所似？」兄子胡兒曰：「撒鹽空中差可擬。」兄女曰：「未若柳絮因風起。」公大笑樂。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_018",
+        "text": "王子猷居山陰，夜大雪，眠覺，開室，命酌酒。四望皎然，因起傍徨，詠左思招隱詩。忽憶戴安道，時戴在剡，即便夜乘小船就之。經宿方至，造門不前而返。人問其故，王曰：「吾本乘興而行，盡興而返，何必見戴？」",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_019",
+        "text": "子曰：「道之以政，齊之以刑，民免而無恥；道之以德，齊之以禮，有恥且格。」",
+        "category": "論語"
+      },
+      {
+        "id": "cl_020",
+        "text": "子曰：「君子食無求飽，居無求安，敏於事而慎於言，就有道而正焉，可謂好學也已。」",
+        "category": "論語"
+      },
+      {
+        "id": "cl_021",
+        "text": "管寧、華歆共園中鋤菜，見地有片金，管揮鋤與瓦石不異，華捉而擲去之。又嘗同席讀書，有乘軒冕過門者，寧讀如故，歆廢書出看。寧割席分坐曰：「子非吾友也。」",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_022",
+        "text": "荀巨伯遠看友人疾，值胡賊攻郡，友人語巨伯曰：「吾今死矣，子可去！」巨伯曰：「遠來相視，子令吾去，敗義以求生，豈荀巨伯所行邪？」賊既至，謂巨伯曰：「大軍至，一郡盡空，汝何男子而敢獨止？」巨伯曰：「友人有疾，不忍委之，寧以我身代友人命。」賊相謂曰：「我輩無義之人，而入有義之國！」遂班軍而還，一郡並獲全。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_023",
+        "text": "孔文舉年十歲，隨父到洛。時李元禮有盛名，為司隸校尉，詣門者皆雋才清稱，及中表親戚乃通。文舉至門，謂吏曰：「我是李府君親。」既通，前坐，元禮問曰：「君與僕有何親？」對曰：「昔先君仲尼與君先人伯陽有師資之尊，是僕與君奕世為通好也。」元禮及賓客莫不奇之。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_024",
+        "text": "徐孺子年九歲，嘗月下戲。人語之曰：「若令月中無物，當極明邪？」徐曰：「不然。譬如人眼中有瞳子，無此必不明。」",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_025",
+        "text": "文帝嘗令東阿王七步中作詩，不成者行大法。應聲便為詩曰：「煮豆持作羹，漉菽以為汁。萁在釜下然，豆在釜中泣。本自同根生，相煎何太急！」帝深有慚色。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_026",
+        "text": "阮宣子有令聞。太尉王夷甫見而問曰：「老莊與聖教同異？」對曰：「將無同。」太尉善其言，辟之為掾，世謂三語掾。衛玠嘲之曰：「一言可辟，何假於三？」宣子曰：「苟是，天下人望，亦可無言而辟，復何假一？」遂相與為友。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_027",
+        "text": "嵇中散臨刑東市，神氣不變，索琴彈之，奏廣陵散。曲終曰：「袁孝尼嘗請學此散，吾靳固不與。廣陵散於今絕矣！」太學生三千人上書，請以為師，不許。文王亦尋悔焉。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_028",
+        "text": "王戎七歲，嘗與諸小兒遊，看道邊李樹多子，折枝。諸兒競走取之，唯戎不動。人問之，答曰：「樹在道邊而多子，此必苦李。」取之，信然。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_029",
+        "text": "王經少貧苦，仕至二千石。母語之曰：「汝本寒家子，仕至二千石，此可以止乎？」經不能用，為尚書，助魏，不忠於晉，被收，涕泣辭母曰：「不從母敕，以至今日。」母都無慽容，語之曰：「為子則孝，為臣則忠，有孝有忠，何負吾邪？」",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_030",
+        "text": "漢元帝宮人既多，乃令畫工圖之。欲有呼者，輒披圖召之。其中常者皆行貨賂。王明君姿容甚麗，志不苟求，工遂毀為其狀。後匈奴來和，求美女於漢帝，帝以明君充行。既召見而惜之，但名字已去，不欲中改，於是遂行。",
+        "category": "世說新語"
+      },
+      {
+        "id": "cl_031",
+        "text": "有屠人貨肉歸，日已暮。歘一狼來瞰擔中肉，似甚涎垂，步亦步，尾行數里。屠懼，示之以刃，則稍卻；既走，又從之。屠無計，默念：「狼所欲者肉，不如姑懸諸樹而蚤取之。」遂鉤肉翹足掛樹間，示以空空。狼乃止，屠即徑歸。昧爽往取肉，遙望樹上懸巨物，似人縊死狀，大駭。逡巡近之，則死狼也。仰首審視，見口中含肉，肉鉤刺狼腭，如魚吞餌。",
+        "category": "聊齋志異·狼三則"
+      },
+      {
+        "id": "cl_032",
+        "text": "余友畢怡庵，倜儻不群，豪縱自喜，貌豐肥，多髭，士林知名。嘗以故至叔刺史公之別業，休憩樓上。傳言樓中故多狐，畢每讀青鳳傳，心輒向往，恨不一遇。因於樓上攝想凝思。既而歸齋，日已寖暮，時暑，月燠熱，當戶而寢。睡中有人搖之醒，而卻視，則一婦人，年逾不惑，而風雅猶存。畢驚起，問其誰何。笑曰：「我狐也，蒙君注念，心竊感納。」",
+        "category": "聊齋志異·狐夢"
+      },
+      {
+        "id": "cl_033",
+        "text": "王果去牆數步，奔而入，及牆，虛若無物。回視，果在牆外矣！大喜，入謝道士。曰：「歸宜潔持，否則不驗。」遂資斧遣之歸。抵家，自詡遇仙，堅壁所不能阻。妻不信，王效其作為，去牆數尺，奔而入，頭觸硬壁，驀然而踣。妻扶視之，額上墳起，如巨卵焉。妻揶揄之，王慚忿，罵老道士之無良而已。",
+        "category": "聊齋志異·崂山道士"
+      },
+      {
+        "id": "cl_034",
+        "text": "太原王生早行，遇一女郎抱襆獨奔，甚艱於步。急走趁之，乃二八姝麗，心相愛樂。問：「何夙夜踽踽獨行？」女曰：「行道之人，不能解愁懮，何勞相問？」生曰：「卿何愁懮？或可效力，不辭也。」女黯然曰：「父母貪賂，鬻妾朱門。嫡妒甚，朝詈而夕楚辱之，所弗堪也，將遠遁耳。」",
+        "category": "聊齋志異·畫皮"
+      },
+      {
+        "id": "cl_035",
+        "text": "宣德間，宮中尚促織之戲，歲征民間此物。故非西產，有華陰令欲媚上官，以一頭進。試使斗而才，因責常供，令以責之里正。市中游俠兒得佳者，籠養之，昂其直，居為奇貨。里胥猾黠，假此科斂丁口，每責一頭，輒傾數家之產。",
+        "category": "聊齋志異·促織"
+      },
+      {
+        "id": "cl_036",
+        "text": "白翁，直隸人，長子甲筮仕南服，三年無耗。適有瓜葛，丁姓造謁，翁款之。丁素走無常，談次，翁輒問以冥事。丁對，語涉幻，翁不深信，但微哂之。別後數日，翁方臥，見丁又來，邀與同遊。從之去，入一城，闕移時，丁指一門曰：「此間君家甥也。」時翁有姊子為晉令。訝曰：「烏在此？」丁曰：「倘不信，入便知之。」翁入，果見甥蟬冠豸繡，坐堂上，戟幢行列，無人可通。",
+        "category": "聊齋志異·夢狼"
+      },
+      {
+        "id": "cl_037",
+        "text": "彭城郎玉柱，其先世官至太守。居官廉，得俸不治生產，積書盈屋。至玉柱尤癡。家苦貧，無物不鬻，惟父藏書一卷，不忍置。父在時，曾書勸學篇黏其座右。郎日諷誦，又幛以素紗，惟恐磨滅。非為干祿，實信書中真有金粟。晝夜研讀，無間寒暑。",
+        "category": "聊齋志異·書痴"
+      },
+      {
+        "id": "cl_038",
+        "text": "馬驥字龍媒，賈人子，美豐姿，少倜儻，喜歌舞。輒從梨園子弟，以錦帕纏頭，美如好女，因復有俊人之號。十四歲入郡庠，即知名。父衰老，罷賈而歸，謂生曰：「數卷書，飢不可煮，寒不可衣。吾兒可仍繼父賈。」馬由是稍稍權子母，從人浮海，為颶風引去，數晝夜，至一都會。其人皆奇丑，見馬至，以為妖，群嘩而走。",
+        "category": "聊齋志異·羅剎海市"
+      },
+      {
+        "id": "cl_039",
+        "text": "崔文子者，泰山人也，學仙於王子喬。子喬化為白蜺而持藥與文子。文子驚怪，引戈擊蜺，中之，因墮其藥。俯而視之，王子喬之屍也。置之室中，覆以敝筐。須臾，化為大鳥。開而視之，翻然飛去。",
+        "category": "搜神記·崔文子遇王子喬"
+      },
+      {
+        "id": "cl_040",
+        "text": "漢明帝時，尚書郎河東王喬為鄴令。喬有神術，每月朔，嘗自縣詣台。帝怪其來數，而不見車騎，密令太史候望之。言其臨至時，輒有雙鳧從東南飛來。因伏伺，見鳧，舉羅張之，但得一雙舄。使尚書識視，四年中所賜尚書官屬履也。",
+        "category": "搜神記·王喬乘鳧"
+      },
+      {
+        "id": "cl_041",
+        "text": "胡御史牧亭言：其里有人，畜一豬，見鄰叟輒瞋目狂吼，奔突欲噬；見他人則否。鄰叟初甚怒之，欲買而啖其肉。既而憬然省曰：「此殆佛經所謂夙冤耶？世無不可解之冤。」乃以善價贖得，送佛寺為長生豬。後再見之，弭耳昵就，非復曩態矣。",
+        "category": "閱微草堂筆記·豬為夙冤"
+      },
+      {
+        "id": "cl_042",
+        "text": "雍正壬子，有宦家子婦，素無勃谿狀。突狂電穿牖，如火光激射。雷楔貫心而入，洞左脅而出。其夫亦為雷燄燔燒，背到尻皆焦黑，氣息僅屬。久之，乃蘇。顧婦屍泣曰：「我性剛勁，與母爭論，或有之。爾不過私訴抑鬱，背燈掩淚而已，何雷之誤中爾耶？是未知律重主謀，幽明一也。」",
+        "category": "閱微草堂筆記·雷楔及夫婦"
+      },
+      {
+        "id": "cl_043",
+        "text": "杭州北關門外，有一屋，鬼屢見人，不敢居。扃鎖甚固。書生蔡姓者將買其宅，人危之，蔡不聽。券成，家人不肯入，蔡親自啟屋，秉燭坐。至夜半，有女子冉冉來，頸拖紅帛，向蔡伏拜，結繩於梁，伸頸就之。蔡無怖色。女子再掛一繩，招蔡。蔡曳一足就之。女子曰：「君誤矣！」蔡笑曰：「汝誤，才有今日；我勿誤也。」鬼大哭，伏地再拜去。自此怪遂絕，蔡亦登第。",
+        "category": "子不語·蔡書生"
+      },
+      {
+        "id": "cl_044",
+        "text": "阿保機嘗居西樓，夜宿氊帳中。晨起，見黑龍長千餘丈，蜿蜒其上。引弓射之，即騰空夭矯而逝，墜於黃龍府之西。相去已千五百里，才長數尺。其骸今見置金國內庫。蕃相陳王悟室長子源嘗見之，尾鬣支體皆具，雙角已為人截去。雲與吾家所藏董羽畫出水龍，絕相似。謂其背上鬣，不作魚鬣也。",
+        "category": "夷堅志·阿保機射龍"
+      },
+      {
+        "id": "cl_045",
+        "text": "戊午夏，熙州野外濼水有龍見。三日：初於水面見蒼龍一條，良久即沒。次日見金龍，以爪托一嬰兒。兒雖為龍所戲弄，略無懼色。三日，金龍如故。見一帝者乘白馬，紅衫玉帶，如少年中官狀。馬前有六蟾蜍。凡三時，方沒。郡人競往觀之，相去甚近，而無風濤之害。熙州嘗以圖示劉齊、劉不悅、趙伯璘，曾見之。",
+        "category": "夷堅志·熙州龍"
+      },
+      {
+        "id": "cl_046",
+        "text": "董仲舒嘗下帷獨詠。忽有客來，風姿音氣，殊為不凡。與論五經，究其微奧。仲舒素不聞有此人，而疑其非常。客又曰：「欲雨？」因此戲之曰：「巢居知風，穴居知雨。卿非狐貍，即是鼷鼠。」客聞此言，色動形壞，化成老貍，蹶然而走。",
+        "category": "幽明錄·董仲舒戲客為貍"
+      },
+      {
+        "id": "cl_047",
+        "text": "阮瞻素秉無鬼論，世莫能難。每自謂理足可以辨正幽明。忽有一鬼通姓名，作客詣阮。寒溫畢，即談名理。客甚有才情。末及鬼神事，反復甚苦，遂屈，乃作色曰：「鬼神古今聖賢所共傳，君何獨言無耶？仆便是鬼！」於是忽變為異形，須臾消滅。阮默然，意色大惡。後年，余病死。",
+        "category": "幽明錄·阮瞻無鬼論"
+      },
+      {
+        "id": "cl_048",
+        "text": "永和九年，歲在癸丑，暮春之初，會於會稽山陰之蘭亭，修禊事也。群賢畢至，少長咸集。此地有崇山峻嶺，茂林修竹；又有清流激湍，映帶左右。引以為流觴曲水，列坐其次。雖無絲竹管弦之盛，一觴一詠，亦足以暢敘幽情。是日也，天朗氣清，惠風和暢。仰觀宇宙之大，俯察品類之盛。所以遊目騁懷，足以極視聽之娛，信可樂也。",
+        "category": "蘭亭集序"
+      },
+      {
+        "id": "cl_049",
+        "text": "壬戌之秋，七月既望，蘇子與客泛舟遊於赤壁之下。清風徐來，水波不興。舉酒屬客，誦明月之詩，歌窈窕之章。少焉，月出於東山之上，徘徊於斗牛之間。白露橫江，水光接天。縱一葦之所如，凌萬頃之茫然。浩浩乎如馮虛御風，而不知其所止；飄飄乎如遺世獨立，羽化而登仙。",
+        "category": "前赤壁賦"
+      },
+      {
+        "id": "cl_050",
+        "text": "世有伯樂，然後有千里馬。千里馬常有，而伯樂不常有。故雖有名馬，只辱於奴隸人之手，騈死於槽櫪之間，不以千里稱也。馬之千里者，一食或盡粟一石。食馬者，不知其能千里而食也。",
+        "category": "馬說"
+      },
+      {
+        "id": "cl_051",
+        "text": "永州之野，產異蛇：黑質而白章，觸草木盡死；以齧人，無禦之者。然得而臘之，以為餌，可以已大風、攣踠、瘺癘，去死肌，殺三蟲。其始，太醫以王命聚之，歲賦其二。募有能捕之者，當其租入。永之人，爭奔走焉。",
+        "category": "捕蛇者說"
+      },
+      {
+        "id": "cl_052",
+        "text": "豫章故郡，洪都新府。星分翼軫，地接衡廬。襟三江而帶五湖，控蠻荊而引甌越。物華天寶，龍光射牛斗之墟；人傑地靈，徐孺下陳蕃之榻。雄州霧列，俊采星馳。臺隍枕夷夏之交，賓主盡東南之美。",
+        "category": "滕王閣序"
+      },
+      {
+        "id": "cl_053",
+        "text": "開元七年，道士有呂翁者，得神仙術，行邯鄲。道中息邸舍，攝帽弛帶，隱囊而坐。俄見旅中少年，乃盧生也，衣短褐，乘青駒，將適於田，亦止於邸中。與翁共席而坐，言笑殊暢。久之，盧生顧其衣裝敝褻，乃長歎息曰：「大丈夫生世不諧，困如是也！」",
+        "category": "枕中記"
+      },
+      {
+        "id": "cl_054",
+        "text": "唧唧復唧唧，木蘭當戶織。不聞機杼聲，惟聞女歎息。問女何所思？問女何所憶？女亦無所思，女亦無所憶。昨夜見軍帖，可汗大點兵。軍書十二卷，卷卷有爺名。阿爺無大兒，木蘭無長兄。願為市鞍馬，從此替爺征。",
+        "category": "木蘭詩"
+      },
+      {
+        "id": "cl_055",
+        "text": "但令心似金鈿堅，天上人間會相見。臨別殷勤重寄詞，詞中有誓，兩心知。七月七日長生殿，夜半無人私語時。在天願作比翼鳥，在地願為連理枝。天長地久有時盡，此恨綿綿無絕期。",
+        "category": "長恨歌"
+      },
+      {
+        "id": "cl_056",
+        "text": "原來但凡世上，雲生從龍，風生從虎。那一陣風過處，只聽得亂樹背後撲地一聲響，跳出一隻吊睛白額大蟲來。武松見了，叫聲「呵呀」，從青石上翻將下來，便拿那條梢棒在手裡，閃在青石邊。那個大蟲又飢又渴，把兩隻爪在地下略按一按，和身望上一撲，從半空裡攛將下來。",
+        "category": "水滸傳·景陽岡"
+      },
+      {
+        "id": "cl_057",
+        "text": "作者自云：因曾歷過一番夢幻之後，故將真事隱去，而借通靈之說，撰此石頭記一書也。故曰「甄士隱夢幻識通靈」。但書中所記何事，又因何而撰是書哉？自又云：今風塵碌碌，一事無成。忽念及當日所有之女子，一一細推了去，覺其行止見識，皆出於我之上。",
+        "category": "紅樓夢·開篇"
+      }
+    ]
+  }
+}

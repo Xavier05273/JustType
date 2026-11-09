@@ -21,14 +21,26 @@
 
 *{box-sizing:border-box}
 
-/* ===== 4 challenge color themes (light) — practice view via body[data-mode] ===== */
+/* ===== 9 challenge color themes (light) — practice view via body[data-mode] ===== */
 body[data-mode="words"]{--accent:#2563eb;--current-bg:#dbeafe;--current-border:#93c5fd;--active-line-bg:rgba(37,99,235,.08)}
 body[data-mode="sentences"]{--accent:#059669;--current-bg:#d1fae5;--current-border:#6ee7b7;--active-line-bg:rgba(5,150,105,.08)}
 body[data-mode="articles_punct"]{--accent:#7c3aed;--current-bg:#ede9fe;--current-border:#c4b5fd;--active-line-bg:rgba(124,58,237,.08)}
-/* ===== 3 themes (dark) ===== */
+body[data-mode="long_articles"]{--accent:#d97706;--current-bg:#fef3c7;--current-border:#fcd34d;--active-line-bg:rgba(217,119,6,.08)}
+body[data-mode="mixed_zh_en"]{--accent:#0891b2;--current-bg:#cffafe;--current-border:#67e8f9;--active-line-bg:rgba(8,145,178,.08)}
+body[data-mode="life_situations"]{--accent:#db2777;--current-bg:#fce7f3;--current-border:#f9a8d4;--active-line-bg:rgba(219,39,119,.08)}
+body[data-mode="general_legal_docs"]{--accent:#475569;--current-bg:#e2e8f0;--current-border:#94a3b8;--active-line-bg:rgba(71,85,105,.08)}
+body[data-mode="litigation_legal_docs"]{--accent:#c2410c;--current-bg:#ffedd5;--current-border:#fdba74;--active-line-bg:rgba(194,65,12,.08)}
+body[data-mode="classical_texts"]{--accent:#b91c1c;--current-bg:#fee2e2;--current-border:#fca5a5;--active-line-bg:rgba(185,28,28,.08)}
+/* ===== 9 themes (dark) ===== */
 html[data-theme="dark"] body[data-mode="words"]{--accent:#60a5fa;--current-bg:#1e3a5f;--current-border:#3b82f6;--active-line-bg:rgba(96,165,250,.16)}
 html[data-theme="dark"] body[data-mode="sentences"]{--accent:#34d399;--current-bg:#064e3b;--current-border:#059669;--active-line-bg:rgba(52,211,153,.16)}
 html[data-theme="dark"] body[data-mode="articles_punct"]{--accent:#a78bfa;--current-bg:#2e1065;--current-border:#7c3aed;--active-line-bg:rgba(167,139,250,.16)}
+html[data-theme="dark"] body[data-mode="long_articles"]{--accent:#fbbf24;--current-bg:#422006;--current-border:#b45309;--active-line-bg:rgba(251,191,36,.16)}
+html[data-theme="dark"] body[data-mode="mixed_zh_en"]{--accent:#22d3ee;--current-bg:#083344;--current-border:#0e7490;--active-line-bg:rgba(34,211,238,.16)}
+html[data-theme="dark"] body[data-mode="life_situations"]{--accent:#f472b6;--current-bg:#500724;--current-border:#be185d;--active-line-bg:rgba(244,114,182,.16)}
+html[data-theme="dark"] body[data-mode="general_legal_docs"]{--accent:#94a3b8;--current-bg:#1e293b;--current-border:#475569;--active-line-bg:rgba(148,163,184,.16)}
+html[data-theme="dark"] body[data-mode="litigation_legal_docs"]{--accent:#fb923c;--current-bg:#431407;--current-border:#c2410c;--active-line-bg:rgba(251,146,60,.16)}
+html[data-theme="dark"] body[data-mode="classical_texts"]{--accent:#f87171;--current-bg:#450a0a;--current-border:#b91c1c;--active-line-bg:rgba(248,113,113,.16)}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink);
@@ -104,11 +116,15 @@ kbd{
   transform-style:preserve-3d;backface-visibility:hidden;
   will-change:transform,opacity;
   display:flex;flex-direction:column;
-  transition:border-color .2s ease,box-shadow .2s ease;
+  transition:border-color .2s ease,box-shadow .2s ease,translate .18s ease;
+  translate:0 0;
 }
 .mode-card-bar{position:absolute;top:0;left:0;right:0;height:5px;background:var(--card-accent)}
-.mode-card:hover{border-color:var(--card-accent)}
 .mode-card.is-center{border-color:var(--card-accent);box-shadow:0 10px 28px var(--card-soft)}
+.mode-card:hover,.mode-card:focus-visible{border-color:var(--card-accent);box-shadow:0 14px 36px var(--card-soft);translate:0 -4px}
+.mode-card:focus-visible{outline:2px solid var(--card-accent);outline-offset:2px}
+.carousel-viewport.dragging .mode-card:hover{translate:0 0;box-shadow:0 10px 28px var(--card-soft)}
+@media (prefers-reduced-motion: reduce){.mode-card{transition:border-color .2s ease,box-shadow .2s ease}.mode-card:hover,.mode-card:focus-visible{translate:0 0}}
 .mode-card h3{margin:6px 0 6px;font-size:20px;color:var(--card-accent)}
 .mode-card p{margin:0 0 10px;color:var(--muted);font-size:14px;flex:1}
 .mode-meta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
@@ -130,10 +146,26 @@ kbd{
 .mode-card.m-words{--card-accent:#2563eb;--card-soft:rgba(37,99,235,.14)}
 .mode-card.m-sentences{--card-accent:#059669;--card-soft:rgba(5,150,105,.14)}
 .mode-card.m-articles_punct{--card-accent:#7c3aed;--card-soft:rgba(124,58,237,.14)}
+.mode-card.m-long_articles{--card-accent:#d97706;--card-soft:rgba(217,119,6,.14)}
+.mode-card.m-mixed_zh_en{--card-accent:#0891b2;--card-soft:rgba(8,145,178,.14)}
+.mode-card.m-life_situations{--card-accent:#db2777;--card-soft:rgba(219,39,119,.14)}
+.mode-card.m-general_legal_docs{--card-accent:#475569;--card-soft:rgba(71,85,105,.14)}
+.mode-card.m-litigation_legal_docs{--card-accent:#c2410c;--card-soft:rgba(194,65,12,.14)}
+.mode-card.m-classical_texts{--card-accent:#b91c1c;--card-soft:rgba(185,28,28,.14)}
 html[data-theme="dark"] .mode-card.m-words{--card-accent:#60a5fa;--card-soft:rgba(96,165,250,.20)}
 html[data-theme="dark"] .mode-card.m-sentences{--card-accent:#34d399;--card-soft:rgba(52,211,153,.20)}
 html[data-theme="dark"] .mode-card.m-articles_punct{--card-accent:#a78bfa;--card-soft:rgba(167,139,250,.20)}
+html[data-theme="dark"] .mode-card.m-long_articles{--card-accent:#fbbf24;--card-soft:rgba(251,191,36,.20)}
+html[data-theme="dark"] .mode-card.m-mixed_zh_en{--card-accent:#22d3ee;--card-soft:rgba(34,211,238,.20)}
+html[data-theme="dark"] .mode-card.m-life_situations{--card-accent:#f472b6;--card-soft:rgba(244,114,182,.20)}
+html[data-theme="dark"] .mode-card.m-general_legal_docs{--card-accent:#94a3b8;--card-soft:rgba(148,163,184,.20)}
+html[data-theme="dark"] .mode-card.m-litigation_legal_docs{--card-accent:#fb923c;--card-soft:rgba(251,146,60,.20)}
+html[data-theme="dark"] .mode-card.m-classical_texts{--card-accent:#f87171;--card-soft:rgba(248,113,113,.20)}
 .footer{margin-top:26px;color:var(--muted);font-size:13px;text-align:center}
+.footer-github{display:inline-flex;align-items:center;gap:5px;color:var(--accent);text-decoration:none;font-weight:600;transition:opacity .15s ease;text-underline-offset:3px}
+.footer-github:hover{text-decoration:underline;opacity:.85}
+.footer-github:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.footer-github-icon{flex:none;display:block}
 code{background:var(--kbd-bg);color:var(--ink);padding:1px 6px;border-radius:6px;font-size:13px}
 .practice-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:12px}
 .practice-title{font-size:18px;font-weight:700}
@@ -216,6 +248,60 @@ code{background:var(--kbd-bg);color:var(--ink);padding:1px 6px;border-radius:6px
 .char.current{background:var(--current-bg);box-shadow:0 0 0 1px var(--current-border)}
 .char.correct{color:var(--green)}
 .char.error{color:var(--red);background:rgb(214 69 69 / .15)}
+
+/* ===== 生活情境題：LINE 回合聊天（只做 LINE） ===== */
+/* 官方配色：LINE Green #06C755、聊窗預設藍色牆紙、對手白泡、自己淺綠泡。 */
+.chat-target{padding:0;overflow:hidden;min-height:0;display:flex;flex-direction:column;flex:none;width:100%;max-width:680px;margin:0 auto}
+#practiceView .chat-target{height:auto;max-height:calc(2 * calc(var(--font-size) * 1.7 + 18px) + 62px + 32px + 54px)}
+.chat-body{scrollbar-width:thin}
+.chat-header{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  font-size:15px;font-weight:700;background:#fff;color:#1f1f1f;
+  border-bottom:1px solid #e8e8e8;
+}
+.chat-back{font-size:26px;line-height:1;color:#1f1f1f;font-weight:400}
+.chat-avatar{
+  width:34px;height:34px;border-radius:50%;background:#06c755;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex:none;
+}
+.chat-name{flex:1}
+.chat-icons{color:#3f3f3f;font-size:15px;letter-spacing:2px}
+.chat-body{display:flex;flex-direction:column;gap:10px;padding:14px 16px 18px;overflow-y:auto;background:#8ea9db}
+.chat-msg{display:flex;flex-direction:column;max-width:82%}
+.chat-msg.chat-left{align-self:flex-start;align-items:flex-start}
+.chat-msg.chat-right{align-self:flex-end;align-items:flex-end}
+.chat-speaker{font-size:12px;font-weight:700;margin:0 4px 3px;line-height:1.4;color:#3f3f3f}
+.chat-bubble{
+  padding:9px 13px;border-radius:16px;font-size:var(--font-size);line-height:1.7;
+  white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 2px rgb(0 0 0 / .12);
+}
+.chat-msg.chat-left .chat-bubble{background:#fff;color:#1f1f1f;border-radius:4px 16px 16px 16px}
+.chat-msg.chat-right .chat-bubble{background:#a5d6a7;color:#10231a;border-radius:16px 4px 16px 16px}
+.chat-msg.chat-right .chat-bubble .char.pending{color:#35584a}
+.chat-msg.chat-right .chat-bubble .char.current{background:#fff;border-radius:4px}
+.chat-msg.chat-right .chat-bubble .char.correct{color:#065f46}
+.chat-msg.chat-right .chat-bubble .char.error{color:#b91c1c;background:rgb(0 0 0 / .08)}
+.chat-meta{font-size:11px;color:#2f3f5f;margin-top:3px}
+.chat-msg.chat-left .chat-meta{align-self:flex-start}
+.chat-msg.chat-right .chat-meta{align-self:flex-end}
+.chat-draft .chat-bubble{border:2px dashed #06c755;opacity:.92}
+/* 入場：氣泡浮現 */
+@keyframes chatBubbleIn{
+  from{opacity:0;transform:translateY(10px) scale(.94)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.chat-msg.msg-enter{animation:chatBubbleIn .45s cubic-bezier(.22,1,.36,1)}
+.chat-msg.chat-right.msg-enter{transform-origin:bottom right}
+.chat-msg.chat-left.msg-enter{transform-origin:bottom left}
+/* 對手輸入中：三個跳動點 */
+.chat-typing{display:inline-flex;gap:5px;align-items:center;padding:12px 16px}
+.chat-typing span{width:8px;height:8px;border-radius:50%;background:#8a8a8a;animation:chatDot 1.1s infinite}
+.chat-typing span:nth-child(2){animation-delay:.18s}
+.chat-typing span:nth-child(3){animation-delay:.36s}
+@keyframes chatDot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+/* 生活情境題的輸入框長得很像 LINE 的圓角列 */
+body[data-mode="life_situations"] .input-box input{border-radius:999px}
+body[data-mode="life_situations"] .hint-line{color:#4b5563}
 .input-box{margin-top:14px;display:flex;flex-direction:column;gap:10px}
 .input-box input{
   width:100%;padding:12px 14px;font-size:var(--font-size);border-radius:10px;border:2px solid var(--line);
@@ -231,6 +317,67 @@ code{background:var(--kbd-bg);color:var(--ink);padding:1px 6px;border-radius:6px
 }
 .auto-advance-label input{
   cursor:pointer;width:16px;height:16px;accent-color:var(--accent);
+}
+/* Practice view fills the viewport height so the target text and the
+   on-screen keyboard never push each other off screen. The target box
+   takes the remaining space and scrolls internally when needed; the
+   topbar is 61px tall (40px brand + 20px padding + 1px border). */
+/* 鍵位提示開啟時（#practiceView.onkb-on）：鍵盤 position:fixed 固定喺視窗底部、
+   往上約一行（底邊離視窗底約一行鍵高），位置唔跟題目走。
+   題目唔因開鍵盤而變長／變短：短題同平時一樣高（min-height 120px，只跟內容
+   長度變）；文章太長時題目收起嚟，只佔「鍵盤上方剩返嘅空間」，多出嚟嘅
+   內容喺題目框入面捲動（唔會頂到鍵盤）。練習視窗底部留出「鍵盤高 +
+   上移一行 + 間距」嘅空間，輸入框／選項固定貼喺鍵盤上方，唔會被題目
+   推出去或蓋住鍵盤。
+   鍵位提示關閉時（無 .onkb-on），題目維持原本上下厚度，唔撐滿整屏。 */
+#practiceView{display:flex;flex-direction:column;height:auto;min-height:0}
+#practiceView:not(.onkb-on) .target-box:not(.chat-target){flex:none}
+#practiceView.onkb-on{display:flex;flex-direction:column;height:calc(100vh - 61px);height:calc(100dvh - 61px);padding-bottom:calc(48px * 6 + 5px * 5 + 18px);overflow:hidden}
+#practiceView.onkb-on>*{flex-shrink:0}
+#practiceView.onkb-on #onKeyboardWrap{position:fixed;left:0;right:0;bottom:calc(48px + 5px);margin-top:0;z-index:20}
+/* 文章太長時收起題目：題目框 flex:1 收縮、內部捲動，只佔鍵盤上方
+   剩返嘅空間；固定嘅其餘項目（標題／進度／拆字／輸入框／提示／選項）
+   以 flex-basis:auto 唔縮，題目先收，選項唔會被推出去。
+   短題未用到上限時自然高度（同關鍵盤時一樣），唔會被扯長。
+   內容大於可用空間時固定項目會齊齊響應式縮小（`min-height:0` 允許
+   題目框跌到 0 以下捲動），確保選項一律喺鍵盤上方，唔會溢出。 */
+#practiceView .target-box:not(.chat-target){flex:none}
+#practiceView.onkb-on .target-box:not(.chat-target){flex:1 1 0;min-height:0;overflow-y:auto;scrollbar-width:thin}
+/* 矮視窗固定項目縮小一階，留返足夠位畀題目框，免溢出。 */
+@media (max-height:700px){
+  #practiceView.onkb-on .practice-head{margin-bottom:6px}
+  #practiceView.onkb-on .practice-head .btn{padding:4px 10px}
+  #practiceView.onkb-on .progress-track{margin-bottom:6px}
+  #practiceView.onkb-on .cangjie-bar{margin-bottom:0}
+  #practiceView.onkb-on .decomp-wheel{height:30px}
+  #practiceView.onkb-on .decomp-wheel-card{height:24px}
+  #practiceView.onkb-on .input-box{margin-top:8px;gap:6px}
+  #practiceView.onkb-on .input-box input{padding:8px 12px}
+  #practiceView.onkb-on .hint-line{margin:4px 2px;min-height:1.2em}
+}
+@media (max-height:900px){
+  #practiceView.onkb-on{padding-bottom:calc(42px * 6 + 3px * 5 + 18px)}
+  #practiceView.onkb-on #onKeyboardWrap{bottom:calc(42px + 3px)}
+}
+/* 矮視窗（≤700px）：只縮鍵盤，練習版面（題目厚度、按鈕、輸入框）維持原狀，
+   題目高度唔因開鍵盤而變；內容唔夠位時練習視窗可捲動，選項喺鍵盤上方。 */
+@media (max-height:700px){
+  #practiceView.onkb-on{padding-bottom:calc(34px * 6 + 2px * 5 + 10px)}
+  #practiceView.onkb-on #onKeyboardWrap{bottom:calc(34px + 2px)}
+  #practiceView.onkb-on .on-kb{gap:2px}
+  #practiceView.onkb-on .on-kb-row{gap:2px}
+  #practiceView.onkb-on #onKeyboardWrap .on-kb-key{height:34px}
+}
+body[data-mode="life_situations"] .input-box{margin-top:8px}
+body[data-mode="life_situations"] .on-kb-wrap{margin-top:10px}
+@media (max-height:900px){
+  .container{padding-top:12px}
+  .on-kb{gap:3px}
+  .on-kb-row{gap:3px}
+  #onKeyboardWrap .on-kb-key{height:42px}
+  .cangjie-bar{margin-bottom:2px}
+  .decomp-wheel{height:38px}
+  .decomp-wheel-card{height:30px}
 }
 /* On-screen key hint keyboard (under the input, opt-in via checkbox) */
 .on-kb-wrap{margin-top:18px}

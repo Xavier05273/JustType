@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JustType — 繁體中文打字練習</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg" />
-<link rel="icon" type="image/png" sizes="64x64" href="favicon.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
-<link rel="apple-touch-icon" href="favicon.png" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="apple-touch-icon" href="assets/favicon.png" />
 <meta name="theme-color" content="#2563eb" />
-<meta name="description" content="繁體中文打字練習：單字、句子、小短文。" />
+<meta name="description" content="繁體中文打字練習：單字、句子、小短文、文言文。" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -36,7 +36,7 @@
 <main id="homeView" class="container">
   <section class="hero">
     <h1>選一種練習，直接開始打</h1>
-    <p class="hero-sub"><strong>單字</strong>、<strong>句子</strong>、<strong>小短文</strong></p>
+    <p class="hero-sub"><strong>單字</strong>、<strong>句子</strong>、<strong>小短文</strong>、<strong>長文章</strong>、<strong>生活情境題</strong>、<strong>中英雜燴</strong>、<strong>文言文</strong>、<strong>一般法律公文</strong>、<strong>訴訟法律公文</strong></p>
   </section>
 
   <section class="carousel-shell" aria-label="練習模式">
@@ -51,7 +51,7 @@
     </div>
   </section>
 
-  <footer class="footer">JustType · 本地靜態站 · 資料在 <code>data.json</code></footer>
+  <footer class="footer">JustType · <a class="footer-github" href="https://github.com/Xavier05273/JustType" target="_blank" rel="noopener noreferrer" title="前往 GitHub 專案"><svg class="footer-github-icon" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Github</a></footer>
 </main>
 
 <main id="practiceView" class="container hidden">
@@ -62,7 +62,6 @@
       <span class="hud-item">時間 <strong id="hudTime">00:00</strong></span>
       <span class="hud-item">速度 <strong id="hudWpm">0</strong> 字/分</span>
       <span class="hud-item">正確率 <strong id="hudAcc">100%</strong></span>
-      <span class="hud-item">進度 <strong id="hudProg">0%</strong></span>
     </div>
   </div>
 
@@ -76,11 +75,7 @@
   <p id="hintLine" class="hint-line" aria-live="polite"></p>
 
   <div class="practice-foot">
-    <button id="restartBtn" class="btn" type="button">換一題重抽</button>
-    <label class="auto-advance-label" for="autoAdvanceCheck" title="完成後不跳出彈窗，直接進入下一題">
-      <input type="checkbox" id="autoAdvanceCheck" />
-      <span>自動跳下一題（不彈窗）</span>
-    </label>
+    <button id="restartBtn" class="btn" type="button">換一題</button>
     <label class="auto-advance-label" id="endlessLabel" for="endlessCheck" title="開啟後不結算，持續自動跳下一題">
       <input type="checkbox" id="endlessCheck" />
       <span>無盡模式</span>
@@ -89,7 +84,7 @@
       <input type="checkbox" id="onKeyboardCheck" />
       <span>鍵位提示</span>
     </label>
-    <label class="auto-advance-label" for="layoutSelect">版面
+    <label class="auto-advance-label" for="layoutSelect" id="layoutLabel">
       <select id="layoutSelect" aria-label="鍵盤版面">
         <option value="bopomofo" selected>注音</option>
         <option value="cangjie">倉頡</option>

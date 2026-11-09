@@ -1,5 +1,7 @@
 *.bak-*
 *.bak
+_archive/
+.hermes/
 .DS_Store
 node_modules/
 __pycache__/
