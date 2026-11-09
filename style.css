@@ -361,8 +361,56 @@ code{background:var(--kbd-bg);color:var(--ink);padding:1px 6px;border-radius:6px
 .anomaly-line{color:#b45309;font-size:14px;margin:8px 0}
 html[data-theme="dark"] .anomaly-line{color:#fbbf24}
 .modal-actions{display:flex;gap:10px;margin-top:16px}
+
+/* Stats Modal */
+.modal.stats-modal{
+  max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow-y:auto;
+}
+.stats-modal-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+}
+.stats-modal-head h2{margin:0;font-size:20px}
+.stats-overview{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:14px;
+}
+.stats-overview .cell{
+  border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel);text-align:center;
+}
+.stats-overview .cell .k{font-size:12px;color:var(--muted);margin-bottom:2px}
+.stats-overview .cell .v{font-size:20px;font-weight:700;color:var(--accent)}
+.stats-section-title{
+  font-size:14px;font-weight:700;color:var(--muted);margin:10px 0 6px;display:flex;align-items:center;gap:6px;
+}
+.stats-best-grid{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:14px;
+}
+.stats-best-card{
+  border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel);
+  display:flex;flex-direction:column;gap:4px;
+}
+.stats-best-card .mode-name{font-size:13px;font-weight:700;color:var(--ink)}
+.stats-best-card .best-wpm{font-size:16px;font-weight:700;color:var(--accent)}
+.stats-best-card .best-sub{font-size:12px;color:var(--muted)}
+.stats-hist-wrap{
+  flex:1;min-height:140px;max-height:220px;overflow-y:auto;border:1px solid var(--line);
+  border-radius:10px;background:var(--panel);padding:6px;
+}
+.stats-hist-list{display:flex;flex-direction:column;gap:6px}
+.stats-hist-item{
+  display:flex;align-items:center;justify-content:space-between;padding:8px 12px;
+  background:var(--bg);border-radius:8px;font-size:13px;gap:8px;
+}
+.stats-hist-item .hist-mode{font-weight:600;min-width:55px}
+.stats-hist-item .hist-wpm{font-weight:700;color:var(--ink)}
+.stats-hist-item .hist-meta{color:var(--muted);font-size:12px}
+.stats-empty{padding:24px;text-align:center;color:var(--muted);font-size:14px}
+.stats-modal-foot{justify-content:flex-end;margin-top:14px}
+
 @media (max-width:680px){
   .carousel-viewport{height:290px}
   .hero h1{font-size:24px}
   .hud{gap:10px}
+  .stats-overview{grid-template-columns:repeat(3, 1fr);gap:6px}
+  .stats-best-grid{grid-template-columns:1fr;gap:6px}
+  .stats-hist-wrap{max-height:150px;min-height:100px}
 }
