@@ -12,6 +12,7 @@
   const LS_ONKB = "tp-lite-onkb-v1";
   const LS_ONKB_DEFAULT_OFF_DONE = "tp-lite-onkb-default-off-v1";
   const LS_DECOMP = "tp-lite-decomp-v1"; // 右上角拆字顯示: cangjie|boshiamy|sucheng
+  const LS_CUSTOM_TEXT = "justtype_custom_text"; // 使用者自訂練習文本
 
   // Standard ANSI Physical Keyboard Layout (5 rows, exact 15.0u width per row).
   // Matches real physical keyboards in Taiwan (Bopomofo + QWERTY).
@@ -203,6 +204,7 @@
     { key: "classical_texts", title: "文言文", desc: "文以載道", dataKey: "classical_texts", color: "red" },
     { key: "general_legal_docs", title: "一般法律公文", desc: "法者，天子所與天下公共也", dataKey: "general_legal_docs", color: "slate" },
     { key: "litigation_legal_docs", title: "訴訟法律公文", desc: "你的夢想是成為書記官嗎", dataKey: "litigation_legal_docs", color: "orange" },
+    { key: "custom_text", title: "自訂文本", desc: "貼上自選文章或法條練習", dataKey: "custom_text", color: "purple" },
   ];
 
   // Pre-2026-11-09-restructure mode keys, kept only for history display.
@@ -232,6 +234,24 @@
   const statsBtn = $("#statsBtn");
   const closeStatsBtn = $("#closeStatsBtn");
   const closeStatsBtnBottom = $("#closeStatsBtnBottom");
+  const backHomeBtn = $("#backHomeBtn");
+  const changeCustomTextBtn = $("#changeCustomTextBtn");
+  const resultChangeCustomBtn = $("#resultChangeCustomBtn");
+  const customTextOverlay = $("#customTextOverlay");
+  const closeCustomTextBtn = $("#closeCustomTextBtn");
+  const cancelCustomBtn = $("#cancelCustomBtn");
+  const startCustomBtn = $("#startCustomBtn");
+  const customTextInput = $("#customTextInput");
+  const customCharCount = $("#customCharCount");
+  const toggleJsonModeBtn = $("#toggleJsonModeBtn");
+  const customErrorMsg = $("#customErrorMsg");
+  const customModalSub = $("#customModalSub");
+
+  let isCustomJsonMode = false;
+  let openCustomTextModal = null;
+  let closeCustomTextModal = null;
+  let escConfirmTimer = null;
+  let escConfirmActive = false;
 
   let DATA = null;
   let ZHUYIN = null;
@@ -461,6 +481,7 @@
     // 1. First fetch core question data (data.json) to render home view immediately
     const res = await fetch("data/data.json");
     DATA = await res.json();
+    ensureCustomData();
 
     decompMethod = ["cangjie", "boshiamy", "sucheng"].includes(loadJSON(LS_DECOMP, "cangjie"))
       ? loadJSON(LS_DECOMP, "cangjie") : "cangjie";
@@ -481,7 +502,46 @@
     });
   }
 
+    function getCustomTextRaw() {
+    return localStorage.getItem(LS_CUSTOM_TEXT) || "";
+  }
+
+  function parseCustomText(raw) {
+    if (!raw || !raw.trim()) return null;
+    let title = "自訂文本";
+    let content = raw.trim();
+    if (raw.trim().startsWith("{")) {
+      try {
+        const obj = JSON.parse(raw);
+        if (obj && typeof obj.content === "string") {
+          content = obj.content.trim();
+          if (obj.title && typeof obj.title === "string") {
+            title = obj.title.trim();
+          }
+        }
+      } catch {}
+    }
+    return { title, content };
+  }
+
+  function ensureCustomData() {
+    if (!DATA) return;
+    const parsed = parseCustomText(getCustomTextRaw());
+    if (parsed && parsed.content) {
+      DATA.custom_text = {
+        label: parsed.title,
+        texts: [{ id: "custom-1", text: parsed.content }]
+      };
+    } else {
+      DATA.custom_text = {
+        label: "自訂文本",
+        texts: []
+      };
+    }
+  }
+
   function renderHome() {
+    ensureCustomData();
     const best = loadBest();
     modeGrid.innerHTML = "";
     // 3D hit-test fix: .mode-carousel has preserve-3d and covers the whole
@@ -494,7 +554,8 @@
     if (carouselDots) carouselDots.innerHTML = "";
     const cards = [];
     MODES.forEach((m, idx) => {
-      const items = DATA[m.dataKey].texts;
+      const isCustom = m.key === "custom_text";
+      const items = (DATA[m.dataKey] && DATA[m.dataKey].texts) || [];
       const b = best[m.key];
       const card = document.createElement("button");
       card.className = "mode-card m-" + m.key;
@@ -502,13 +563,30 @@
       card.dataset.modeKey = m.key;
       card.dataset.index = idx;
       card.setAttribute("aria-label", m.title + "，點擊開始練習");
+
+      const customSub = isCustom && items.length > 0
+        ? `<span>長度 <strong>${Array.from(items[0].text).length} 字</strong></span>`
+        : `<span>題庫 <strong>${isCustom ? (items.length ? "已設定" : "尚未設定") : items.length + " 題"}</strong></span>`;
+
       card.innerHTML =
         `<span class="mode-card-bar" aria-hidden="true"></span>` +
+        (isCustom && items.length > 0 ? `<span class="mode-card-edit" title="編輯文本" aria-label="編輯文本">✎</span>` : "") +
         `<h3>${m.title}</h3><p>${m.desc}</p>` +
-        `<div class="mode-meta"><span>題庫 <strong>${items.length} 題</strong></span>` +
+        `<div class="mode-meta">${customSub}` +
         `<span>個人最佳 <strong>${b ? b.wpm + " 字/分 · " + b.acc + "%" : "—"}</strong></span></div>` +
         `<span class="mode-card-go">開始挑戰 →</span>` +
         `<span class="mode-glare" aria-hidden="true"></span>`;
+
+      if (isCustom) {
+        const editBtn = card.querySelector(".mode-card-edit");
+        if (editBtn) {
+          editBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openCustomTextModal();
+          });
+        }
+      }
+
       card.addEventListener("click", () => onCardClicked(idx));
       modeGrid.appendChild(card);
       cards.push(card);
@@ -645,7 +723,15 @@
     }
     if (idx === carousel.selected) {
       // Center card: start the round
-      startRound(MODES[idx].key);
+      const modeKey = MODES[idx].key;
+      if (modeKey === "custom_text") {
+        const raw = getCustomTextRaw();
+        if (!raw || !raw.trim()) {
+          openCustomTextModal();
+          return;
+        }
+      }
+      startRound(modeKey);
     } else {
       // Side card: navigate carousel to bring that card to center
       setCarouselTarget(idx);
@@ -832,6 +918,9 @@
       state.chatSegs = chat.segs;
       state.lines = chat.userTurns;
       state.chatVisible = 0;
+    } else if (modeKey === "custom_text" && item && item.text) {
+      const splitted = item.text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      state.lines = splitted.length > 0 ? splitted : [item.text];
     }
     state.inputs = state.lines.map(() => "");
     showPractice();
@@ -843,15 +932,34 @@
     }
   }
 
+  function resetEscConfirm() {
+    if (escConfirmTimer) {
+      clearTimeout(escConfirmTimer);
+      escConfirmTimer = null;
+    }
+    escConfirmActive = false;
+    if (backHomeBtn) {
+      backHomeBtn.textContent = "← 回首頁";
+    }
+  }
+
   function showPractice() {
+    resetEscConfirm();
     document.body.dataset.mode = state.modeKey;
     homeView.classList.add("hidden");
     practiceView.classList.remove("hidden");
     resultOverlay.classList.add("hidden");
-    $("#practiceTitle").textContent = state.mode.title;
+    const titleText = state.modeKey === "custom_text" && state.item && state.item.label
+      ? `自訂：${state.item.label}`
+      : state.mode.title;
+    $("#practiceTitle").textContent = titleText;
+    if (changeCustomTextBtn) {
+      changeCustomTextBtn.classList.toggle("hidden", state.modeKey !== "custom_text");
+    }
   }
 
   function showHome() {
+    resetEscConfirm();
     // Cancel any pending result modal that would reappear after going home
     if (resultTimeoutId) {
       clearTimeout(resultTimeoutId);
@@ -2529,6 +2637,9 @@
       if (stats.isAnomalous) warn.textContent = "⚠️ 計時異常（完成時間過短，疑似貼上或瞬間輸入），速度未計入最佳紀錄。";
     }
     $("#newRecordLine").classList.toggle("hidden", !stats.isRecord);
+    if (resultChangeCustomBtn) {
+      resultChangeCustomBtn.classList.toggle("hidden", state.modeKey !== "custom_text");
+    }
     resultOverlay.classList.remove("hidden");
   }
 
@@ -2690,12 +2801,206 @@
       statsOverlay.addEventListener("click", (e) => {
         if (e.target === statsOverlay) closeStatsModal();
       });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !statsOverlay.classList.contains("hidden")) {
-          closeStatsModal();
+    }
+
+    openCustomTextModal = function() {
+      if (!customTextOverlay) return;
+      const raw = getCustomTextRaw();
+      if (customTextInput) {
+        customTextInput.value = raw;
+        customTextInput.classList.remove("is-invalid");
+      }
+      updateCustomMeta();
+      hideCustomError();
+      customTextOverlay.classList.remove("hidden");
+      if (customTextInput) {
+        setTimeout(() => customTextInput.focus(), 50);
+      }
+    }
+
+    closeCustomTextModal = function() {
+      if (!customTextOverlay) return;
+      customTextOverlay.classList.add("hidden");
+      hideCustomError();
+      if (practiceView && !practiceView.classList.contains("hidden")) {
+        focusCurrent();
+      }
+    }
+
+    function hideCustomError() {
+      if (customErrorMsg) {
+        customErrorMsg.classList.add("hidden");
+        customErrorMsg.textContent = "";
+      }
+      if (customTextInput) customTextInput.classList.remove("is-invalid");
+    }
+
+    function showCustomError(msg) {
+      if (customErrorMsg) {
+        customErrorMsg.classList.remove("hidden");
+        customErrorMsg.textContent = msg;
+      }
+      if (customTextInput) {
+        customTextInput.classList.add("is-invalid");
+        customTextInput.focus();
+      }
+    }
+
+    function updateCustomMeta() {
+      if (!customTextInput || !customCharCount) return;
+      const val = customTextInput.value || "";
+      const len = Array.from(val.replace(/\s/g, "")).length;
+      customCharCount.textContent = `${len} 字`;
+    }
+
+    function validateCustomInput(rawText) {
+      if (!rawText || !rawText.trim()) {
+        return { valid: false, error: "內容不能為空，請貼上文字" };
+      }
+      const trimmed = rawText.trim();
+      let content = trimmed;
+
+      if (isCustomJsonMode || trimmed.startsWith("{")) {
+        try {
+          const data = JSON.parse(trimmed);
+          if (!data || typeof data !== "object") {
+            return { valid: false, error: "JSON 格式錯誤：必須是包含 content 屬性的物件" };
+          }
+          if (!data.content || typeof data.content !== "string" || !data.content.trim()) {
+            return { valid: false, error: "缺少必要內容：content 欄位必須有文字" };
+          }
+          content = data.content.trim();
+        } catch {
+          return { valid: false, error: "JSON 格式錯誤（括號、引號未閉合或語法錯誤）" };
         }
+      }
+
+      const charCount = Array.from(content.replace(/\s/g, "")).length;
+      if (charCount < 5) {
+        return { valid: false, error: "內容太短，請至少輸入 5 個字" };
+      }
+      if (Array.from(content).length > 5000) {
+        return { valid: false, error: "文本過長，請限制在 5,000 字以內" };
+      }
+
+      return { valid: true, content };
+    }
+
+    function handleStartCustom() {
+      if (!customTextInput) return;
+      const raw = customTextInput.value;
+      const res = validateCustomInput(raw);
+      if (!res.valid) {
+        showCustomError(res.error);
+        return;
+      }
+      localStorage.setItem(LS_CUSTOM_TEXT, raw.trim());
+      ensureCustomData();
+      renderHome();
+      closeCustomTextModal();
+      startRound("custom_text");
+    }
+
+    if (closeCustomTextBtn) closeCustomTextBtn.addEventListener("click", closeCustomTextModal);
+    if (cancelCustomBtn) cancelCustomBtn.addEventListener("click", closeCustomTextModal);
+    if (startCustomBtn) startCustomBtn.addEventListener("click", handleStartCustom);
+    if (customTextInput) {
+      customTextInput.addEventListener("input", () => {
+        updateCustomMeta();
+        hideCustomError();
       });
     }
+    if (toggleJsonModeBtn) {
+      toggleJsonModeBtn.addEventListener("click", () => {
+        isCustomJsonMode = !isCustomJsonMode;
+        if (isCustomJsonMode) {
+          toggleJsonModeBtn.textContent = "返回純文字模式";
+          if (customModalSub) customModalSub.textContent = "以 JSON 格式貼上（例：{\"title\": \"文章標題\", \"content\": \"文章內文...\"}）：";
+          if (customTextInput && !customTextInput.value.trim().startsWith("{")) {
+            const currentVal = customTextInput.value.trim();
+            customTextInput.value = JSON.stringify({ title: "自訂文章", content: currentVal || "請在此輸入內文..." }, null, 2);
+          }
+        } else {
+          toggleJsonModeBtn.textContent = "進階：切換 JSON 格式";
+          if (customModalSub) customModalSub.textContent = "直接貼上你想練習的文章、法條或文稿（5 ~ 5,000 字）：";
+          if (customTextInput && customTextInput.value.trim().startsWith("{")) {
+            try {
+              const obj = JSON.parse(customTextInput.value.trim());
+              if (obj && obj.content) customTextInput.value = obj.content;
+            } catch {}
+          }
+        }
+        updateCustomMeta();
+        hideCustomError();
+      });
+    }
+
+    if (customTextOverlay) {
+      customTextOverlay.addEventListener("click", (e) => {
+        if (e.target === customTextOverlay) closeCustomTextModal();
+      });
+    }
+
+    if (changeCustomTextBtn) {
+      changeCustomTextBtn.addEventListener("click", () => {
+        resetEscConfirm();
+        openCustomTextModal();
+      });
+    }
+    if (resultChangeCustomBtn) {
+      resultChangeCustomBtn.addEventListener("click", () => {
+        resultOverlay.classList.add("hidden");
+        openCustomTextModal();
+      });
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+
+      // 1. 組字中防呆：若正在 IME 組字中，Esc 僅作為輸入法取消組字，不觸發任何退出或關閉動作
+      if (e.isComposing || (state && state.composing) || e.keyCode === 229) {
+        return;
+      }
+
+      // 2. 自訂文本彈窗開啟時，Esc 優先關閉該彈窗
+      if (customTextOverlay && !customTextOverlay.classList.contains("hidden")) {
+        closeCustomTextModal();
+        return;
+      }
+
+      // 3. 成績統計彈窗開啟時，Esc 優先關閉該彈窗
+      if (statsOverlay && !statsOverlay.classList.contains("hidden")) {
+        closeStatsModal();
+        return;
+      }
+
+      // 4. 結算彈窗開啟時，Esc 關閉彈窗並回首頁
+      if (resultOverlay && !resultOverlay.classList.contains("hidden")) {
+        showHome();
+        return;
+      }
+
+      // 5. 練習畫面中，實作兩段式 Esc 退出（2 秒內再按一次才觸發，2 秒後無動作自動恢復）
+      if (practiceView && !practiceView.classList.contains("hidden")) {
+        if (escConfirmActive) {
+          // 2 秒內再次按下，觸發回首頁
+          resetEscConfirm();
+          showHome();
+        } else {
+          // 第一次按下：顯示提示，並啟動 2 秒計時器
+          escConfirmActive = true;
+          if (backHomeBtn) {
+            backHomeBtn.textContent = "再按一次退出…";
+          }
+          hint("按 Esc 再確認一次以退出回首頁");
+          if (escConfirmTimer) clearTimeout(escConfirmTimer);
+          escConfirmTimer = setTimeout(() => {
+            resetEscConfirm();
+            setHintDefault();
+          }, 2000);
+        }
+      }
+    });
 
     $("#resetStatsBtn").addEventListener("click", () => {
       if (confirm("確定要清除所有練習紀錄與個人最佳成績嗎？此動作無法復原。")) {
@@ -2707,9 +3012,18 @@
         }
       }
     });
-    $("#backHomeBtn").addEventListener("click", showHome);
-    $("#restartBtn").addEventListener("click", () => startRound(state.modeKey));
-    $("#againBtn").addEventListener("click", () => startRound(state.modeKey));
+    $("#backHomeBtn").addEventListener("click", () => {
+      resetEscConfirm();
+      showHome();
+    });
+    $("#restartBtn").addEventListener("click", () => {
+      resetEscConfirm();
+      startRound(state.modeKey);
+    });
+    $("#againBtn").addEventListener("click", () => {
+      resetEscConfirm();
+      startRound(state.modeKey);
+    });
     $("#homeBtn").addEventListener("click", showHome);
     $("#targetBox").addEventListener("click", focusCurrent);
     if (endlessCheck) {

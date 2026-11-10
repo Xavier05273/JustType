@@ -56,7 +56,7 @@
 
 <main id="practiceView" class="container hidden">
   <div class="practice-head">
-    <button id="backHomeBtn" class="btn ghost" type="button">← 回首頁</button>
+    <button id="backHomeBtn" class="btn ghost" type="button" tabindex="-1">← 回首頁</button>
     <div class="practice-title" id="practiceTitle">練習</div>
     <div class="hud">
       <span class="hud-item">時間 <strong id="hudTime">00:00</strong></span>
@@ -70,12 +70,13 @@
   <div class="cangjie-bar">
     <div id="cangjieHint" class="cangjie-hint" aria-live="polite" title="目前要打的字之拆字（倉頡／嘸蝦米／速成三方塊橫向反向環滾輪，拖曳/滾輪/箭頭切換；組字時凍結）">拆字：—</div>
   </div>
-  <div id="targetBox" class="target-box" tabindex="0" aria-label="目標文字，點一下聚焦輸入框"></div>
+  <div id="targetBox" class="target-box" tabindex="-1" aria-label="目標文字，點一下聚焦輸入框"></div>
   <div id="inputBox" class="input-box"></div>
   <p id="hintLine" class="hint-line" aria-live="polite"></p>
 
   <div class="practice-foot">
     <button id="restartBtn" class="btn" type="button">換一題</button>
+    <button id="changeCustomTextBtn" class="btn hidden" type="button">更換文章</button>
     <label class="auto-advance-label" id="endlessLabel" for="endlessCheck" title="開啟後不結算，持續自動跳下一題">
       <input type="checkbox" id="endlessCheck" />
       <span>無盡模式</span>
@@ -107,7 +108,29 @@
     <p id="newRecordLine" class="new-record hidden">★ 新紀錄！</p>
     <div class="modal-actions">
       <button id="againBtn" class="btn primary" type="button">再來一局</button>
+      <button id="resultChangeCustomBtn" class="btn hidden" type="button">更換文章</button>
       <button id="homeBtn" class="btn" type="button">回首頁</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="customTextOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="customTextTitle">
+  <div class="modal custom-modal">
+    <div class="stats-modal-head">
+      <h2 id="customTextTitle">自訂練習文本</h2>
+      <button id="closeCustomTextBtn" class="btn ghost small" type="button" aria-label="關閉視窗">✕</button>
+    </div>
+    <p class="custom-modal-sub" id="customModalSub">直接貼上你想練習的文章、法條或文稿（5 ~ 5,000 字）：</p>
+    <textarea id="customTextInput" class="custom-textarea" rows="8" placeholder="直接貼上你想練習的文章、法條或文稿..."></textarea>
+    <div class="custom-meta-row">
+      <span id="customCharCount" class="custom-char-count">0 字</span>
+      <button id="toggleJsonModeBtn" class="btn-link" type="button">進階：切換 JSON 格式</button>
+    </div>
+    <div id="customErrorMsg" class="custom-error hidden"></div>
+    <div class="modal-actions">
+      <button id="startCustomBtn" class="btn primary" type="button">開始練習</button>
+      <button id="cancelCustomBtn" class="btn" type="button">取消</button>
     </div>
   </div>
 </div>
