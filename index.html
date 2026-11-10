@@ -7,7 +7,8 @@
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png" />
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
-<link rel="apple-touch-icon" href="assets/favicon.png" />
+<link rel="apple-touch-icon" href="assets/icon-192.png" />
+<link rel="manifest" href="manifest.webmanifest" />
 <meta name="theme-color" content="#2563eb" />
 <meta name="description" content="繁體中文打字練習：單字、句子、小短文、文言文。" />
 <link rel="stylesheet" href="style.css" />
@@ -169,7 +170,13 @@
     <div id="statsHistWrap" class="stats-hist-wrap">
       <div id="statsHistList" class="stats-hist-list"></div>
     </div>
+    <div id="statsMsg" class="stats-msg hidden" role="status" aria-live="polite"></div>
     <div class="modal-actions stats-modal-foot">
+      <div class="stats-transfer-actions">
+        <button id="exportStatsBtn" class="btn small" type="button" title="將個人最佳與練習紀錄匯出為 JSON 檔">匯出成績 (JSON)</button>
+        <button id="importStatsBtn" class="btn small" type="button" title="匯入先前備份的成績 JSON 檔">匯入成績 (JSON)</button>
+        <input type="file" id="statsFileInput" accept=".json,application/json" class="hidden-file-input" />
+      </div>
       <button id="closeStatsBtnBottom" class="btn primary" type="button">關閉</button>
     </div>
   </div>

@@ -1,0 +1,36 @@
+{
+  "name": "JustType — 繁體中文打字練習",
+  "short_name": "JustType",
+  "description": "繁體中文打字練習：單字、句子、小短文、長文章、生活情境、中英雜燴、文言文、公文與法律條文。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "lang": "zh-TW",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
