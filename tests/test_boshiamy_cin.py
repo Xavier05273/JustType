@@ -70,41 +70,11 @@ def test_boshiamy_flow():
             }""")
             page.reload()
 
-            # 確認預設頂部輸入法為「注音」
-            top_select = page.locator("#topbarLayoutSelect")
-            assert top_select.input_value() == "bopomofo"
+            # 1. 驗證最上方輸入法選單已刪除
+            assert page.locator("#topbarLayoutSelect").count() == 0
 
-            # 2. 首次點擊切換至「嘸蝦米」輸入法 -> 應觸發啟用引導彈窗
-            modal = page.locator("#boshiamyImportOverlay")
-            assert modal.is_hidden()
-            top_select.select_option("boshiamy")
-            modal.wait_for(state="visible")
-
-            # 檢查彈窗標題與說明文字
-            title = page.locator("#boshiamyModalTitle")
-            sub = page.locator("#boshiamyModalSub")
-            assert "啟用嘸蝦米模式" in title.inner_text()
-            assert "因版權限制，本站不內建嘸蝦米碼表" in sub.inner_text()
-            assert ".cin" in sub.inner_text()
-
-            # 關閉彈窗測試
-            cancel_btn = page.locator("#cancelBoshiamyBtn")
-            cancel_btn.click()
-            assert modal.is_hidden()
-
-            # 3. 進入練習模式測試：此時輸入法為嘸蝦米但尚未載入碼表
+            # 2. 進入練習模式測試
             page.wait_for_selector(".mode-card.is-center")
-            page.click(".mode-card.is-center")
-
-            # 首頁點擊因未載入碼表，應再次跳出彈窗引導
-            modal.wait_for(state="visible")
-
-            # 關閉彈窗
-            page.keyboard.press("Escape")
-            assert modal.is_hidden()
-
-            # 暫時切換回注音進入練習頁
-            top_select.select_option("bopomofo")
             page.click(".mode-card.is-center")
             page.wait_for_selector("#practiceView:not(.hidden)")
 
@@ -112,12 +82,13 @@ def test_boshiamy_flow():
             page.check("#onKeyboardCheck")
             page.wait_for_timeout(300)
 
-            # 4. 在練習頁切換至「嘸蝦米」
+            # 3. 在練習頁切換至「嘸蝦米」 -> 預設不彈窗，使用者可自由點擊
+            modal = page.locator("#boshiamyImportOverlay")
+            assert modal.is_hidden()
             layout_select = page.locator("#layoutSelect")
             layout_select.select_option("boshiamy")
-            modal.wait_for(state="visible")
-            page.keyboard.press("Escape")
-            assert modal.is_hidden()
+            page.wait_for_timeout(300)
+            assert modal.is_hidden(), "切換到嘸蝦米時不應自動彈出彈窗"
 
             # 驗證「上方拆字提示區」顯示情境提示「嘸蝦米：匯入 .cin 檔」
             cangjie_hint = page.locator("#cangjieHint")
@@ -129,13 +100,34 @@ def test_boshiamy_flow():
             overlay_btn = page.locator(".on-kb-overlay-btn")
             assert "點擊匯入 .cin 碼表啟用鍵盤" in overlay_btn.inner_text()
 
+            # 驗證遮罩寬度與鍵盤一致，不延伸到兩側
+            kb_box = page.locator("#onKeyboard").bounding_box()
+            overlay_box = page.locator(".on-kb-overlay").bounding_box()
+            assert kb_box is not None and overlay_box is not None
+            assert abs(kb_box["x"] - overlay_box["x"]) < 2
+            assert abs(kb_box["width"] - overlay_box["width"]) < 2
+
             # 驗證打字輸入框為 disabled 且 placeholder 提示匯入
             input_box = page.locator("#inputBox input")
             assert input_box.is_disabled()
             assert "請先點擊上方或鍵盤匯入碼表" in (input_box.get_attribute("placeholder") or "")
 
-            # 驗證防呆體驗：在練習頁敲擊任何按鍵自動呼叫上傳彈窗
-            page.keyboard.press("KeyA")
+            # 驗證點擊鍵盤遮罩按鈕可開啟彈窗
+            overlay_btn.click()
+            modal.wait_for(state="visible")
+            title = page.locator("#boshiamyModalTitle")
+            sub = page.locator("#boshiamyModalSub")
+            assert "啟用嘸蝦米模式" in title.inner_text()
+            assert "因版權限制，本站不內建嘸蝦米碼表" in sub.inner_text()
+            assert ".cin" in sub.inner_text()
+
+            # 關閉彈窗
+            cancel_btn = page.locator("#cancelBoshiamyBtn")
+            cancel_btn.click()
+            assert modal.is_hidden()
+
+            # 點擊拆字區「匯入 .cin 檔」也能開啟彈窗
+            page.locator(".decomp-import-btn").click()
             modal.wait_for(state="visible")
 
             # 5. 上傳 .cin 檔案並本地解析

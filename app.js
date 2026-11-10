@@ -228,7 +228,6 @@
   const layoutLabel = $("#layoutLabel");
   const onKeyboardWrap = $("#onKeyboardWrap");
   const onKeyboard = $("#onKeyboard");
-  const topbarLayoutSelect = $("#topbarLayoutSelect");
   const layoutSelect = $("#layoutSelect");
   const cangjieHint = $("#cangjieHint");
   const statsOverlay = $("#statsOverlay");
@@ -1667,7 +1666,7 @@
     // 虛擬鍵盤區情境觸發：僅當使用者手動切換到「嘸蝦米」且未載入碼表時才顯示灰色遮罩與按鈕
     const isBoshiamyUninitialized = layout === "boshiamy" && !BOSHIAMY;
     onKeyboardWrap.classList.toggle("is-uninitialized", isBoshiamyUninitialized);
-    let overlay = onKeyboardWrap.querySelector(".on-kb-overlay");
+    let overlay = onKeyboard.querySelector(".on-kb-overlay");
     if (isBoshiamyUninitialized) {
       if (!overlay) {
         overlay = document.createElement("div");
@@ -1679,7 +1678,7 @@
         overlay.addEventListener("click", () => {
           if (typeof openBoshiamyModal === "function") openBoshiamyModal();
         });
-        onKeyboardWrap.appendChild(overlay);
+        onKeyboard.appendChild(overlay);
       }
     } else {
       if (overlay) overlay.remove();
@@ -3340,9 +3339,6 @@
       if (layoutSelect) {
         layoutSelect.value = currentInitialLayout;
       }
-      if (topbarLayoutSelect) {
-        topbarLayoutSelect.value = currentInitialLayout;
-      }
       if (savedLayout === "qwerty") {
         pref.layout = "boshiamy";
         saveJSON(LS_ONKB, pref);
@@ -3357,12 +3353,6 @@
     }
     if (layoutSelect) {
       layoutSelect.addEventListener("change", (e) => {
-        onLayoutChanged(e.target.value);
-      });
-    }
-
-    if (topbarLayoutSelect) {
-      topbarLayoutSelect.addEventListener("change", (e) => {
         onLayoutChanged(e.target.value);
       });
     }
@@ -3381,12 +3371,6 @@
       diff = ((diff + 1.5) % 3 + 3) % 3 - 1.5;
       setDecompWheelTarget(Math.round(decompWheel.pos + diff));
     }
-    // If switched to boshiamy and not loaded, trigger modal and update UI
-    if (val === "boshiamy" && !BOSHIAMY) {
-      if (typeof openBoshiamyModal === "function") {
-        openBoshiamyModal();
-      }
-    }
     if (state && !state.finished) {
       renderPractice();
       paint();
@@ -3397,9 +3381,6 @@
   function syncLayoutSelectors(layout) {
     if (layoutSelect && layoutSelect.value !== layout) {
       layoutSelect.value = layout;
-    }
-    if (topbarLayoutSelect && topbarLayoutSelect.value !== layout) {
-      topbarLayoutSelect.value = layout;
     }
   }
 

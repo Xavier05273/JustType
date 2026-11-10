@@ -323,17 +323,22 @@ code{background:var(--kbd-bg);color:var(--ink);padding:1px 6px;border-radius:6px
 .on-kb-wrap.is-uninitialized .on-kb{
   opacity:0.4;
   filter:grayscale(1);
-  pointer-events:none;
   transition:opacity .25s ease, filter .25s ease;
+}
+.on-kb-wrap.is-uninitialized .on-kb .on-kb-key{
+  pointer-events:none;
 }
 .on-kb-overlay{
   position:absolute;
   inset:0;
+  width:100%;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
   background:rgba(0, 0, 0, 0.08);
   border-radius:10px;
+  pointer-events:auto;
   z-index:5;
   cursor:pointer;
 }
@@ -520,7 +525,7 @@ body[data-mode="life_situations"] .on-kb-wrap{margin-top:10px}
 }
 /* On-screen key hint keyboard (under the input, opt-in via checkbox) */
 .on-kb-wrap{margin-top:18px}
-.on-kb{display:flex;flex-direction:column;gap:5px;user-select:none;-webkit-user-select:none;max-width:960px;margin:0 auto}
+.on-kb{position:relative;display:flex;flex-direction:column;gap:5px;user-select:none;-webkit-user-select:none;max-width:960px;margin:0 auto}
 .on-kb-row{display:flex;gap:5px;width:100%}
 .on-kb-key{
   flex: calc(var(--u, 1) * 10) 1 0px;
