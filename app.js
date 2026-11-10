@@ -228,9 +228,17 @@
   const layoutLabel = $("#layoutLabel");
   const onKeyboardWrap = $("#onKeyboardWrap");
   const onKeyboard = $("#onKeyboard");
+  const topbarLayoutSelect = $("#topbarLayoutSelect");
   const layoutSelect = $("#layoutSelect");
   const cangjieHint = $("#cangjieHint");
   const statsOverlay = $("#statsOverlay");
+  const boshiamyImportOverlay = $("#boshiamyImportOverlay");
+  const closeBoshiamyModalBtn = $("#closeBoshiamyModalBtn");
+  const cancelBoshiamyBtn = $("#cancelBoshiamyBtn");
+  const boshiamyDropzone = $("#boshiamyDropzone");
+  const boshiamyFileInput = $("#boshiamyFileInput");
+  const selectBoshiamyFileBtn = $("#selectBoshiamyFileBtn");
+  const boshiamyStatusMsg = $("#boshiamyStatusMsg");
   const statsBtn = $("#statsBtn");
   const closeStatsBtn = $("#closeStatsBtn");
   const closeStatsBtnBottom = $("#closeStatsBtnBottom");
@@ -250,6 +258,8 @@
   let isCustomJsonMode = false;
   let openCustomTextModal = null;
   let closeCustomTextModal = null;
+  let openBoshiamyModal = null;
+  let closeBoshiamyModal = null;
   let escConfirmTimer = null;
   let escConfirmActive = false;
 
@@ -492,7 +502,7 @@
     Promise.all([
       fetch("data/zhuyin.json").then((r) => r.json()).then((d) => { ZHUYIN = d; }).catch(() => { ZHUYIN = null; }),
       fetch("data/cangjie.json").then((r) => r.json()).then((d) => { CANGJIE = d; }).catch(() => { CANGJIE = null; }),
-      fetch("data/boshiamy.json").then((r) => r.json()).then((d) => { BOSHIAMY = d; }).catch(() => { BOSHIAMY = null; }),
+      loadBoshiamyFromIDB().then((d) => { BOSHIAMY = d; }).catch(() => { BOSHIAMY = null; }),
     ]).then(() => {
       // If currently practicing, refresh key hints and decomposition wheel once dictionaries are loaded
       if (state && !state.finished) {
@@ -502,7 +512,109 @@
     });
   }
 
-    function getCustomTextRaw() {
+    // ---- IndexedDB Helper for Boshiamy Table ----
+  const IDB_NAME = "justtype_db";
+  const IDB_VERSION = 1;
+  const IDB_STORE = "tables";
+  const IDB_KEY_BOSHIAMY = "boshiamy";
+
+  function openIndexedDB() {
+    return new Promise((resolve, reject) => {
+      if (!window.indexedDB) {
+        reject(new Error("IndexedDB 不支援"));
+        return;
+      }
+      const req = window.indexedDB.open(IDB_NAME, IDB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function loadBoshiamyFromIDB() {
+    try {
+      const db = await openIndexedDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, "readonly");
+        const store = tx.objectStore(IDB_STORE);
+        const req = store.get(IDB_KEY_BOSHIAMY);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async function saveBoshiamyToIDB(table) {
+    const db = await openIndexedDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      const store = tx.objectStore(IDB_STORE);
+      const req = store.put(table, IDB_KEY_BOSHIAMY);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // Parse .cin file or table text to { char: shortest_code }
+  function parseCinTable(text) {
+    if (!text || typeof text !== "string") return null;
+    const table = {};
+    const lines = text.split(/\r?\n/);
+    let inChardef = false;
+    const hasChardefBlock = lines.some((l) => l.trim().startsWith("%chardef begin"));
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line || line.startsWith("#")) continue;
+
+      if (line.startsWith("%chardef begin")) {
+        inChardef = true;
+        continue;
+      }
+      if (line.startsWith("%chardef end")) {
+        inChardef = false;
+        continue;
+      }
+
+      if (hasChardefBlock && !inChardef) continue;
+
+      // Skip other header commands starting with %
+      if (line.startsWith("%")) continue;
+
+      const parts = line.split(/\s+/);
+      if (parts.length < 2) continue;
+
+      let code = parts[0].toLowerCase();
+      let ch = parts[1];
+
+      // Support swapped columns (e.g. char code)
+      if (code.length === 1 && !/^[a-z]+$/.test(code) && /^[a-z]+$/i.test(ch)) {
+        const tmp = code;
+        code = ch.toLowerCase();
+        ch = tmp;
+      }
+
+      // We only index single characters with a-z keys
+      if (Array.from(ch).length !== 1) continue;
+      if (!/^[a-z]+$/.test(code)) continue;
+
+      // Shortest code takes precedence; if same length, keep first seen
+      if (!table[ch] || code.length < table[ch].length) {
+        table[ch] = code;
+      }
+    }
+
+    return Object.keys(table).length > 0 ? table : null;
+  }
+
+  function getCustomTextRaw() {
     return localStorage.getItem(LS_CUSTOM_TEXT) || "";
   }
 
@@ -724,6 +836,13 @@
     if (idx === carousel.selected) {
       // Center card: start the round
       const modeKey = MODES[idx].key;
+      // 首次點擊偵測：若當前輸入法選定為嘸蝦米，且本地尚未載入碼表，直接彈出引導彈窗
+      if (getCurrentLayout() === "boshiamy" && !BOSHIAMY) {
+        if (typeof openBoshiamyModal === "function") {
+          openBoshiamyModal();
+          return;
+        }
+      }
       if (modeKey === "custom_text") {
         const raw = getCustomTextRaw();
         if (!raw || !raw.trim()) {
@@ -1177,7 +1296,13 @@
       ? "" // in LINE turns the sent text lives in the bubble above, not the input
       : (state.inputs[li] || "");
     const lifeActive = !isChat || state.animationPhase === ANIMATION_PHASE.USER_TYPING;
-    if (state.lines.length > 1 && !isChat) {
+    const currentLayout = getCurrentLayout();
+    const isBoshiamyUninitialized = currentLayout === "boshiamy" && !BOSHIAMY;
+
+    if (isBoshiamyUninitialized) {
+      inp.placeholder = "請先點擊上方或鍵盤匯入碼表";
+      inp.disabled = true;
+    } else if (state.lines.length > 1 && !isChat) {
       const isLastLine = li >= state.lines.length - 1;
       inp.placeholder = active
         ? `第 ${li + 1} / ${state.lines.length} 行：在此輸入…（${isLastLine ? "打對即完成" : "打對自動換行"}）`
@@ -1189,7 +1314,7 @@
     } else {
       inp.placeholder = active ? "在此輸入…" : "（已完成）";
     }
-    inp.disabled = !active || !lifeActive;
+    inp.disabled = !active || !lifeActive || isBoshiamyUninitialized;
     inp.autocomplete = "off"; inp.autocorrect = "off"; inp.autocapitalize = "off"; inp.spellcheck = false;
     inp.setAttribute("aria-label", `第 ${li + 1} 行輸入`);
     inp.dataset.line = li;
@@ -1538,6 +1663,28 @@
     if (!show) return;
     const layout = (loadJSON(LS_ONKB, {}) || {}).layout || (layoutSelect ? layoutSelect.value : "bopomofo");
     if (onKeyboard.dataset.layout !== layout) buildOnKeyboard(layout);
+
+    // 虛擬鍵盤區情境觸發：僅當使用者手動切換到「嘸蝦米」且未載入碼表時才顯示灰色遮罩與按鈕
+    const isBoshiamyUninitialized = layout === "boshiamy" && !BOSHIAMY;
+    onKeyboardWrap.classList.toggle("is-uninitialized", isBoshiamyUninitialized);
+    let overlay = onKeyboardWrap.querySelector(".on-kb-overlay");
+    if (isBoshiamyUninitialized) {
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.className = "on-kb-overlay";
+        overlay.setAttribute("role", "button");
+        overlay.setAttribute("tabindex", "0");
+        overlay.setAttribute("aria-label", "點擊匯入 .cin 碼表啟用鍵盤");
+        overlay.innerHTML = `<button type="button" class="on-kb-overlay-btn">📥 點擊匯入 .cin 碼表啟用鍵盤</button>`;
+        overlay.addEventListener("click", () => {
+          if (typeof openBoshiamyModal === "function") openBoshiamyModal();
+        });
+        onKeyboardWrap.appendChild(overlay);
+      }
+    } else {
+      if (overlay) overlay.remove();
+    }
+
     paintOnKeyboard();
   }
 
@@ -1777,7 +1924,7 @@
   function decompositionFor(ch, method) {
     if (!ch) return null;
     if (method === "boshiamy") {
-      if (!BOSHIAMY) return { missing: "字庫未載入" };
+      if (!BOSHIAMY) return { isBoshiamyUninitialized: true };
       const code = BOSHIAMY[ch] || null;
       if (!code) return { missing: "查無拆字" };
       // 嘸蝦米只顯示英文字母，不顯示部首/字根漢字（使用者要求）。
@@ -1811,16 +1958,20 @@
   function decompositionCardHTML(ch, methodKey) {
     const label = methodLabel(methodKey);
     if (!ch) return `<span class="decomp-name">${label}</span> ： —`;
-    if (PUNCT_KEY_MAP[ch] || /^[\x00-\x7F]$/.test(ch)) {
-      return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： 照打`;
+    if (methodKey === "boshiamy" && !BOSHIAMY) {
+      return `<span class="decomp-name">${label}</span> ： <span class="decomp-import-btn" role="button" tabindex="0" title="點擊匯入碼表">匯入 .cin 檔</span>`;
+    }
+    const reloadBtn = methodKey === "boshiamy" ? ` <button type="button" class="decomp-reload-btn" title="重新上傳或更換碼表" aria-label="重新上傳或更換碼表">⚙️</button>` : "";
+    if (PUNCT_KEY_MAP[ch] || /^[ -]$/.test(ch)) {
+      return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： 照打${reloadBtn}`;
     }
     const dec = decompositionFor(ch, methodKey);
     if (dec && dec.missing) {
-      return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： ${dec.missing}`;
+      return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： ${dec.missing}${reloadBtn}`;
     }
-    if (dec.lettersOnly) {
+    if (dec && dec.lettersOnly) {
       const letters = Array.from(dec.code).map((c) => c.toUpperCase()).join(" ");
-      return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： <span class="cj-letters">${letters}</span>`;
+      return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： <span class="cj-letters">${letters}</span>${reloadBtn}`;
     }
     return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： <span class="cj-radicals">${dec.radicals}</span> <span class="cj-code">${dec.code}</span>`;
   }
@@ -1958,8 +2109,16 @@
     if (!cangjieHint || cangjieHint.dataset.decompBound) return;
     cangjieHint.dataset.decompBound = "1";
 
-    // Nav buttons click (‹ / ›)
+    // Nav buttons click (‹ / ›) & In-place CTA click (匯入 .cin / ⚙️)
     cangjieHint.addEventListener("click", (e) => {
+      const importBtn = e.target.closest(".decomp-import-btn");
+      const reloadBtn = e.target.closest(".decomp-reload-btn");
+      if (importBtn || reloadBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof openBoshiamyModal === "function") openBoshiamyModal();
+        return;
+      }
       const prev = e.target.closest(".decomp-wheel-prev");
       const next = e.target.closest(".decomp-wheel-next");
       if (prev) {
@@ -2954,8 +3113,139 @@
       });
     }
 
+    // Boshiamy Import Modal Logic
+    openBoshiamyModal = function() {
+      if (!boshiamyImportOverlay) return;
+      hideBoshiamyStatus();
+      if (boshiamyFileInput) boshiamyFileInput.value = "";
+      boshiamyImportOverlay.classList.remove("hidden");
+      if (boshiamyDropzone) setTimeout(() => boshiamyDropzone.focus(), 50);
+    };
+
+    closeBoshiamyModal = function() {
+      if (!boshiamyImportOverlay) return;
+      boshiamyImportOverlay.classList.add("hidden");
+      hideBoshiamyStatus();
+      if (practiceView && !practiceView.classList.contains("hidden")) {
+        focusCurrent();
+      }
+    };
+
+    function showBoshiamyStatus(msg, isError) {
+      if (!boshiamyStatusMsg) return;
+      boshiamyStatusMsg.textContent = msg;
+      boshiamyStatusMsg.className = "boshiamy-status " + (isError ? "error" : "success");
+      boshiamyStatusMsg.classList.remove("hidden");
+    }
+
+    function hideBoshiamyStatus() {
+      if (!boshiamyStatusMsg) return;
+      boshiamyStatusMsg.textContent = "";
+      boshiamyStatusMsg.className = "boshiamy-status hidden";
+    }
+
+    async function handleBoshiamyFile(file) {
+      if (!file) return;
+      showBoshiamyStatus("解析碼表中，請稍候...", false);
+      try {
+        const text = await file.text();
+        const table = parseCinTable(text);
+        if (!table || Object.keys(table).length === 0) {
+          showBoshiamyStatus("解析失敗：找不到有效的碼表資料，請確認檔案格式是否為 .cin 或包含字元編碼配對", true);
+          return;
+        }
+        await saveBoshiamyToIDB(table);
+        BOSHIAMY = table;
+        showBoshiamyStatus(`成功解析 ${Object.keys(table).length} 字！正在開啟練習...`, false);
+        setTimeout(() => {
+          closeBoshiamyModal();
+          // 若在首頁，自動進入練習頁面（預設第一項「單字」或當前選定關卡）
+          if (homeView && !homeView.classList.contains("hidden")) {
+            const modeKey = (carousel && MODES[carousel.selected]) ? MODES[carousel.selected].key : "words";
+            startRound(modeKey);
+          } else {
+            // 已在練習頁：即時更新拆字、鍵盤與輸入框
+            renderPractice();
+            paint();
+            focusCurrent();
+          }
+        }, 350);
+      } catch (err) {
+        showBoshiamyStatus(`讀取檔案錯誤：${err.message}`, true);
+      }
+    }
+
+    if (closeBoshiamyModalBtn) closeBoshiamyModalBtn.addEventListener("click", closeBoshiamyModal);
+    if (cancelBoshiamyBtn) cancelBoshiamyBtn.addEventListener("click", closeBoshiamyModal);
+    if (boshiamyImportOverlay) {
+      boshiamyImportOverlay.addEventListener("click", (e) => {
+        if (e.target === boshiamyImportOverlay) closeBoshiamyModal();
+      });
+    }
+
+    if (selectBoshiamyFileBtn && boshiamyFileInput) {
+      selectBoshiamyFileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        boshiamyFileInput.click();
+      });
+    }
+    if (boshiamyDropzone && boshiamyFileInput) {
+      boshiamyDropzone.addEventListener("click", () => {
+        boshiamyFileInput.click();
+      });
+      boshiamyDropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        boshiamyDropzone.classList.add("dragover");
+      });
+      boshiamyDropzone.addEventListener("dragleave", () => {
+        boshiamyDropzone.classList.remove("dragover");
+      });
+      boshiamyDropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        boshiamyDropzone.classList.remove("dragover");
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handleBoshiamyFile(e.dataTransfer.files[0]);
+        }
+      });
+    }
+    if (boshiamyFileInput) {
+      boshiamyFileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          handleBoshiamyFile(e.target.files[0]);
+        }
+      });
+    }
+
     document.addEventListener("keydown", (e) => {
+      // 若尚未載入嘸蝦米碼表且輸入框被停用，手快敲鍵盤時自動呼叫上傳彈窗（防呆體驗）
+      if (
+        getCurrentLayout() === "boshiamy" &&
+        !BOSHIAMY &&
+        practiceView &&
+        !practiceView.classList.contains("hidden") &&
+        (!boshiamyImportOverlay || boshiamyImportOverlay.classList.contains("hidden"))
+      ) {
+        if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key && e.key.length === 1) {
+          e.preventDefault();
+          if (typeof openBoshiamyModal === "function") {
+            openBoshiamyModal();
+            return;
+          }
+        }
+      }
+
       if (e.key !== "Escape") return;
+
+      // 1. 組字中防呆：若正在 IME 組字中，Esc 僅作為輸入法取消組字，不觸發任何退出或關閉動作
+      if (e.isComposing || (state && state.composing) || e.keyCode === 229) {
+        return;
+      }
+
+      // 2. 嘸蝦米匯入彈窗開啟時，Esc 優先關閉該彈窗
+      if (boshiamyImportOverlay && !boshiamyImportOverlay.classList.contains("hidden")) {
+        closeBoshiamyModal();
+        return;
+      }
 
       // 1. 組字中防呆：若正在 IME 組字中，Esc 僅作為輸入法取消組字，不觸發任何退出或關閉動作
       if (e.isComposing || (state && state.composing) || e.keyCode === 229) {
@@ -3042,16 +3332,20 @@
     }
     if (onKeyboardCheck) {
       onKeyboardCheck.checked = (loadJSON(LS_ONKB, {}) || {}).show === true;
+      const pref = loadJSON(LS_ONKB, {}) || {};
+      const savedLayout = pref.layout;
+      // 舊值 qwerty（英數）已移除，自動對應到嘸蝦米（英文字母鍵位），並寫回。預設為注音。
+      const migrated = savedLayout === "qwerty" ? "boshiamy" : savedLayout;
+      const currentInitialLayout = migrated || "bopomofo";
       if (layoutSelect) {
-        const pref = loadJSON(LS_ONKB, {}) || {};
-        const savedLayout = pref.layout;
-        // 舊值 qwerty（英數）已移除，自動對應到嘸蝦米（英文字母鍵位），並寫回。
-        const migrated = savedLayout === "qwerty" ? "boshiamy" : savedLayout;
-        layoutSelect.value = migrated || "bopomofo";
-        if (savedLayout === "qwerty") {
-          pref.layout = "boshiamy";
-          saveJSON(LS_ONKB, pref);
-        }
+        layoutSelect.value = currentInitialLayout;
+      }
+      if (topbarLayoutSelect) {
+        topbarLayoutSelect.value = currentInitialLayout;
+      }
+      if (savedLayout === "qwerty") {
+        pref.layout = "boshiamy";
+        saveJSON(LS_ONKB, pref);
       }
       onKeyboardCheck.addEventListener("change", (e) => {
         const pref = loadJSON(LS_ONKB, {});
@@ -3063,18 +3357,49 @@
     }
     if (layoutSelect) {
       layoutSelect.addEventListener("change", (e) => {
-        const pref = loadJSON(LS_ONKB, {});
-        pref.layout = e.target.value;
-        saveJSON(LS_ONKB, pref);
-        if (onKeyboard) onKeyboard.dataset.layout = "";
-        renderOnKeyboard();
-        const mIdx = methodIndex(e.target.value);
-        if (mIdx !== -1 && decompWheel) {
-          let diff = mIdx - (((decompWheel.pos % 3) + 3) % 3);
-          diff = ((diff + 1.5) % 3 + 3) % 3 - 1.5;
-          setDecompWheelTarget(Math.round(decompWheel.pos + diff));
-        }
+        onLayoutChanged(e.target.value);
       });
+    }
+
+    if (topbarLayoutSelect) {
+      topbarLayoutSelect.addEventListener("change", (e) => {
+        onLayoutChanged(e.target.value);
+      });
+    }
+  }
+
+  function onLayoutChanged(val) {
+    const pref = loadJSON(LS_ONKB, {});
+    pref.layout = val;
+    saveJSON(LS_ONKB, pref);
+    syncLayoutSelectors(val);
+    if (onKeyboard) onKeyboard.dataset.layout = "";
+    renderOnKeyboard();
+    const mIdx = methodIndex(val);
+    if (mIdx !== -1 && decompWheel) {
+      let diff = mIdx - (((decompWheel.pos % 3) + 3) % 3);
+      diff = ((diff + 1.5) % 3 + 3) % 3 - 1.5;
+      setDecompWheelTarget(Math.round(decompWheel.pos + diff));
+    }
+    // If switched to boshiamy and not loaded, trigger modal and update UI
+    if (val === "boshiamy" && !BOSHIAMY) {
+      if (typeof openBoshiamyModal === "function") {
+        openBoshiamyModal();
+      }
+    }
+    if (state && !state.finished) {
+      renderPractice();
+      paint();
+      focusCurrent();
+    }
+  }
+
+  function syncLayoutSelectors(layout) {
+    if (layoutSelect && layoutSelect.value !== layout) {
+      layoutSelect.value = layout;
+    }
+    if (topbarLayoutSelect && topbarLayoutSelect.value !== layout) {
+      topbarLayoutSelect.value = layout;
     }
   }
 

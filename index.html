@@ -28,6 +28,13 @@
       <option value="md" selected>中</option>
       <option value="lg">大</option>
     </select>
+    <label class="font-size-label" for="topbarLayoutSelect">輸入法</label>
+    <select id="topbarLayoutSelect" aria-label="輸入法">
+      <option value="bopomofo" selected>注音</option>
+      <option value="cangjie">倉頡</option>
+      <option value="boshiamy">嘸蝦米</option>
+      <option value="sucheng">速成</option>
+    </select>
     <button id="statsBtn" class="btn ghost small" type="button" aria-label="查看練習紀錄與成效統計">成績統計</button>
     <button id="resetStatsBtn" class="btn ghost small" type="button">清除紀錄</button>
   </div>
@@ -114,6 +121,27 @@
   </div>
 </div>
 
+
+<div id="boshiamyImportOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="boshiamyModalTitle">
+  <div class="modal custom-modal">
+    <div class="stats-modal-head">
+      <h2 id="boshiamyModalTitle">啟用嘸蝦米模式</h2>
+      <button id="closeBoshiamyModalBtn" class="btn ghost small" type="button" aria-label="關閉視窗">✕</button>
+    </div>
+    <p class="custom-modal-sub" id="boshiamyModalSub">因版權限制，本站不內建嘸蝦米碼表。請拖曳或選取您的 .cin 檔（例如 liu.cin）進行本地解析。</p>
+    <div id="boshiamyDropzone" class="boshiamy-dropzone" tabindex="0" role="button" aria-label="拖曳檔案到此處，或點擊選擇檔案">
+      <div class="dropzone-icon" aria-hidden="true">📁</div>
+      <div class="dropzone-text">將 .cin 檔案拖曳至此，或點擊選取</div>
+      <div class="dropzone-sub">僅在瀏覽器本機解析與儲存（IndexedDB），不傳送至任何伺服器</div>
+      <input type="file" id="boshiamyFileInput" accept=".cin,.txt" class="hidden-file-input" />
+      <button id="selectBoshiamyFileBtn" class="btn primary small" type="button">選擇檔案</button>
+    </div>
+    <div id="boshiamyStatusMsg" class="boshiamy-status hidden"></div>
+    <div class="modal-actions">
+      <button id="cancelBoshiamyBtn" class="btn" type="button">取消</button>
+    </div>
+  </div>
+</div>
 
 <div id="customTextOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="customTextTitle">
   <div class="modal custom-modal">

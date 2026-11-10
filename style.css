@@ -264,6 +264,98 @@ code{background:var(--kbd-bg);color:var(--ink);padding:1px 6px;border-radius:6px
   color:var(--red);font-size:13px;margin-top:8px;padding:6px 10px;
   background:rgba(239, 68, 68, 0.08);border-radius:6px;
 }
+
+/* Boshiamy Dropzone & Modal Elements */
+.boshiamy-dropzone{
+  border:2px dashed var(--line);border-radius:12px;padding:28px 16px;text-align:center;
+  background:var(--bg);cursor:pointer;transition:border-color .15s ease, background-color .15s ease;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.boshiamy-dropzone:hover, .boshiamy-dropzone:focus-visible{
+  border-color:var(--accent);outline:none;
+}
+.boshiamy-dropzone.dragover{
+  border-color:var(--accent);background:var(--active-line-bg);
+}
+.dropzone-icon{font-size:32px;line-height:1}
+.dropzone-text{font-size:15px;font-weight:600;color:var(--ink)}
+.dropzone-sub{font-size:12px;color:var(--muted);max-width:340px}
+.hidden-file-input{display:none}
+.boshiamy-status{
+  font-size:13px;margin-top:10px;padding:8px 12px;border-radius:6px;
+}
+.boshiamy-status.error{
+  color:var(--red);background:rgba(239, 68, 68, 0.08);
+}
+.boshiamy-status.success{
+  color:var(--green);background:rgba(16, 185, 129, 0.08);
+}
+
+/* In-place Call-to-Action for Boshiamy */
+.decomp-import-btn{
+  border-bottom:1px dashed var(--accent);
+  padding:2px 4px;
+  cursor:pointer;
+  transition:background-color .15s ease, color .15s ease;
+  border-radius:4px;
+}
+.decomp-import-btn:hover{
+  background-color:var(--active-line-bg);
+  color:var(--accent);
+}
+.decomp-reload-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:12px;
+  padding:0 2px;
+  opacity:0.4;
+  transition:opacity .15s ease;
+}
+.decomp-reload-btn:hover{
+  opacity:1;
+}
+
+/* Keyboard uninitialized disabled / overlay state */
+.on-kb-wrap{
+  position:relative;
+}
+.on-kb-wrap.is-uninitialized .on-kb{
+  opacity:0.4;
+  filter:grayscale(1);
+  pointer-events:none;
+  transition:opacity .25s ease, filter .25s ease;
+}
+.on-kb-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0, 0, 0, 0.08);
+  border-radius:10px;
+  z-index:5;
+  cursor:pointer;
+}
+html[data-theme="dark"] .on-kb-overlay{
+  background:rgba(0, 0, 0, 0.25);
+}
+.on-kb-overlay-btn{
+  background:var(--panel);
+  border:2px dashed var(--accent);
+  color:var(--accent);
+  font-weight:700;
+  font-size:15px;
+  padding:12px 24px;
+  border-radius:10px;
+  box-shadow:0 6px 18px rgba(0, 0, 0, 0.12);
+  cursor:pointer;
+  transition:transform .15s ease, background-color .15s ease;
+}
+.on-kb-overlay-btn:hover{
+  transform:scale(1.03);
+  background-color:var(--active-line-bg);
+}
 .mode-card-edit{
   position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:6px;
   border:1px solid var(--line);background:var(--panel);color:var(--muted);
