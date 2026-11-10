@@ -41,10 +41,14 @@ python3 serve.py 8092
 
 - `index.html`、`style.css`、`app.js` — 頁面、樣式與打字引擎
 - `assets/` — favicon 圖示
-- `data/` — 題庫與字庫：`data.json`（題庫）、`zhuyin.json`（注音對齊）、`cangjie.json`（倉頡）、`boshiamy.json`（嘸蝦米，速成由倉頡推導）
-- `build_cangjie.py`、`build_boshiamy.py` — 重建拆字字庫
+- `data/` — 題庫與字庫：`data.json`（題庫）、`zhuyin.json`（注音對齊）、`cangjie.json`（倉頡，速成由倉頡推導）
+- `build_cangjie.py` — 重建拆字字庫
 - `serve.py`、`serve.sh` — 靜態伺服器
 - `validate_queue.js` — 抽題回歸門（`node validate_queue.js`）
+
+## 嘸蝦米支援
+
+因版權限制，本站不內建嘸蝦米碼表。當選擇嘸蝦米輸入法模式時，可直接拖曳或選取您的 `.cin` 檔（例如 `liu.cin`），於瀏覽器本地解析並存於 IndexedDB，開機即練。
 
 ## 題庫來源
 
@@ -56,6 +60,5 @@ python3 serve.py 8092
 ## 授權
 
 - 程式碼與原創文件：MIT License（見 `LICENSE`）
-- `boshiamy.json`：GPL-3.0-or-later，不適用 MIT
 - `cangjie.json`：MIT
 - 詳見 `NOTICE` 與 `LICENSES/`
