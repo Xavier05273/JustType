@@ -242,6 +242,10 @@
   const statsBtn = $("#statsBtn");
   const closeStatsBtn = $("#closeStatsBtn");
   const closeStatsBtnBottom = $("#closeStatsBtnBottom");
+  const exportStatsBtn = $("#exportStatsBtn");
+  const importStatsBtn = $("#importStatsBtn");
+  const statsFileInput = $("#statsFileInput");
+  const statsMsg = $("#statsMsg");
   const backHomeBtn = $("#backHomeBtn");
   const changeCustomTextBtn = $("#changeCustomTextBtn");
   const resultChangeCustomBtn = $("#resultChangeCustomBtn");
@@ -2860,8 +2864,20 @@
       saveJSON(LS_FONT, e.target.value);
       applyFontSize(e.target.value);
     });
+    function setStatsMsg(text, type) {
+      if (!statsMsg) return;
+      if (!text) {
+        statsMsg.textContent = "";
+        statsMsg.className = "stats-msg hidden";
+        return;
+      }
+      statsMsg.textContent = text;
+      statsMsg.className = `stats-msg is-${type || "success"}`;
+    }
+
     function openStatsModal() {
       if (!statsOverlay) return;
+      setStatsMsg("");
       renderStatsModal();
       statsOverlay.classList.remove("hidden");
     }
@@ -2869,10 +2885,118 @@
     function closeStatsModal() {
       if (!statsOverlay) return;
       statsOverlay.classList.add("hidden");
+      setStatsMsg("");
       // Restore focus to active typing input if currently in practice view
       if (practiceView && !practiceView.classList.contains("hidden")) {
         focusCurrent();
       }
+    }
+
+    function exportStats() {
+      try {
+        const best = loadBest();
+        const hist = loadHist();
+        const data = {
+          app: "JustType",
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          best,
+          history: hist
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const dateStr = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `justtype-stats-${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setStatsMsg("成績匯出成功！已下載 JSON 檔案。", "success");
+      } catch (err) {
+        setStatsMsg("匯出失敗：" + (err && err.message ? err.message : String(err)), "error");
+      }
+    }
+
+    function importStatsJSON(jsonStr) {
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch (e) {
+        setStatsMsg("匯入失敗：檔案不是有效的 JSON 格式", "error");
+        return;
+      }
+
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        setStatsMsg("匯入失敗：JSON 結構不正確（應為包含 best 或 history 的物件）", "error");
+        return;
+      }
+
+      const importedBest = parsed.best || {};
+      const importedHist = parsed.history || parsed.hist || [];
+
+      if (!Array.isArray(importedHist) && typeof importedBest !== "object") {
+        setStatsMsg("匯入失敗：未找到有效的成績紀錄或最佳紀錄", "error");
+        return;
+      }
+
+      // 1. Sanitize & Merge best records
+      const currentBest = loadBest();
+      let bestUpdatedCount = 0;
+      if (importedBest && typeof importedBest === "object" && !Array.isArray(importedBest)) {
+        for (const [mode, val] of Object.entries(importedBest)) {
+          if (val && typeof val === "object" && typeof val.wpm === "number") {
+            const wpm = Math.round(val.wpm);
+            if (wpm > 0 && wpm <= 450) {
+              const acc = Number.isFinite(val.acc) ? Math.min(100, Math.max(0, Number(val.acc))) : 100;
+              const sec = Number.isFinite(val.sec) ? Math.max(0, Math.round(val.sec)) : 0;
+              const existing = currentBest[mode];
+              // Update if no previous record or imported has higher WPM
+              if (!existing || wpm > existing.wpm) {
+                currentBest[mode] = { wpm, acc, sec };
+                bestUpdatedCount++;
+              }
+            }
+          }
+        }
+        saveJSON(LS_BEST, currentBest);
+      }
+
+      // 2. Sanitize & Merge history records
+      const currentHist = loadHist();
+      let histAddedCount = 0;
+      if (Array.isArray(importedHist)) {
+        importedHist.forEach((item) => {
+          if (!item || typeof item !== "object") return;
+          const wpm = Math.round(item.wpm || 0);
+          if (wpm <= 0 || wpm > 450) return;
+          const acc = Number.isFinite(item.acc) ? Math.min(100, Math.max(0, Number(item.acc))) : 100;
+          const sec = Number.isFinite(item.sec) ? Math.max(0, Math.round(item.sec)) : 0;
+          const mode = typeof item.mode === "string" ? item.mode : "words";
+          const time = Number.isFinite(item.time) ? item.time : Date.now();
+          const typed = typeof item.typed === "number" ? item.typed : undefined;
+          const correct = typeof item.correct === "number" ? item.correct : undefined;
+          const id = item.id;
+
+          // Check duplicate against existing records (same mode, time, wpm)
+          const isDuplicate = currentHist.some((h) =>
+            h.mode === mode && Math.abs(h.time - time) < 1000 && h.wpm === wpm
+          );
+          if (!isDuplicate) {
+            currentHist.push({ mode, wpm, acc, sec, time, typed, correct, id });
+            histAddedCount++;
+          }
+        });
+
+        // Sort descending by time and keep top 50
+        currentHist.sort((a, b) => (b.time || 0) - (a.time || 0));
+        saveJSON(LS_HIST, currentHist.slice(0, 50));
+      }
+
+      renderHome();
+      renderStatsModal();
+      setStatsMsg(`匯入成功！更新了 ${bestUpdatedCount} 項最佳成績，新增了 ${histAddedCount} 筆練習紀錄。`, "success");
     }
 
     function renderStatsModal() {
@@ -2956,6 +3080,29 @@
     if (statsBtn) statsBtn.addEventListener("click", openStatsModal);
     if (closeStatsBtn) closeStatsBtn.addEventListener("click", closeStatsModal);
     if (closeStatsBtnBottom) closeStatsBtnBottom.addEventListener("click", closeStatsModal);
+    if (exportStatsBtn) exportStatsBtn.addEventListener("click", exportStats);
+    if (importStatsBtn) {
+      importStatsBtn.addEventListener("click", () => {
+        if (statsFileInput) {
+          statsFileInput.value = "";
+          statsFileInput.click();
+        }
+      });
+    }
+    if (statsFileInput) {
+      statsFileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          importStatsJSON(evt.target.result);
+        };
+        reader.onerror = () => {
+          setStatsMsg("讀取檔案失敗，請再試一次", "error");
+        };
+        reader.readAsText(file, "utf-8");
+      });
+    }
     if (statsOverlay) {
       statsOverlay.addEventListener("click", (e) => {
         if (e.target === statsOverlay) closeStatsModal();
@@ -3401,6 +3548,16 @@
     if (topbarLayoutSelect && topbarLayoutSelect.value !== layout) {
       topbarLayoutSelect.value = layout;
     }
+  }
+
+  // Register Service Worker for PWA support
+  if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch((err) => {
+        // Silently catch registration errors in environments where SW might be restricted
+        console.warn("ServiceWorker registration failed:", err);
+      });
+    });
   }
 
   init().catch((e) => {

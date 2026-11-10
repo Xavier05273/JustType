@@ -650,7 +650,7 @@ html[data-theme="dark"] .anomaly-line{color:#fbbf24}
 
 /* Stats Modal */
 .modal.stats-modal{
-  max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow-y:auto;
+  max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow-y:auto;padding-bottom:20px;
 }
 .stats-modal-head{
   display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
@@ -690,7 +690,24 @@ html[data-theme="dark"] .anomaly-line{color:#fbbf24}
 .stats-hist-item .hist-wpm{font-weight:700;color:var(--ink)}
 .stats-hist-item .hist-meta{color:var(--muted);font-size:12px}
 .stats-empty{padding:24px;text-align:center;color:var(--muted);font-size:14px}
-.stats-modal-foot{justify-content:flex-end;margin-top:14px}
+.stats-msg{
+  margin-top:10px;padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.4;
+  border:1px solid transparent;transition:all .2s ease;
+}
+.stats-msg.is-success{
+  background:rgba(16, 185, 129, 0.12);color:#059669;border-color:rgba(16, 185, 129, 0.3);
+}
+html[data-theme="dark"] .stats-msg.is-success{
+  background:rgba(16, 185, 129, 0.18);color:#34d399;border-color:rgba(16, 185, 129, 0.4);
+}
+.stats-msg.is-error{
+  background:rgba(239, 68, 68, 0.12);color:#dc2626;border-color:rgba(239, 68, 68, 0.3);
+}
+html[data-theme="dark"] .stats-msg.is-error{
+  background:rgba(239, 68, 68, 0.18);color:#f87171;border-color:rgba(239, 68, 68, 0.4);
+}
+.stats-modal-foot{justify-content:space-between;align-items:center;margin-top:14px;padding-top:4px;flex-wrap:wrap;gap:8px}
+.stats-transfer-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
 @media (max-width:680px){
   .carousel-viewport{height:290px}
