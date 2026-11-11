@@ -103,7 +103,7 @@ def test_pwa_and_stats_transfer():
                 localStorage.removeItem('tp-lite-history-v1');
             }""")
             # 關閉並重新打開彈窗
-            page.click("#closeStatsBtnBottom")
+            page.click("#closeStatsBtn")
             stats_modal.wait_for(state="hidden")
 
             page.click("#statsBtn")

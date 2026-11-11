@@ -29,8 +29,14 @@
       <option value="md" selected>中</option>
       <option value="lg">大</option>
     </select>
-    <button id="statsBtn" class="btn ghost small" type="button" aria-label="查看練習紀錄與成效統計">成績統計</button>
-    <button id="resetStatsBtn" class="btn ghost small" type="button">清除紀錄</button>
+    <button id="statsBtn" class="btn ghost small btn-expandable" type="button" aria-label="成績統計" title="成績統計">
+      <span class="btn-icon" aria-hidden="true">📊</span>
+      <span class="btn-expand-text">成績統計</span>
+    </button>
+    <button id="resetStatsBtn" class="btn ghost small btn-expandable" type="button" aria-label="刪除紀錄" title="刪除紀錄">
+      <span class="btn-icon" aria-hidden="true">🗑️</span>
+      <span class="btn-expand-text">刪除紀錄</span>
+    </button>
   </div>
 </header>
 
@@ -250,7 +256,6 @@
         <button id="importStatsBtn" class="btn small" type="button" title="匯入先前備份的成績 JSON 檔">匯入成績 (JSON)</button>
         <input type="file" id="statsFileInput" accept=".json,application/json" class="hidden-file-input" />
       </div>
-      <button id="closeStatsBtnBottom" class="btn primary" type="button">關閉</button>
     </div>
   </div>
 </div>

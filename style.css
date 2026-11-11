@@ -80,6 +80,54 @@ select{
 .btn.small{padding:6px 10px;font-size:13px}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn.primary:hover{filter:brightness(1.08)}
+
+/* Expandable square icon buttons in topbar (e.g. 📊 stats, 🗑️ clear records) */
+.btn-expandable{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:34px;
+  width:34px;
+  padding:0;
+  border-radius:8px;
+  overflow:hidden;
+  white-space:nowrap;
+  position:relative;
+  transition:width .28s cubic-bezier(0.4, 0, 0.2, 1), padding .28s cubic-bezier(0.4, 0, 0.2, 1), border-color .15s ease, background-color .15s ease;
+}
+.btn-expandable .btn-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  font-size:15px;
+  line-height:1;
+}
+.btn-expandable .btn-expand-text{
+  display:inline-block;
+  max-width:0;
+  opacity:0;
+  font-size:13px;
+  font-weight:600;
+  line-height:1;
+  overflow:hidden;
+  transition:max-width .28s cubic-bezier(0.4, 0, 0.2, 1), opacity .2s ease, margin .28s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left:0;
+  margin-right:0;
+}
+.btn-expandable:hover,
+.btn-expandable:focus-visible{
+  width:auto;
+  padding-right:12px;
+}
+.btn-expandable:hover .btn-expand-text,
+.btn-expandable:focus-visible .btn-expand-text{
+  max-width:100px;
+  opacity:1;
+  margin-left:2px;
+}
 .container{max-width:900px;margin:0 auto;padding:28px 18px 48px}
 /* Home: full-bleed carousel, practice view keeps the narrow column */
 #homeView.container{max-width:none;padding-left:0;padding-right:0}
