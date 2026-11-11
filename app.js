@@ -13,6 +13,7 @@
   const LS_ONKB_DEFAULT_OFF_DONE = "tp-lite-onkb-default-off-v1";
   const LS_DECOMP = "tp-lite-decomp-v1"; // 右上角拆字顯示: cangjie|boshiamy|sucheng
   const LS_CUSTOM_TEXT = "justtype_custom_text"; // 使用者自訂練習文本
+  const LS_SETTLE_COUNT = "tp-lite-settle-counts-v1"; // 各模式結算目標題數
 
   // Standard ANSI Physical Keyboard Layout (5 rows, exact 15.0u width per row).
   // Matches real physical keyboards in Taiwan (Bopomofo + QWERTY).
@@ -220,6 +221,7 @@
   const resultOverlay = $("#resultOverlay");
   const endlessCheck = $("#endlessCheck");
   const endlessLabel = $("#endlessLabel");
+  const settleCountInput = $("#settleCountInput");
   const carouselViewport = $("#carouselViewport");
   const carouselDots = $("#carouselDots");
   const carouselPrev = $("#carouselPrev");
@@ -430,6 +432,24 @@
   function isShortMode(modeKey) {
     return modeKey === "words" || modeKey === "sentences";
   }
+
+  function getModeSettleTarget(modeKey) {
+    const defaults = { words: 10, sentences: 5 };
+    const defaultVal = defaults[modeKey] !== undefined ? defaults[modeKey] : 1;
+    const custom = loadJSON(LS_SETTLE_COUNT, {});
+    if (custom && typeof custom[modeKey] === "number" && custom[modeKey] >= 1) {
+      return custom[modeKey];
+    }
+    return defaultVal;
+  }
+
+  function setModeSettleTarget(modeKey, val) {
+    const num = Math.max(1, parseInt(val, 10) || 1);
+    const custom = loadJSON(LS_SETTLE_COUNT, {});
+    custom[modeKey] = num;
+    saveJSON(LS_SETTLE_COUNT, custom);
+  }
+
   // Endless （無盡模式） is available in every mode, including the article
   // mode. It is per-mode and off by default: isEndlessEnabled only returns
   // true when the user explicitly checked the box (LS_ENDLESS[modeKey]===true).
@@ -448,13 +468,20 @@
   function syncEndlessCheck() {
     if (!state || !endlessCheck) return;
     const show = isEndlessApplicable(state.modeKey);
-    endlessCheck.checked = isEndlessEnabled(state.modeKey);
+    const enabled = isEndlessEnabled(state.modeKey);
+    endlessCheck.checked = enabled;
     endlessCheck.disabled = !show;
     if (endlessLabel) {
       endlessLabel.style.display = show ? "" : "none";
-      endlessLabel.title = show
-        ? "開啟後不結算，持續自動跳下一題（所有模式皆同；預設關閉）"
-        : "無盡模式適用所有模式";
+      endlessLabel.title = enabled
+        ? "無盡模式開啟：不結算，持續自動跳下一題"
+        : `於第 ${getModeSettleTarget(state.modeKey)} 題結算成績`;
+      endlessLabel.classList.toggle("is-endless", enabled);
+      endlessLabel.classList.toggle("is-finite", !enabled);
+    }
+    if (settleCountInput) {
+      settleCountInput.disabled = !show || enabled;
+      settleCountInput.value = getModeSettleTarget(state.modeKey);
     }
   }
 
@@ -1115,12 +1142,13 @@
     // Keep overall theme in sync with the last selected mode instead of clearing it.
     // renderHome() below also re-asserts the mode from carouselIndex.
     // Abort an unfinished finite round: next entry starts a fresh round.
-    if (state && isShortMode(state.modeKey) && !isEndlessEnabled(state.modeKey)) {
+    if (state && !isEndlessEnabled(state.modeKey)) {
       state.sessionCompleted = 0;
       state.roundTotalTyped = 0;
       state.roundTotalCorrect = 0;
       state.roundElapsed = 0;
       state.roundStartedAt = null;
+      state.roundCharLogs = [];
     }
     resultOverlay.classList.add("hidden");
     practiceView.classList.add("hidden");
@@ -2800,67 +2828,59 @@
     state.sessionCompleted = (state.sessionCompleted || 0) + 1;
 
     const modeKey = state.modeKey;
-    const target = ROUND_TARGET[modeKey] || 1;
+    const target = getModeSettleTarget(modeKey);
     const endless = isEndlessEnabled(modeKey);
-    const finiteShort = isShortMode(modeKey) && !endless;
 
-    if (finiteShort) {
-      state.roundTotalTyped = (state.roundTotalTyped || 0) + state.totalTyped;
-      state.roundTotalCorrect = (state.roundTotalCorrect || 0) + state.totalCorrect;
-      state.roundElapsed = (state.roundElapsed || 0) + state.elapsed;
-      state.roundCharLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
-      // Continuous round time: from first keystroke of the round to now,
-      // including inter-item gaps and reading time between items.
-      const continuousSec = state.roundStartedAt
-        ? (Date.now() - state.roundStartedAt) / 1000
-        : state.roundElapsed;
-
-      if (state.sessionCompleted < target) {
-        // Mid-round: feedback only, auto-advance; settlement waits for target.
-        const fb = peekStats(state.roundTotalTyped, state.roundTotalCorrect, continuousSec);
-        showAutoNextFeedback(fb, { progress: `${state.sessionCompleted}/${target}` });
-        state.autoNextTimer = setTimeout(() => {
-          state.autoNextTimer = null;
-          startRound(state.modeKey);
-        }, 300);
-        return;
-      }
-      const combinedLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
-      const stats = recordStats({
-        totalTyped: state.roundTotalTyped,
-        totalCorrect: state.roundTotalCorrect,
-        sec: continuousSec,
-        charLogs: combinedLogs,
-      });
-      state.sessionCompleted = 0;
+    if (endless) {
+      // 無盡模式：永不結算，只給回饋並自動跳下一題（所有模式皆同）。
       state.roundTotalTyped = 0;
       state.roundTotalCorrect = 0;
       state.roundElapsed = 0;
       state.roundStartedAt = null;
       state.roundCharLogs = [];
-      resultTimeoutId = setTimeout(() => { resultTimeoutId = null; showResultModal(stats); }, 250);
-      return;
-    }
-
-    state.roundTotalTyped = 0;
-    state.roundTotalCorrect = 0;
-    state.roundElapsed = 0;
-    state.roundStartedAt = null;
-    state.roundCharLogs = [];
-    const stats = recordStats();
-
-    if (endless) {
-      // 無盡模式：永不結算，只給回饋並自動跳下一題（所有模式皆同）。
+      const stats = recordStats();
       showAutoNextFeedback(stats);
       state.autoNextTimer = setTimeout(() => {
         state.autoNextTimer = null;
         startRound(state.modeKey);
       }, 300);
-    } else {
-      // 有限輪（無盡關閉）：其他模式打完一個就結算彈窗；
-      // 單字／句子已在上面的 finiteShort 分支累積到 10／5 題才到達這裡的對應結算。
-      resultTimeoutId = setTimeout(() => { resultTimeoutId = null; showResultModal(stats); }, 250);
+      return;
     }
+
+    // 有限輪（無盡關閉）：依指定目標題數 (target) 累積後結算
+    state.roundTotalTyped = (state.roundTotalTyped || 0) + state.totalTyped;
+    state.roundTotalCorrect = (state.roundTotalCorrect || 0) + state.totalCorrect;
+    state.roundElapsed = (state.roundElapsed || 0) + state.elapsed;
+    state.roundCharLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
+    const continuousSec = state.roundStartedAt
+      ? (Date.now() - state.roundStartedAt) / 1000
+      : state.roundElapsed;
+
+    if (state.sessionCompleted < target) {
+      // Mid-round: feedback only, auto-advance; settlement waits for target.
+      const fb = peekStats(state.roundTotalTyped, state.roundTotalCorrect, continuousSec);
+      showAutoNextFeedback(fb, { progress: `${state.sessionCompleted}/${target}` });
+      state.autoNextTimer = setTimeout(() => {
+        state.autoNextTimer = null;
+        startRound(state.modeKey);
+      }, 300);
+      return;
+    }
+
+    const combinedLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
+    const stats = recordStats({
+      totalTyped: state.roundTotalTyped,
+      totalCorrect: state.roundTotalCorrect,
+      sec: continuousSec,
+      charLogs: combinedLogs,
+    });
+    state.sessionCompleted = 0;
+    state.roundTotalTyped = 0;
+    state.roundTotalCorrect = 0;
+    state.roundElapsed = 0;
+    state.roundStartedAt = null;
+    state.roundCharLogs = [];
+    resultTimeoutId = setTimeout(() => { resultTimeoutId = null; showResultModal(stats); }, 250);
   }
 
   function peekStats(totalTyped, totalCorrect, sec) {
@@ -3019,7 +3039,6 @@
   }
 
   let chartPoints = [];
-  let currentChartTab = "macro"; // "macro" | "latency"
   let lastResultTelemetry = null;
   let resultChartHoverIdx = -1;
 
@@ -3075,73 +3094,6 @@
     const padding = { top: 30, right: 30, bottom: 40, left: 45 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
-
-    const isLatencyTab = currentChartTab === "latency";
-
-    if (isLatencyTab) {
-      // Latency Tab: character-by-character breakdown
-      const n = logs.length;
-      const maxVal = Math.max(500, ...logs.map((l) => (l.netDuration != null ? l.netDuration : l.duration) || 0)) * 1.15;
-
-      // Background horizontal grid lines
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
-      ctx.lineWidth = 1;
-      ctx.fillStyle = "rgba(161, 161, 170, 0.6)";
-      ctx.font = "11px monospace";
-      ctx.textAlign = "right";
-
-      const gridSteps = 4;
-      for (let i = 0; i <= gridSteps; i++) {
-        const val = Math.round((maxVal / gridSteps) * i);
-        const y = padding.top + chartH - (i / gridSteps) * chartH;
-        ctx.beginPath();
-        ctx.moveTo(padding.left, y);
-        ctx.lineTo(padding.left + chartW, y);
-        ctx.stroke();
-        ctx.fillText(`${val}ms`, padding.left - 8, y + 4);
-      }
-
-      const stepX = chartW / Math.max(1, n);
-      const barWidth = Math.max(3, Math.min(22, stepX * 0.65));
-      chartPoints = [];
-
-      logs.forEach((log, idx) => {
-        const x = padding.left + idx * stepX + stepX / 2;
-        const dur = (log.netDuration != null ? log.netDuration : log.duration) || 20;
-        const barH = Math.min(chartH, (dur / maxVal) * chartH);
-        const y = padding.top + chartH - barH;
-        chartPoints.push({ x, y, barH, barWidth, log, idx, type: "latency" });
-      });
-
-      chartPoints.forEach((pt, idx) => {
-        const isHovered = (resultChartHoverIdx === idx);
-        const hasErrors = (pt.log.backspaces > 0) || !pt.log.correct;
-        ctx.fillStyle = hasErrors
-          ? (isHovered ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.5)")
-          : (isHovered ? "rgba(56, 189, 248, 0.9)" : "rgba(56, 189, 248, 0.4)");
-
-        const rx = pt.x - pt.barWidth / 2;
-        const ry = padding.top + chartH - pt.barH;
-        const r = Math.min(3, pt.barWidth / 2);
-        ctx.beginPath();
-        ctx.moveTo(rx, ry + pt.barH);
-        ctx.lineTo(rx, ry + r);
-        ctx.quadraticCurveTo(rx, ry, rx + r, ry);
-        ctx.lineTo(rx + pt.barWidth - r, ry);
-        ctx.quadraticCurveTo(rx + pt.barWidth, ry, rx + pt.barWidth, ry + r);
-        ctx.lineTo(rx + pt.barWidth, ry + pt.barH);
-        ctx.closePath();
-        ctx.fill();
-
-        if (n <= 45 || idx % Math.ceil(n / 35) === 0) {
-          ctx.fillStyle = isHovered ? "#fbbf24" : "rgba(161, 161, 170, 0.75)";
-          ctx.font = isHovered ? "bold 12px sans-serif" : "11px sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(pt.log.char || "", pt.x, height - 12);
-        }
-      });
-      return;
-    }
 
     // Macro Tab: Time Buckets X-Axis & Dual Smooth WPM Curves
     const totalDurationMs = logs.reduce((acc, l) => acc + (l.duration || 0), 0);
@@ -3341,47 +3293,24 @@
       renderResultChart(lastResultTelemetry.charLogs);
 
       const pt = chartPoints[closestIdx];
+      if (!pt || !pt.bucket) return;
 
-      if (pt.type === "macro" && pt.bucket) {
-        const b = pt.bucket;
-        const charsSample = b.chars.slice(0, 8).join("");
-        const moreSuffix = b.chars.length > 8 ? "…" : "";
-        const charsDisplay = b.chars.length > 0 ? `「${escapeHtml(charsSample + moreSuffix)}」` : "（無擊鍵）";
+      const b = pt.bucket;
+      const charsSample = b.chars.slice(0, 8).join("");
+      const moreSuffix = b.chars.length > 8 ? "…" : "";
+      const charsDisplay = b.chars.length > 0 ? `「${escapeHtml(charsSample + moreSuffix)}」` : "（無擊鍵）";
 
-        tooltip.innerHTML = `
-          <div class="tooltip-char-line">
-            <span class="tooltip-char">${b.timeSec} 秒處</span>
-            <span class="tooltip-duration">${b.charCount} 字</span>
-          </div>
-          <div class="tooltip-detail-grid">
-            <div>累計均速: <strong style="color:#f59e0b">${b.cumulativeWpm} WPM</strong></div>
-            <div>即時速度: <strong style="color:#38bdf8">${b.instantWpm} WPM</strong></div>
-            <div style="margin-top:2px;color:#a1a1aa">區間字元: <span style="color:#f4f4f5">${charsDisplay}</span></div>
-          </div>
-        `;
-      } else {
-        const log = pt.log;
-        const decompStr = log.decomp ? `<div class="tooltip-decomp">${escapeHtml(log.decomp)}</div>` : "";
-        const errorStr = (log.backspaces > 0 || !log.correct)
-          ? `<div class="tooltip-err">退格修正: ${log.backspaces} 次</div>`
-          : "";
-        const displayDur = log.netDuration != null ? log.netDuration : log.duration;
-
-        const charWpm = Math.round(log.cpm / 5);
-        tooltip.innerHTML = `
-          <div class="tooltip-char-line">
-            <span class="tooltip-char">「${escapeHtml(log.char)}」</span>
-            <span class="tooltip-duration">${displayDur} ms</span>
-          </div>
-          <div class="tooltip-detail-grid">
-            <div>首鍵思維: <strong>${log.cognitiveLatency} ms</strong></div>
-            <div>選字耗時: <strong>${log.imeSelectDuration || 0} ms</strong></div>
-            <div>即時速度: <strong>${charWpm} WPM <span style="font-size:10px;color:#a1a1aa">(${log.cpm} CPM)</span></strong></div>
-          </div>
-          ${decompStr}
-          ${errorStr}
-        `;
-      }
+      tooltip.innerHTML = `
+        <div class="tooltip-char-line">
+          <span class="tooltip-char">${b.timeSec} 秒處</span>
+          <span class="tooltip-duration">${b.charCount} 字</span>
+        </div>
+        <div class="tooltip-detail-grid">
+          <div>累計均速: <strong style="color:#f59e0b">${b.cumulativeWpm} WPM</strong></div>
+          <div>即時速度: <strong style="color:#38bdf8">${b.instantWpm} WPM</strong></div>
+          <div style="margin-top:2px;color:#a1a1aa">區間字元: <span style="color:#f4f4f5">${charsDisplay}</span></div>
+        </div>
+      `;
 
       tooltip.classList.remove("hidden");
       const ttWidth = 190;
@@ -3532,7 +3461,8 @@
     // Live HUD: use continuous round time if available so short-item speed
     // doesn't spike between items, and floor by per-char minimum.
     let rawSec = sec;
-    if (state.roundStartedAt && isShortMode(state.modeKey)) {
+    const target = getModeSettleTarget(state.modeKey);
+    if (state.roundStartedAt && (target > 1 || isShortMode(state.modeKey))) {
       const cont = (Date.now() - state.roundStartedAt) / 1000;
       const typedSoFar = (state.roundTotalCorrect || 0) + state.totalCorrect;
       const typedAll = (state.roundTotalTyped || 0) + state.totalTyped;
@@ -4169,34 +4099,6 @@
       });
     }
 
-    const tabMacro = $("#tabMacro");
-    const tabLatency = $("#tabLatency");
-    if (tabMacro && tabLatency) {
-      tabMacro.addEventListener("click", () => {
-        currentChartTab = "macro";
-        tabMacro.classList.add("active");
-        tabMacro.setAttribute("aria-selected", "true");
-        tabLatency.classList.remove("active");
-        tabLatency.setAttribute("aria-selected", "false");
-        const legendCum = $("#legendCumWpm");
-        const legendInst = $("#legendInstWpm");
-        if (legendCum) legendCum.style.display = "inline-flex";
-        if (legendInst) legendInst.style.display = "inline-flex";
-        if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
-      });
-      tabLatency.addEventListener("click", () => {
-        currentChartTab = "latency";
-        tabLatency.classList.add("active");
-        tabLatency.setAttribute("aria-selected", "true");
-        tabMacro.classList.remove("active");
-        tabMacro.setAttribute("aria-selected", "false");
-        const legendCum = $("#legendCumWpm");
-        const legendInst = $("#legendInstWpm");
-        if (legendCum) legendCum.style.display = "none";
-        if (legendInst) legendInst.style.display = "none";
-        if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
-      });
-    }
 
     setupChartInteractions();
 
@@ -4235,9 +4137,32 @@
         state.roundTotalTyped = 0;
         state.roundTotalCorrect = 0;
         state.roundElapsed = 0;
+        syncEndlessCheck();
         showPractice();
         setHintDefault();
         focusCurrent();
+      });
+    }
+    if (settleCountInput) {
+      const onSettleCountChange = () => {
+        if (!state) return;
+        const val = Math.max(1, parseInt(settleCountInput.value, 10) || 1);
+        settleCountInput.value = val;
+        setModeSettleTarget(state.modeKey, val);
+        state.sessionCompleted = 0;
+        state.roundTotalTyped = 0;
+        state.roundTotalCorrect = 0;
+        state.roundElapsed = 0;
+        syncEndlessCheck();
+      };
+      settleCountInput.addEventListener("change", onSettleCountChange);
+      settleCountInput.addEventListener("blur", onSettleCountChange);
+      settleCountInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          settleCountInput.blur();
+          focusCurrent();
+        }
       });
     }
     if (onKeyboardCheck) {
