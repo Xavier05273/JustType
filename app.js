@@ -240,7 +240,6 @@
   const boshiamyStatusMsg = $("#boshiamyStatusMsg");
   const statsBtn = $("#statsBtn");
   const closeStatsBtn = $("#closeStatsBtn");
-  const closeStatsBtnBottom = $("#closeStatsBtnBottom");
   const exportStatsBtn = $("#exportStatsBtn");
   const importStatsBtn = $("#importStatsBtn");
   const statsFileInput = $("#statsFileInput");
@@ -929,8 +928,24 @@
 
     document.addEventListener("keydown", (e) => {
       if (!carousel || homeView.classList.contains("hidden")) return;
-      if (e.key === "ArrowLeft") setCarouselTarget(carousel.selected - 1);
-      else if (e.key === "ArrowRight") setCarouselTarget(carousel.selected + 1);
+      if (e.isComposing || (state && state.composing) || e.keyCode === 229) return;
+      // If any modal/overlay is open, don't trigger carousel keyboard actions
+      if (
+        (statsOverlay && !statsOverlay.classList.contains("hidden")) ||
+        (customTextOverlay && !customTextOverlay.classList.contains("hidden")) ||
+        (boshiamyImportOverlay && !boshiamyImportOverlay.classList.contains("hidden")) ||
+        (resultOverlay && !resultOverlay.classList.contains("hidden"))
+      ) {
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        setCarouselTarget(carousel.selected - 1);
+      } else if (e.key === "ArrowRight") {
+        setCarouselTarget(carousel.selected + 1);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        onCardClicked(carousel.selected);
+      }
     });
   }
 
@@ -3555,7 +3570,6 @@
 
     if (statsBtn) statsBtn.addEventListener("click", openStatsModal);
     if (closeStatsBtn) closeStatsBtn.addEventListener("click", closeStatsModal);
-    if (closeStatsBtnBottom) closeStatsBtnBottom.addEventListener("click", closeStatsModal);
     if (exportStatsBtn) exportStatsBtn.addEventListener("click", exportStats);
     if (importStatsBtn) {
       importStatsBtn.addEventListener("click", () => {
