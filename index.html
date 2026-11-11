@@ -107,42 +107,30 @@
   </section>
 </main>
 
-<div id="resultOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+<div id="resultOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="測驗結算">
   <div class="modal result-profiler-modal">
-    <!-- Header -->
-    <div class="profiler-header">
-      <div class="profiler-title-wrap">
-        <h2 id="resultTitle" class="profiler-title">代碼效能分析器</h2>
-        <span class="profiler-badge">PROFILER TELEMETRY</span>
-      </div>
-      <div class="profiler-meta">
-        <span id="resultTimeElapsed">用時: 00:00</span>
-        <span id="resultCharsStat">答對字數: 0 / 0</span>
-      </div>
-    </div>
-
     <p id="newRecordLine" class="new-record hidden">★ 新紀錄！</p>
     <p id="anomalyLine" class="anomaly-line hidden"></p>
 
     <!-- 1. 頂部 KPI 儀表板 -->
     <div class="profiler-kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-label">出字速度 (CPM)</div>
-        <div id="kpiCpm" class="kpi-value text-amber">0</div>
-        <div id="kpiWpm" class="kpi-sub">0 WPM</div>
+        <div class="kpi-label">WPM</div>
+        <div id="kpiWpm" class="kpi-value text-amber">0</div>
+        <div id="kpiCpm" class="kpi-sub">0 CPM</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">準確率 (ACCURACY)</div>
+        <div class="kpi-label">準確率</div>
         <div id="kpiAcc" class="kpi-value text-emerald">100%</div>
         <div id="kpiAccRatio" class="kpi-sub">0 / 0 字</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">首鍵反應 (COGNITIVE)</div>
+        <div class="kpi-label">首鍵反應</div>
         <div id="kpiLatency" class="kpi-value text-sky">0 <span class="kpi-unit">ms</span></div>
         <div class="kpi-sub">拆碼思維時間</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">節奏一致性 (RHYTHM)</div>
+        <div class="kpi-label">節奏一致性</div>
         <div id="kpiConsistency" class="kpi-value text-indigo">100%</div>
         <div class="kpi-sub">配速穩定度</div>
       </div>
@@ -152,12 +140,12 @@
     <div class="profiler-chart-panel">
       <div class="chart-header">
         <div class="chart-tabs" role="tablist">
-          <button id="tabMacro" class="chart-tab active" type="button" role="tab" aria-selected="true">● 綜合節奏 (WPM + Burst)</button>
-          <button id="tabLatency" class="chart-tab" type="button" role="tab" aria-selected="false">拆碼延遲柱狀圖 (Latency)</button>
+          <button id="tabMacro" class="chart-tab active" type="button" role="tab" aria-selected="true">● 綜合節奏</button>
+          <button id="tabLatency" class="chart-tab" type="button" role="tab" aria-selected="false">拆碼延遲柱狀圖</button>
         </div>
         <div class="chart-legend">
-          <span class="legend-item"><span class="legend-dot bg-amber"></span> 均速 (WPM)</span>
-          <span class="legend-item"><span class="legend-dot bg-zinc"></span> 單字爆發 (Burst)</span>
+          <span class="legend-item" id="legendCumWpm"><span class="legend-dot bg-amber"></span> 累計平均 WPM</span>
+          <span class="legend-item" id="legendInstWpm"><span class="legend-dot bg-sky"></span> 即時 WPM</span>
         </div>
       </div>
       <div id="chartCanvasContainer" class="chart-canvas-container">
@@ -171,8 +159,7 @@
       <!-- 瓶頸診斷 -->
       <div class="profiler-bottlenecks-card">
         <div class="bottlenecks-header">
-          <span class="bottlenecks-title"><span class="pulse-dot"></span> 卡鍵瓶頸字 (Top Slowest Bottlenecks)</span>
-          <span class="bottlenecks-subtitle">耗時最高字根檢索</span>
+          <span class="bottlenecks-title"><span class="pulse-dot"></span> 卡鍵瓶頸字</span>
         </div>
         <div id="bottleneckList" class="bottlenecks-list">
           <!-- 動態插入卡鍵字卡片 -->
