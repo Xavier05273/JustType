@@ -697,7 +697,8 @@ body[data-mode="life_situations"] .on-kb-wrap{margin-top:10px}
 .result-grid .cell .k{font-size:13px;color:var(--muted)}
 .result-grid .cell .v{font-size:24px;font-weight:700;color:var(--ink)}
 .new-record{color:#f59e0b;font-weight:700}
-.anomaly-line{color:#b45309;font-size:14px;margin:8px 0}
+.anomaly-line{color:#b45309;font-size:13px;margin:0 0 6px}
+.anomaly-line.hidden{display:none !important;margin:0 !important}
 html[data-theme="dark"] .anomaly-line{color:#fbbf24}
 .modal-actions{display:flex;gap:10px;margin-top:16px}
 
@@ -768,13 +769,13 @@ html[data-theme="dark"] .stats-msg.is-error{
 .modal.result-profiler-modal {
   max-width: 820px;
   width: 95vw;
-  padding: 24px;
+  padding: 16px 20px;
   background: var(--panel);
   border: 1px solid var(--line);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .profiler-header {
@@ -825,11 +826,11 @@ html[data-theme="dark"] .stats-msg.is-error{
 .profiler-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .kpi-card {
-  padding: 14px;
+  padding: 10px 14px;
   border-radius: 10px;
   background: var(--bg);
   border: 1px solid var(--line);
@@ -847,10 +848,10 @@ html[data-theme="dark"] .stats-msg.is-error{
 
 .kpi-value {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
-  line-height: 1.2;
-  margin-top: 4px;
+  line-height: 1.15;
+  margin-top: 2px;
 }
 
 .kpi-unit {
@@ -872,13 +873,13 @@ html[data-theme="dark"] .stats-msg.is-error{
 
 /* 2. 中間核心圖表區 */
 .profiler-chart-panel {
-  padding: 16px;
+  padding: 12px 14px;
   border-radius: 12px;
   background: var(--bg);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .chart-header {
@@ -947,7 +948,7 @@ html[data-theme="dark"] .stats-msg.is-error{
 .chart-canvas-container {
   position: relative;
   width: 100%;
-  height: 240px;
+  height: 190px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -1056,17 +1057,17 @@ html[data-theme="light"] .tooltip-decomp {
 .profiler-bottom-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 14px;
+  gap: 10px;
 }
 
 .profiler-bottlenecks-card {
-  padding: 14px 16px;
+  padding: 10px 14px;
   border-radius: 12px;
   background: var(--bg);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .bottlenecks-header {
@@ -1115,8 +1116,8 @@ html[data-theme="light"] .tooltip-decomp {
 .bottleneck-card {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 4px 10px;
   border-radius: 8px;
   background: var(--panel);
   border: 1px solid rgba(239, 68, 68, 0.3);
@@ -1130,7 +1131,7 @@ html[data-theme="light"] .tooltip-decomp {
 }
 
 .bottleneck-char {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   color: #f87171;
 }
@@ -1154,14 +1155,14 @@ html[data-theme="light"] .tooltip-decomp {
 
 /* 操作按鈕組 */
 .profiler-actions-card {
-  padding: 14px 16px;
+  padding: 10px 14px;
   border-radius: 12px;
   background: var(--bg);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .btn-action-focus {

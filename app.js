@@ -246,7 +246,6 @@
   const statsMsg = $("#statsMsg");
   const backHomeBtn = $("#backHomeBtn");
   const changeCustomTextBtn = $("#changeCustomTextBtn");
-  const resultChangeCustomBtn = $("#resultChangeCustomBtn");
   const customTextOverlay = $("#customTextOverlay");
   const closeCustomTextBtn = $("#closeCustomTextBtn");
   const cancelCustomBtn = $("#cancelCustomBtn");
@@ -3050,9 +3049,9 @@
     const canvas = document.getElementById("resultChartCanvas");
     if (!canvas) return;
     const container = document.getElementById("chartCanvasContainer");
-    const rect = container ? container.getBoundingClientRect() : { width: 680, height: 260 };
+    const rect = container ? container.getBoundingClientRect() : { width: 680, height: 200 };
     const width = Math.max(300, Math.floor(rect.width || 680));
-    const height = 240;
+    const height = 190;
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = width * dpr;
@@ -3183,13 +3182,13 @@
     let cumulativeCount = 0;
     buckets.forEach((b) => {
       cumulativeCount += b.charCount;
-      // 即時 WPM = 當前時間桶打字量 / 區間單位時間 (換算為分鐘)
-      b.instantWpm = Math.round((b.charCount / bucketSize) * 60);
-      // 累計平均 WPM = 至今累計字數 / 至今總時間 (換算為分鐘)
-      b.cumulativeWpm = Math.round((cumulativeCount / b.timeSec) * 60);
+      // 即時 WPM = 當前時間桶字數換算為 CPM 再除以 5（標準 WPM）
+      b.instantWpm = Math.round(((b.charCount / bucketSize) * 60) / 5);
+      // 累計平均 WPM = 至今累計字數換算為 CPM 再除以 5（標準 WPM）
+      b.cumulativeWpm = Math.round(((cumulativeCount / b.timeSec) * 60) / 5);
     });
 
-    const maxVal = Math.max(60, ...buckets.map((b) => Math.max(b.instantWpm, b.cumulativeWpm))) * 1.15;
+    const maxVal = Math.max(20, ...buckets.map((b) => Math.max(b.instantWpm, b.cumulativeWpm))) * 1.15;
 
     // Background horizontal grid lines
     ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
@@ -3368,6 +3367,7 @@
           : "";
         const displayDur = log.netDuration != null ? log.netDuration : log.duration;
 
+        const charWpm = Math.round(log.cpm / 5);
         tooltip.innerHTML = `
           <div class="tooltip-char-line">
             <span class="tooltip-char">「${escapeHtml(log.char)}」</span>
@@ -3376,7 +3376,7 @@
           <div class="tooltip-detail-grid">
             <div>首鍵思維: <strong>${log.cognitiveLatency} ms</strong></div>
             <div>選字耗時: <strong>${log.imeSelectDuration || 0} ms</strong></div>
-            <div>即時速度: <strong>${log.cpm} CPM</strong></div>
+            <div>即時速度: <strong>${charWpm} WPM <span style="font-size:10px;color:#a1a1aa">(${log.cpm} CPM)</span></strong></div>
           </div>
           ${decompStr}
           ${errorStr}
@@ -3437,13 +3437,12 @@
     if (kpiLatency) kpiLatency.innerHTML = `${stats.avgFirstKeyLatency || 0} <span class="kpi-unit">ms</span>`;
     if (kpiConsistency) kpiConsistency.textContent = `${stats.consistency || 80}%`;
 
-    // 3. New record & Anomaly flags
+    // 3. Anomaly flag
     const warn = $("#anomalyLine");
     if (warn) {
       warn.classList.toggle("hidden", !stats.isAnomalous);
       if (stats.isAnomalous) warn.textContent = "⚠️ 計時異常（完成時間過短，疑似貼上或瞬間輸入），速度未計入最佳紀錄。";
     }
-    $("#newRecordLine").classList.toggle("hidden", !stats.isRecord);
 
     // 4. Render Bottlenecks
     const bottleneckList = $("#bottleneckList");
@@ -3474,9 +3473,6 @@
     // 5. Draw Telemetry Chart
     renderResultChart(stats.charLogs || []);
 
-    if (resultChangeCustomBtn) {
-      resultChangeCustomBtn.classList.toggle("hidden", !state || state.modeKey !== "custom_text");
-    }
     resultOverlay.classList.remove("hidden");
   }
 
@@ -3962,14 +3958,8 @@
         openCustomTextModal();
       });
     }
-    if (resultChangeCustomBtn) {
-      resultChangeCustomBtn.addEventListener("click", () => {
-        resultOverlay.classList.add("hidden");
-        openCustomTextModal();
-      });
-    }
 
-    // Boshiamy Import Modal Logic
+    // Boshiamy Import Logic
     openBoshiamyModal = function() {
       if (!boshiamyImportOverlay) return;
       hideBoshiamyStatus();
