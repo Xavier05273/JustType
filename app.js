@@ -1410,6 +1410,14 @@
       maybeFinish();
     });
     inp.addEventListener("keydown", (e) => {
+      if (state && !state.finished) {
+        const now = Date.now();
+        if (state.charStartTime == null) state.charStartTime = now;
+        if (state.charFirstKeyTime == null) state.charFirstKeyTime = now;
+        if (e.key === "Backspace" || e.code === "Backspace" || e.keyCode === 8) {
+          state.charBackspaces = (state.charBackspaces || 0) + 1;
+        }
+      }
       const ignoreCodes = new Set([
         "Tab", "Escape", "ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight",
         "AltLeft", "AltRight", "MetaLeft", "MetaRight", "CapsLock",
@@ -1766,6 +1774,34 @@
            (layoutSelect ? layoutSelect.value : "") ||
            ((loadJSON(LS_ONKB, {}) || {}).layout) ||
            "bopomofo";
+  }
+
+  function getCharDecompInfo(ch, contextLine, charIdx) {
+    if (!ch) return "";
+    const layout = getCurrentLayout();
+    if (layout === "bopomofo") {
+      const z = lookupZhuyinForChar(ch, contextLine, charIdx);
+      return z ? `注音: ${z}` : "";
+    }
+    if (layout === "boshiamy") {
+      if (BOSHIAMY && BOSHIAMY[ch] && BOSHIAMY[ch].length) {
+        return `嘸蝦米: ${BOSHIAMY[ch][0]}`;
+      }
+      return "";
+    }
+    if (layout === "sucheng") {
+      if (CANGJIE && CANGJIE[ch]) {
+        const full = CANGJIE[ch];
+        const sc = full.length <= 2 ? full : (full[0] + full[full.length - 1]);
+        return `速成: ${sc}`;
+      }
+      return "";
+    }
+    // cangjie fallback
+    if (CANGJIE && CANGJIE[ch]) {
+      return `倉頡: ${CANGJIE[ch]}`;
+    }
+    return "";
   }
 
   function getCurrentPosInfo() {
@@ -2629,6 +2665,44 @@
     }
     state.totalTyped = totalTyped;
     state.totalCorrect = totalCorrect;
+
+    // Track per-character telemetry
+    if (state && !state.finished) {
+      if (!state.charLogs) state.charLogs = [];
+      const typedChars = Array.from(state.inputs[li] || "");
+      const lastLen = state.lastCommittedLen || 0;
+      if (typedChars.length > lastLen) {
+        const now = Date.now();
+        const lineText = state.lines[li] || "";
+        const targetChars = Array.from(lineText);
+        for (let idx = lastLen; idx < typedChars.length; idx++) {
+          const ch = typedChars[idx];
+          const tgtCh = targetChars[idx] || ch;
+          const charStart = state.charStartTime || (state.startedAt || now);
+          const duration = Math.max(20, now - charStart);
+          const firstKeyTime = state.charFirstKeyTime || now;
+          const cognitiveLatency = Math.max(0, Math.min(duration, firstKeyTime - charStart));
+          const cpm = Math.round((1 / (duration / 1000)) * 60);
+          const decomp = getCharDecompInfo(tgtCh, lineText, idx);
+          state.charLogs.push({
+            char: tgtCh,
+            typedChar: ch,
+            correct: norm(tgtCh) === norm(ch),
+            duration,
+            cpm,
+            cognitiveLatency,
+            backspaces: state.charBackspaces || 0,
+            decomp,
+            lineIdx: li,
+            charIdx: idx
+          });
+          state.charStartTime = now;
+          state.charFirstKeyTime = null;
+          state.charBackspaces = 0;
+        }
+        state.lastCommittedLen = typedChars.length;
+      }
+    }
   }
 
   function advance(li) {
@@ -2641,6 +2715,10 @@
     clearKeyError();
     setHintDefault();
     state.lineIdx = li + 1;
+    state.lastCommittedLen = 0;
+    state.charStartTime = Date.now();
+    state.charFirstKeyTime = null;
+    state.charBackspaces = 0;
     renderPractice();
     paint();
     focusCurrent();
@@ -2676,6 +2754,7 @@
       state.roundTotalTyped = (state.roundTotalTyped || 0) + state.totalTyped;
       state.roundTotalCorrect = (state.roundTotalCorrect || 0) + state.totalCorrect;
       state.roundElapsed = (state.roundElapsed || 0) + state.elapsed;
+      state.roundCharLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
       // Continuous round time: from first keystroke of the round to now,
       // including inter-item gaps and reading time between items.
       const continuousSec = state.roundStartedAt
@@ -2692,16 +2771,19 @@
         }, 300);
         return;
       }
+      const combinedLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
       const stats = recordStats({
         totalTyped: state.roundTotalTyped,
         totalCorrect: state.roundTotalCorrect,
         sec: continuousSec,
+        charLogs: combinedLogs,
       });
       state.sessionCompleted = 0;
       state.roundTotalTyped = 0;
       state.roundTotalCorrect = 0;
       state.roundElapsed = 0;
       state.roundStartedAt = null;
+      state.roundCharLogs = [];
       resultTimeoutId = setTimeout(() => { resultTimeoutId = null; showResultModal(stats); }, 250);
       return;
     }
@@ -2710,6 +2792,7 @@
     state.roundTotalCorrect = 0;
     state.roundElapsed = 0;
     state.roundStartedAt = null;
+    state.roundCharLogs = [];
     const stats = recordStats();
 
     if (endless) {
@@ -2764,7 +2847,62 @@
       saveJSON(LS_HIST, hist.slice(0, 50));
     }
 
-    return { sec, rawSec: eff.rawSec, cpm, acc, isRecord, isAnomalous, totalTyped, totalCorrect };
+    const charLogs = (override && override.charLogs) || (state && state.charLogs) || [];
+
+    // Calculate cognitive latency (first key reaction time)
+    const validLatencies = charLogs
+      .map((l) => l.cognitiveLatency)
+      .filter((v) => typeof v === "number" && v > 0);
+    const avgFirstKeyLatency = validLatencies.length
+      ? Math.round(validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length)
+      : 0;
+
+    // Calculate rhythm consistency (100 - CV% of char durations, clamped 0~100)
+    let consistency = 80;
+    if (charLogs.length > 2) {
+      const durations = charLogs.map((l) => l.duration);
+      const mean = durations.reduce((a, b) => a + b, 0) / durations.length;
+      if (mean > 0) {
+        const variance = durations.reduce((acc, d) => acc + Math.pow(d - mean, 2), 0) / durations.length;
+        const stdDev = Math.sqrt(variance);
+        const cv = (stdDev / mean) * 100;
+        consistency = Math.max(10, Math.min(100, Math.round(100 - cv)));
+      }
+    }
+
+    // Top 3-5 slowest bottleneck characters (sorted by duration descending, deduplicated by character)
+    const bottleneckMap = new Map();
+    charLogs.forEach((l) => {
+      if (!l.char || !l.char.trim()) return;
+      if (!bottleneckMap.has(l.char) || l.duration > bottleneckMap.get(l.char).duration) {
+        bottleneckMap.set(l.char, l);
+      }
+    });
+    const bottlenecks = Array.from(bottleneckMap.values())
+      .sort((a, b) => b.duration - a.duration)
+      .slice(0, 5)
+      .map((l) => ({
+        char: l.char,
+        duration: l.duration,
+        latency: l.cognitiveLatency,
+        decomp: l.decomp,
+        backspaces: l.backspaces
+      }));
+
+    return {
+      sec,
+      rawSec: eff.rawSec,
+      cpm,
+      acc,
+      isRecord,
+      isAnomalous,
+      totalTyped,
+      totalCorrect,
+      avgFirstKeyLatency,
+      consistency,
+      bottlenecks,
+      charLogs
+    };
   }
 
   function showAutoNextFeedback(stats, opts) {
@@ -2782,27 +2920,366 @@
     $("#progressBar").style.width = "100%";
   }
 
+  // ---- Profiler Dashboard & Telemetry Visualizer ----
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  let chartPoints = [];
+  let currentChartTab = "macro"; // "macro" | "latency"
+  let lastResultTelemetry = null;
+  let resultChartHoverIdx = -1;
+
+  function renderResultChart(logs) {
+    const canvas = document.getElementById("resultChartCanvas");
+    if (!canvas) return;
+    const container = document.getElementById("chartCanvasContainer");
+    const rect = container ? container.getBoundingClientRect() : { width: 680, height: 260 };
+    const width = Math.max(300, Math.floor(rect.width || 680));
+    const height = 240;
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, width, height);
+
+    if (!logs || !logs.length) {
+      ctx.fillStyle = "#71717a";
+      ctx.font = "14px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("無足夠按鍵記錄可分析", width / 2, height / 2);
+      chartPoints = [];
+      return;
+    }
+
+    const padding = { top: 30, right: 30, bottom: 40, left: 45 };
+    const chartW = width - padding.left - padding.right;
+    const chartH = height - padding.top - padding.bottom;
+
+    // Calculate metrics
+    const n = logs.length;
+    let runningTotalDuration = 0;
+    const runningWpm = [];
+    logs.forEach((log, idx) => {
+      runningTotalDuration += log.duration;
+      const mins = (runningTotalDuration / 1000) / 60;
+      const wpm = mins > 0 ? (idx + 1) / mins : 0;
+      runningWpm.push(Math.round(wpm));
+    });
+
+    const isLatencyTab = currentChartTab === "latency";
+    const maxVal = isLatencyTab
+      ? Math.max(500, ...logs.map((l) => l.duration || 0)) * 1.15
+      : Math.max(60, ...logs.map((l) => l.cpm || 0), ...runningWpm) * 1.15;
+
+    // Background horizontal grid lines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "rgba(161, 161, 170, 0.6)";
+    ctx.font = "11px monospace";
+    ctx.textAlign = "right";
+
+    const gridSteps = 4;
+    for (let i = 0; i <= gridSteps; i++) {
+      const val = Math.round((maxVal / gridSteps) * i);
+      const y = padding.top + chartH - (i / gridSteps) * chartH;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(padding.left + chartW, y);
+      ctx.stroke();
+      ctx.fillText(isLatencyTab ? `${val}ms` : `${val}`, padding.left - 8, y + 4);
+    }
+
+    // Measure point coordinates
+    const stepX = chartW / Math.max(1, n);
+    const barWidth = Math.max(3, Math.min(22, stepX * 0.65));
+    chartPoints = [];
+
+    logs.forEach((log, idx) => {
+      const x = padding.left + idx * stepX + stepX / 2;
+      const val = isLatencyTab ? log.duration : log.cpm;
+      const barH = Math.min(chartH, (val / maxVal) * chartH);
+      const y = padding.top + chartH - barH;
+      chartPoints.push({ x, y, barH, barWidth, log, idx, wpm: runningWpm[idx] });
+    });
+
+    // 1. Draw Burst / Latency Bars
+    chartPoints.forEach((pt, idx) => {
+      const isHovered = (resultChartHoverIdx === idx);
+      const hasErrors = (pt.log.backspaces > 0) || !pt.log.correct;
+
+      if (isLatencyTab) {
+        ctx.fillStyle = hasErrors
+          ? (isHovered ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.5)")
+          : (isHovered ? "rgba(56, 189, 248, 0.9)" : "rgba(56, 189, 248, 0.4)");
+      } else {
+        ctx.fillStyle = hasErrors
+          ? (isHovered ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.5)")
+          : (isHovered ? "rgba(161, 161, 170, 0.85)" : "rgba(113, 113, 122, 0.45)");
+      }
+
+      const rx = pt.x - pt.barWidth / 2;
+      const ry = padding.top + chartH - pt.barH;
+      // Draw rounded top bar
+      const r = Math.min(3, pt.barWidth / 2);
+      ctx.beginPath();
+      ctx.moveTo(rx, ry + pt.barH);
+      ctx.lineTo(rx, ry + r);
+      ctx.quadraticCurveTo(rx, ry, rx + r, ry);
+      ctx.lineTo(rx + pt.barWidth - r, ry);
+      ctx.quadraticCurveTo(rx + pt.barWidth, ry, rx + pt.barWidth, ry + r);
+      ctx.lineTo(rx + pt.barWidth, ry + pt.barH);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw character label under the axis if space permits
+      if (n <= 45 || idx % Math.ceil(n / 35) === 0) {
+        ctx.fillStyle = isHovered ? "#fbbf24" : "rgba(161, 161, 170, 0.75)";
+        ctx.font = isHovered ? "bold 12px sans-serif" : "11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(pt.log.char || "", pt.x, height - 12);
+      }
+    });
+
+    // 2. Draw Average WPM Trend Line (only in Macro Tab)
+    if (!isLatencyTab && n > 1) {
+      ctx.beginPath();
+      chartPoints.forEach((pt, idx) => {
+        const lineY = padding.top + chartH - (pt.wpm / maxVal) * chartH;
+        if (idx === 0) ctx.moveTo(pt.x, lineY);
+        else ctx.lineTo(pt.x, lineY);
+      });
+
+      // Line gradient glow
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = "round";
+      ctx.stroke();
+
+      // Draw subtle fill below WPM line
+      const firstPt = chartPoints[0];
+      const lastPt = chartPoints[chartPoints.length - 1];
+      ctx.lineTo(lastPt.x, padding.top + chartH);
+      ctx.lineTo(firstPt.x, padding.top + chartH);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+      grad.addColorStop(0, "rgba(245, 158, 11, 0.2)");
+      grad.addColorStop(1, "rgba(245, 158, 11, 0.0)");
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Points on trend line
+      chartPoints.forEach((pt, idx) => {
+        const lineY = padding.top + chartH - (pt.wpm / maxVal) * chartH;
+        const isHovered = (resultChartHoverIdx === idx);
+        ctx.beginPath();
+        ctx.arc(pt.x, lineY, isHovered ? 5 : 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = isHovered ? "#fff" : "#f59e0b";
+        ctx.fill();
+        if (isHovered) {
+          ctx.strokeStyle = "#f59e0b";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      });
+    }
+  }
+
+  function setupChartInteractions() {
+    const canvas = document.getElementById("resultChartCanvas");
+    const tooltip = document.getElementById("chartTooltip");
+    if (!canvas || !tooltip) return;
+
+    function hideTooltip() {
+      resultChartHoverIdx = -1;
+      tooltip.classList.add("hidden");
+      if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
+    }
+
+    function updateHover(evt) {
+      if (!chartPoints.length || !lastResultTelemetry) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = evt.clientX - rect.left;
+      const mouseY = evt.clientY - rect.top;
+
+      let closestIdx = -1;
+      let minDiff = Infinity;
+      chartPoints.forEach((pt, idx) => {
+        const diff = Math.abs(pt.x - mouseX);
+        if (diff < minDiff && diff < (canvas.clientWidth / chartPoints.length) * 1.5) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+
+      if (closestIdx === -1) {
+        hideTooltip();
+        return;
+      }
+
+      resultChartHoverIdx = closestIdx;
+      renderResultChart(lastResultTelemetry.charLogs);
+
+      const pt = chartPoints[closestIdx];
+      const log = pt.log;
+      const decompStr = log.decomp ? `<div class="tooltip-decomp">${escapeHtml(log.decomp)}</div>` : "";
+      const errorStr = (log.backspaces > 0 || !log.correct)
+        ? `<div class="tooltip-err">退格修正: ${log.backspaces} 次</div>`
+        : "";
+
+      tooltip.innerHTML = `
+        <div class="tooltip-char-line">
+          <span class="tooltip-char">「${escapeHtml(log.char)}」</span>
+          <span class="tooltip-duration">${log.duration} ms</span>
+        </div>
+        <div class="tooltip-detail-grid">
+          <div>首鍵思維: <strong>${log.cognitiveLatency} ms</strong></div>
+          <div>即時速度: <strong>${log.cpm} CPM</strong></div>
+        </div>
+        ${decompStr}
+        ${errorStr}
+      `;
+
+      tooltip.classList.remove("hidden");
+      const ttWidth = 180;
+      let left = pt.x - ttWidth / 2;
+      if (left < 10) left = 10;
+      if (left + ttWidth > canvas.clientWidth - 10) left = canvas.clientWidth - ttWidth - 10;
+      let top = pt.y - 85;
+      if (top < 10) top = pt.y + 20;
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    }
+
+    canvas.addEventListener("mousemove", updateHover);
+    canvas.addEventListener("mouseleave", hideTooltip);
+    canvas.addEventListener("touchstart", (e) => {
+      if (e.touches && e.touches[0]) updateHover(e.touches[0]);
+    }, { passive: true });
+    canvas.addEventListener("touchmove", (e) => {
+      if (e.touches && e.touches[0]) updateHover(e.touches[0]);
+    }, { passive: true });
+    canvas.addEventListener("touchend", hideTooltip);
+  }
+
   function showResultModal(stats) {
-    // Guard: if user already went home, don't resurrect the modal
     if (practiceView.classList.contains("hidden")) return;
-    const grid = $("#resultGrid");
-    const correct = stats.totalCorrect != null ? stats.totalCorrect : state.totalCorrect;
-    const typed = stats.totalTyped != null ? stats.totalTyped : state.totalTyped;
-    grid.innerHTML = `
-      <div class="cell"><div class="k">速度（字/分鐘）</div><div class="v">${stats.cpm}</div></div>
-      <div class="cell"><div class="k">正確率</div><div class="v">${stats.acc}%</div></div>
-      <div class="cell"><div class="k">用時</div><div class="v">${fmtTime(stats.sec)}</div></div>
-      <div class="cell"><div class="k">答對字數</div><div class="v">${correct}/${typed}</div></div>`;
+    lastResultTelemetry = stats;
+    resultChartHoverIdx = -1;
+
+    // 1. Update Header & Meta
+    const elapsedText = fmtTime(stats.sec || 0);
+    const correct = stats.totalCorrect != null ? stats.totalCorrect : (stats.correctChars != null ? stats.correctChars : (state ? state.totalCorrect : 0));
+    const typed = stats.totalTyped != null ? stats.totalTyped : (stats.totalChars != null ? stats.totalChars : (state ? state.totalTyped : 0));
+
+    $("#resultTimeElapsed").textContent = `用時: ${elapsedText}`;
+    $("#resultCharsStat").textContent = `答對字數: ${correct} / ${typed}`;
+
+    // 2. Update Top KPI Cards
+    const kpiCpm = $("#kpiCpm");
+    const kpiWpm = $("#kpiWpm");
+    const kpiAcc = $("#kpiAcc");
+    const kpiAccRatio = $("#kpiAccRatio");
+    const kpiLatency = $("#kpiLatency");
+    const kpiConsistency = $("#kpiConsistency");
+
+    if (kpiCpm) kpiCpm.textContent = stats.cpm;
+    if (kpiWpm) kpiWpm.textContent = `${Math.round(stats.cpm / 5)} WPM`;
+    if (kpiAcc) kpiAcc.textContent = `${stats.acc}%`;
+    if (kpiAccRatio) kpiAccRatio.textContent = `${correct} / ${typed} 字`;
+    if (kpiLatency) kpiLatency.innerHTML = `${stats.avgFirstKeyLatency || 0} <span class="kpi-unit">ms</span>`;
+    if (kpiConsistency) kpiConsistency.textContent = `${stats.consistency || 80}%`;
+
+    // 3. New record & Anomaly flags
     const warn = $("#anomalyLine");
     if (warn) {
       warn.classList.toggle("hidden", !stats.isAnomalous);
       if (stats.isAnomalous) warn.textContent = "⚠️ 計時異常（完成時間過短，疑似貼上或瞬間輸入），速度未計入最佳紀錄。";
     }
     $("#newRecordLine").classList.toggle("hidden", !stats.isRecord);
+
+    // 4. Render Bottlenecks
+    const bottleneckList = $("#bottleneckList");
+    const retryBottlenecksBtn = $("#retryBottlenecksBtn");
+    if (bottleneckList) {
+      bottleneckList.innerHTML = "";
+      const bottlenecks = stats.bottlenecks || [];
+      if (!bottlenecks.length) {
+        bottleneckList.innerHTML = `<div class="bottlenecks-empty">本次練習節奏流暢，未偵測到明顯卡鍵字！ 🎉</div>`;
+        if (retryBottlenecksBtn) retryBottlenecksBtn.classList.add("hidden");
+      } else {
+        if (retryBottlenecksBtn) retryBottlenecksBtn.classList.remove("hidden");
+        bottlenecks.forEach((b, idx) => {
+          const card = document.createElement("div");
+          card.className = "bottleneck-card";
+          card.innerHTML = `
+            <div class="bottleneck-rank">#${idx + 1}</div>
+            <div class="bottleneck-char">${escapeHtml(b.char)}</div>
+            <div class="bottleneck-info">
+              <div class="bottleneck-duration">${b.duration} ms</div>
+              <div class="bottleneck-decomp">${escapeHtml(b.decomp || "—")}</div>
+            </div>
+          `;
+          bottleneckList.appendChild(card);
+        });
+      }
+    }
+
+    // 5. Draw Telemetry Chart
+    renderResultChart(stats.charLogs || []);
+
     if (resultChangeCustomBtn) {
-      resultChangeCustomBtn.classList.toggle("hidden", state.modeKey !== "custom_text");
+      resultChangeCustomBtn.classList.toggle("hidden", !state || state.modeKey !== "custom_text");
     }
     resultOverlay.classList.remove("hidden");
+  }
+
+  function startBottlenecksPractice() {
+    if (!lastResultTelemetry || !lastResultTelemetry.bottlenecks || !lastResultTelemetry.bottlenecks.length) return;
+    const chars = lastResultTelemetry.bottlenecks.map((b) => b.char);
+    // Generate a 20-character muscle-memory targeted drill
+    let drill = "";
+    while (drill.length < 20) {
+      for (const ch of chars) {
+        if (drill.length >= 20) break;
+        drill += ch;
+      }
+    }
+    resultOverlay.classList.add("hidden");
+    startCustomTextDirectly(drill, "卡鍵專項重練");
+  }
+
+  function startCustomTextDirectly(text, title) {
+    if (!text || !text.trim()) return;
+    const item = {
+      id: "bottlenecks_" + Date.now(),
+      text: text.trim(),
+      title: title || "專項練習"
+    };
+    DATA["custom_text"] = { texts: [item] };
+    state.modeKey = "custom_text";
+    state.item = item;
+    state.sessionCompleted = 0;
+    state.roundTotalTyped = 0;
+    state.roundTotalCorrect = 0;
+    state.roundElapsed = 0;
+    state.roundStartedAt = null;
+    state.roundCharLogs = [];
+    showPractice();
+    setHintDefault();
+    focusCurrent();
   }
 
   function elapsedNow() {
@@ -3458,7 +3935,71 @@
     });
     $("#againBtn").addEventListener("click", () => {
       resetEscConfirm();
+      resultOverlay.classList.add("hidden");
       startRound(state.modeKey);
+    });
+    const retryBottlenecksBtn = $("#retryBottlenecksBtn");
+    if (retryBottlenecksBtn) {
+      retryBottlenecksBtn.addEventListener("click", () => {
+        resetEscConfirm();
+        startBottlenecksPractice();
+      });
+    }
+
+    const tabMacro = $("#tabMacro");
+    const tabLatency = $("#tabLatency");
+    if (tabMacro && tabLatency) {
+      tabMacro.addEventListener("click", () => {
+        currentChartTab = "macro";
+        tabMacro.classList.add("active");
+        tabMacro.setAttribute("aria-selected", "true");
+        tabLatency.classList.remove("active");
+        tabLatency.setAttribute("aria-selected", "false");
+        const legendDot = document.querySelector(".legend-item .bg-amber");
+        if (legendDot && legendDot.parentElement) {
+          legendDot.parentElement.style.display = "inline-flex";
+        }
+        if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
+      });
+      tabLatency.addEventListener("click", () => {
+        currentChartTab = "latency";
+        tabLatency.classList.add("active");
+        tabLatency.setAttribute("aria-selected", "true");
+        tabMacro.classList.remove("active");
+        tabMacro.setAttribute("aria-selected", "false");
+        const legendDot = document.querySelector(".legend-item .bg-amber");
+        if (legendDot && legendDot.parentElement) {
+          legendDot.parentElement.style.display = "none";
+        }
+        if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
+      });
+    }
+
+    setupChartInteractions();
+
+    window.addEventListener("resize", () => {
+      if (!resultOverlay.classList.contains("hidden") && lastResultTelemetry) {
+        renderResultChart(lastResultTelemetry.charLogs);
+      }
+    });
+
+    // Keyboard shortcuts inside Result Overlay
+    window.addEventListener("keydown", (e) => {
+      if (resultOverlay.classList.contains("hidden")) return;
+      if (e.isComposing || (state && state.composing) || e.keyCode === 229) return;
+
+      if (e.key === "Enter" && e.shiftKey) {
+        e.preventDefault();
+        startBottlenecksPractice();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        resultOverlay.classList.add("hidden");
+        startRound(state.modeKey);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        resultOverlay.classList.add("hidden");
+        showHome();
+      }
     });
     $("#homeBtn").addEventListener("click", showHome);
     $("#targetBox").addEventListener("click", focusCurrent);
@@ -3530,6 +4071,8 @@
       layoutSelect.value = layout;
     }
   }
+
+  window.showResultModal = showResultModal;
 
   // Register Service Worker for PWA support
   if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
