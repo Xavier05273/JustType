@@ -1032,6 +1032,9 @@
       frozenCangjieHint: null,
       frozenCangjieInfo: null,
       lastKeyError: null, // wrong physical key label that currently shows red frame
+      compositionStartAt: null,
+      selectionStartAt: null,
+      selectionInteractionDuration: 0,
       startedAt: null,
       elapsed: 0,
       timerId: null,
@@ -1340,6 +1343,9 @@
     inp.addEventListener("compositionstart", () => {
       ensureTimerStarted();
       state.composing = true;
+      state.compositionStartAt = Date.now();
+      state.selectionStartAt = null;
+      state.selectionInteractionDuration = 0;
       state.composingText = "";
       state.composingRawText = "";
       state.composingKeys = [];
@@ -1359,6 +1365,14 @@
     });
     inp.addEventListener("compositionend", (e) => {
       ensureTimerStarted();
+      const compEndNow = Date.now();
+      let imeDuration = 0;
+      if (state.selectionStartAt) {
+        imeDuration = compEndNow - state.selectionStartAt;
+      } else if (state.compositionStartAt) {
+        imeDuration = compEndNow - state.compositionStartAt;
+      }
+      state.selectionInteractionDuration = Math.max(0, imeDuration);
       state.composing = false;
       state.composingText = "";
       state.composingRawText = "";
@@ -1451,6 +1465,22 @@
 
       const isBackspace = e.key === "Backspace" || e.code === "Backspace" || e.keyCode === 8;
       const isEnter = e.key === "Enter" || e.code === "Enter" || e.keyCode === 13;
+
+      // Track IME selection actions (arrows, digits, Enter, Space during composition)
+      if (state && !state.finished && (state.composing || state.compositionStartAt)) {
+        const isSelectionNavOrChoice = (
+          e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "ArrowRight" || e.key === "ArrowLeft" ||
+          e.code === "ArrowDown" || e.code === "ArrowUp" || e.code === "ArrowRight" || e.code === "ArrowLeft" ||
+          e.key === "PageDown" || e.key === "PageUp" ||
+          /^[0-9]$/.test(e.key) || /^Digit[0-9]$/.test(e.code) || /^Numpad[0-9]$/.test(e.code) ||
+          isEnter || e.key === " " || e.code === "Space"
+        );
+        if (isSelectionNavOrChoice) {
+          if (!state.selectionStartAt) {
+            state.selectionStartAt = Date.now();
+          }
+        }
+      }
 
       if (isBackspace) {
         clearKeyError();
@@ -2697,6 +2727,8 @@
           const duration = Math.max(20, now - charStart);
           const firstKeyTime = state.charFirstKeyTime || now;
           const cognitiveLatency = Math.max(0, Math.min(duration, firstKeyTime - charStart));
+          const imeSelectDuration = state.selectionInteractionDuration || 0;
+          const netDuration = Math.max(20, duration - imeSelectDuration);
           const cpm = Math.round((1 / (duration / 1000)) * 60);
           const decomp = getCharDecompInfo(tgtCh, lineText, idx);
           state.charLogs.push({
@@ -2704,6 +2736,8 @@
             typedChar: ch,
             correct: norm(tgtCh) === norm(ch),
             duration,
+            netDuration,
+            imeSelectDuration,
             cpm,
             cognitiveLatency,
             backspaces: state.charBackspaces || 0,
@@ -2714,6 +2748,9 @@
           state.charStartTime = now;
           state.charFirstKeyTime = null;
           state.charBackspaces = 0;
+          state.compositionStartAt = null;
+          state.selectionStartAt = null;
+          state.selectionInteractionDuration = 0;
         }
         state.lastCommittedLen = typedChars.length;
       }
@@ -2734,6 +2771,9 @@
     state.charStartTime = Date.now();
     state.charFirstKeyTime = null;
     state.charBackspaces = 0;
+    state.compositionStartAt = null;
+    state.selectionStartAt = null;
+    state.selectionInteractionDuration = 0;
     renderPractice();
     paint();
     focusCurrent();
@@ -2885,24 +2925,57 @@
       }
     }
 
-    // Top 3-5 slowest bottleneck characters (sorted by duration descending, deduplicated by character)
-    const bottleneckMap = new Map();
-    charLogs.forEach((l) => {
-      if (!l.char || !l.char.trim()) return;
-      if (!bottleneckMap.has(l.char) || l.duration > bottleneckMap.get(l.char).duration) {
-        bottleneckMap.set(l.char, l);
-      }
-    });
-    const bottlenecks = Array.from(bottleneckMap.values())
-      .sort((a, b) => b.duration - a.duration)
-      .slice(0, 5)
-      .map((l) => ({
-        char: l.char,
-        duration: l.duration,
-        latency: l.cognitiveLatency,
-        decomp: l.decomp,
-        backspaces: l.backspaces
-      }));
+    // Bottleneck characters analysis (純構字延遲演算法，三重篩選門檻)
+    const validLogs = charLogs.filter((l) => l && l.char && l.char.trim());
+    let bottlenecks = [];
+
+    if (validLogs.length > 0) {
+      // 確保每筆 log 具備 netDuration
+      validLogs.forEach((l) => {
+        if (typeof l.netDuration !== "number") {
+          const imeDur = l.imeSelectDuration || 0;
+          l.netDuration = Math.max(20, (l.duration || 20) - imeDur);
+        }
+      });
+
+      const netDurations = validLogs.map((l) => l.netDuration);
+      const sortedDurs = [...netDurations].sort((a, b) => a - b);
+      const mid = Math.floor(sortedDurs.length / 2);
+      const median = sortedDurs.length % 2 !== 0
+        ? sortedDurs[mid]
+        : (sortedDurs[mid - 1] + sortedDurs[mid]) / 2;
+
+      const mean = netDurations.reduce((a, b) => a + b, 0) / netDurations.length;
+      const variance = netDurations.reduce((acc, d) => acc + Math.pow(d - mean, 2), 0) / netDurations.length;
+      const stdDev = Math.sqrt(variance);
+
+      // 條件 1: 淨延遲 > 400ms
+      // 條件 2: 淨延遲 > Median + 2 * StdDev
+      const outlierThreshold = median + 2 * stdDev;
+      const qualified = validLogs.filter((l) => l.netDuration > 400 && l.netDuration > outlierThreshold);
+
+      // 去重：同一字取最大淨延遲
+      const bottleneckMap = new Map();
+      qualified.forEach((l) => {
+        if (!bottleneckMap.has(l.char) || l.netDuration > bottleneckMap.get(l.char).netDuration) {
+          bottleneckMap.set(l.char, l);
+        }
+      });
+
+      // 條件 3: 依延遲降序排序，若超過 8 個字僅保留前 8 名
+      bottlenecks = Array.from(bottleneckMap.values())
+        .sort((a, b) => b.netDuration - a.netDuration)
+        .slice(0, 8)
+        .map((l) => ({
+          char: l.char,
+          duration: l.duration,
+          netDuration: l.netDuration,
+          imeSelectDuration: l.imeSelectDuration || 0,
+          latency: l.cognitiveLatency,
+          decomp: l.decomp,
+          backspaces: l.backspaces
+        }));
+    }
 
     return {
       sec,
@@ -2951,6 +3024,28 @@
   let lastResultTelemetry = null;
   let resultChartHoverIdx = -1;
 
+  function drawSmoothLine(ctx, points) {
+    if (!points || !points.length) return;
+    if (points.length === 1) {
+      ctx.moveTo(points[0].x, points[0].y);
+      return;
+    }
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = i > 0 ? points[i - 1] : points[i];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = i < points.length - 2 ? points[i + 2] : p2;
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+  }
+
   function renderResultChart(logs) {
     const canvas = document.getElementById("resultChartCanvas");
     if (!canvas) return;
@@ -2982,21 +3077,119 @@
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
 
-    // Calculate metrics
-    const n = logs.length;
-    let runningTotalDuration = 0;
-    const runningWpm = [];
-    logs.forEach((log, idx) => {
-      runningTotalDuration += log.duration;
-      const mins = (runningTotalDuration / 1000) / 60;
-      const wpm = mins > 0 ? (idx + 1) / mins : 0;
-      runningWpm.push(Math.round(wpm));
+    const isLatencyTab = currentChartTab === "latency";
+
+    if (isLatencyTab) {
+      // Latency Tab: character-by-character breakdown
+      const n = logs.length;
+      const maxVal = Math.max(500, ...logs.map((l) => (l.netDuration != null ? l.netDuration : l.duration) || 0)) * 1.15;
+
+      // Background horizontal grid lines
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
+      ctx.lineWidth = 1;
+      ctx.fillStyle = "rgba(161, 161, 170, 0.6)";
+      ctx.font = "11px monospace";
+      ctx.textAlign = "right";
+
+      const gridSteps = 4;
+      for (let i = 0; i <= gridSteps; i++) {
+        const val = Math.round((maxVal / gridSteps) * i);
+        const y = padding.top + chartH - (i / gridSteps) * chartH;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(padding.left + chartW, y);
+        ctx.stroke();
+        ctx.fillText(`${val}ms`, padding.left - 8, y + 4);
+      }
+
+      const stepX = chartW / Math.max(1, n);
+      const barWidth = Math.max(3, Math.min(22, stepX * 0.65));
+      chartPoints = [];
+
+      logs.forEach((log, idx) => {
+        const x = padding.left + idx * stepX + stepX / 2;
+        const dur = (log.netDuration != null ? log.netDuration : log.duration) || 20;
+        const barH = Math.min(chartH, (dur / maxVal) * chartH);
+        const y = padding.top + chartH - barH;
+        chartPoints.push({ x, y, barH, barWidth, log, idx, type: "latency" });
+      });
+
+      chartPoints.forEach((pt, idx) => {
+        const isHovered = (resultChartHoverIdx === idx);
+        const hasErrors = (pt.log.backspaces > 0) || !pt.log.correct;
+        ctx.fillStyle = hasErrors
+          ? (isHovered ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.5)")
+          : (isHovered ? "rgba(56, 189, 248, 0.9)" : "rgba(56, 189, 248, 0.4)");
+
+        const rx = pt.x - pt.barWidth / 2;
+        const ry = padding.top + chartH - pt.barH;
+        const r = Math.min(3, pt.barWidth / 2);
+        ctx.beginPath();
+        ctx.moveTo(rx, ry + pt.barH);
+        ctx.lineTo(rx, ry + r);
+        ctx.quadraticCurveTo(rx, ry, rx + r, ry);
+        ctx.lineTo(rx + pt.barWidth - r, ry);
+        ctx.quadraticCurveTo(rx + pt.barWidth, ry, rx + pt.barWidth, ry + r);
+        ctx.lineTo(rx + pt.barWidth, ry + pt.barH);
+        ctx.closePath();
+        ctx.fill();
+
+        if (n <= 45 || idx % Math.ceil(n / 35) === 0) {
+          ctx.fillStyle = isHovered ? "#fbbf24" : "rgba(161, 161, 170, 0.75)";
+          ctx.font = isHovered ? "bold 12px sans-serif" : "11px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(pt.log.char || "", pt.x, height - 12);
+        }
+      });
+      return;
+    }
+
+    // Macro Tab: Time Buckets X-Axis & Dual Smooth WPM Curves
+    const totalDurationMs = logs.reduce((acc, l) => acc + (l.duration || 0), 0);
+    const totalSec = Math.max(1, totalDurationMs / 1000);
+    // Dynamic bucket size: 1s default, 2s if > 180s, 3s if > 300s
+    let bucketSize = 1;
+    if (totalSec > 300) {
+      bucketSize = 3;
+    } else if (totalSec > 180) {
+      bucketSize = 2;
+    }
+
+    const numBuckets = Math.max(1, Math.ceil(totalSec / bucketSize));
+    const buckets = [];
+    for (let i = 0; i < numBuckets; i++) {
+      buckets.push({
+        bucketIdx: i,
+        timeSec: (i + 1) * bucketSize,
+        chars: [],
+        charCount: 0,
+        logs: [],
+        instantWpm: 0,
+        cumulativeWpm: 0
+      });
+    }
+
+    let elapsedMs = 0;
+    logs.forEach((log) => {
+      elapsedMs += (log.duration || 0);
+      const s = elapsedMs / 1000;
+      let bIdx = Math.floor(s / bucketSize);
+      if (bIdx >= numBuckets) bIdx = numBuckets - 1;
+      buckets[bIdx].chars.push(log.char);
+      buckets[bIdx].charCount += 1;
+      buckets[bIdx].logs.push(log);
     });
 
-    const isLatencyTab = currentChartTab === "latency";
-    const maxVal = isLatencyTab
-      ? Math.max(500, ...logs.map((l) => l.duration || 0)) * 1.15
-      : Math.max(60, ...logs.map((l) => l.cpm || 0), ...runningWpm) * 1.15;
+    let cumulativeCount = 0;
+    buckets.forEach((b) => {
+      cumulativeCount += b.charCount;
+      // 即時 WPM = 當前時間桶打字量 / 區間單位時間 (換算為分鐘)
+      b.instantWpm = Math.round((b.charCount / bucketSize) * 60);
+      // 累計平均 WPM = 至今累計字數 / 至今總時間 (換算為分鐘)
+      b.cumulativeWpm = Math.round((cumulativeCount / b.timeSec) * 60);
+    });
+
+    const maxVal = Math.max(60, ...buckets.map((b) => Math.max(b.instantWpm, b.cumulativeWpm))) * 1.15;
 
     // Background horizontal grid lines
     ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
@@ -3013,93 +3206,95 @@
       ctx.moveTo(padding.left, y);
       ctx.lineTo(padding.left + chartW, y);
       ctx.stroke();
-      ctx.fillText(isLatencyTab ? `${val}ms` : `${val}`, padding.left - 8, y + 4);
+      ctx.fillText(`${val}`, padding.left - 8, y + 4);
     }
 
-    // Measure point coordinates
-    const stepX = chartW / Math.max(1, n);
-    const barWidth = Math.max(3, Math.min(22, stepX * 0.65));
+    const stepX = chartW / Math.max(1, numBuckets);
     chartPoints = [];
 
-    logs.forEach((log, idx) => {
+    const instPts = [];
+    const cumPts = [];
+
+    buckets.forEach((b, idx) => {
       const x = padding.left + idx * stepX + stepX / 2;
-      const val = isLatencyTab ? log.duration : log.cpm;
-      const barH = Math.min(chartH, (val / maxVal) * chartH);
-      const y = padding.top + chartH - barH;
-      chartPoints.push({ x, y, barH, barWidth, log, idx, wpm: runningWpm[idx] });
+      const instY = padding.top + chartH - (b.instantWpm / maxVal) * chartH;
+      const cumY = padding.top + chartH - (b.cumulativeWpm / maxVal) * chartH;
+      instPts.push({ x, y: instY });
+      cumPts.push({ x, y: cumY });
+      chartPoints.push({
+        x,
+        y: cumY,
+        instY,
+        bucket: b,
+        idx,
+        type: "macro"
+      });
     });
 
-    // 1. Draw Burst / Latency Bars
-    chartPoints.forEach((pt, idx) => {
-      const isHovered = (resultChartHoverIdx === idx);
-      const hasErrors = (pt.log.backspaces > 0) || !pt.log.correct;
-
-      if (isLatencyTab) {
-        ctx.fillStyle = hasErrors
-          ? (isHovered ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.5)")
-          : (isHovered ? "rgba(56, 189, 248, 0.9)" : "rgba(56, 189, 248, 0.4)");
-      } else {
-        ctx.fillStyle = hasErrors
-          ? (isHovered ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.5)")
-          : (isHovered ? "rgba(161, 161, 170, 0.85)" : "rgba(113, 113, 122, 0.45)");
+    // Draw X-axis time labels
+    const labelStep = Math.max(1, Math.ceil(numBuckets / 12));
+    buckets.forEach((b, idx) => {
+      if (idx === 0 || idx === numBuckets - 1 || idx % labelStep === 0) {
+        const x = padding.left + idx * stepX + stepX / 2;
+        ctx.fillStyle = "rgba(161, 161, 170, 0.75)";
+        ctx.font = "11px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(`${b.timeSec}s`, x, height - 12);
       }
+    });
 
-      const rx = pt.x - pt.barWidth / 2;
-      const ry = padding.top + chartH - pt.barH;
-      // Draw rounded top bar
-      const r = Math.min(3, pt.barWidth / 2);
+    // 1. Draw Curve 2: 即時 WPM (Sky blue spline)
+    if (instPts.length > 0) {
       ctx.beginPath();
-      ctx.moveTo(rx, ry + pt.barH);
-      ctx.lineTo(rx, ry + r);
-      ctx.quadraticCurveTo(rx, ry, rx + r, ry);
-      ctx.lineTo(rx + pt.barWidth - r, ry);
-      ctx.quadraticCurveTo(rx + pt.barWidth, ry, rx + pt.barWidth, ry + r);
-      ctx.lineTo(rx + pt.barWidth, ry + pt.barH);
+      drawSmoothLine(ctx, instPts);
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.75)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Dots on Instant WPM line
+      instPts.forEach((pt, idx) => {
+        const isHovered = (resultChartHoverIdx === idx);
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, isHovered ? 4.5 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = isHovered ? "#fff" : "#38bdf8";
+        ctx.fill();
+        if (isHovered) {
+          ctx.strokeStyle = "#38bdf8";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      });
+    }
+
+    // 2. Draw Curve 1: 累計平均 WPM (Amber spline with subtle area gradient)
+    if (cumPts.length > 0) {
+      // Area fill under Cumulative WPM
+      ctx.beginPath();
+      drawSmoothLine(ctx, cumPts);
+      const lastPt = cumPts[cumPts.length - 1];
+      const firstPt = cumPts[0];
+      ctx.lineTo(lastPt.x, padding.top + chartH);
+      ctx.lineTo(firstPt.x, padding.top + chartH);
       ctx.closePath();
+      const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+      grad.addColorStop(0, "rgba(245, 158, 11, 0.22)");
+      grad.addColorStop(1, "rgba(245, 158, 11, 0.0)");
+      ctx.fillStyle = grad;
       ctx.fill();
 
-      // Draw character label under the axis if space permits
-      if (n <= 45 || idx % Math.ceil(n / 35) === 0) {
-        ctx.fillStyle = isHovered ? "#fbbf24" : "rgba(161, 161, 170, 0.75)";
-        ctx.font = isHovered ? "bold 12px sans-serif" : "11px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(pt.log.char || "", pt.x, height - 12);
-      }
-    });
-
-    // 2. Draw Average WPM Trend Line (only in Macro Tab)
-    if (!isLatencyTab && n > 1) {
+      // Smooth Line
       ctx.beginPath();
-      chartPoints.forEach((pt, idx) => {
-        const lineY = padding.top + chartH - (pt.wpm / maxVal) * chartH;
-        if (idx === 0) ctx.moveTo(pt.x, lineY);
-        else ctx.lineTo(pt.x, lineY);
-      });
-
-      // Line gradient glow
+      drawSmoothLine(ctx, cumPts);
       ctx.strokeStyle = "#f59e0b";
       ctx.lineWidth = 2.5;
       ctx.lineJoin = "round";
       ctx.stroke();
 
-      // Draw subtle fill below WPM line
-      const firstPt = chartPoints[0];
-      const lastPt = chartPoints[chartPoints.length - 1];
-      ctx.lineTo(lastPt.x, padding.top + chartH);
-      ctx.lineTo(firstPt.x, padding.top + chartH);
-      ctx.closePath();
-      const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
-      grad.addColorStop(0, "rgba(245, 158, 11, 0.2)");
-      grad.addColorStop(1, "rgba(245, 158, 11, 0.0)");
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // Points on trend line
-      chartPoints.forEach((pt, idx) => {
-        const lineY = padding.top + chartH - (pt.wpm / maxVal) * chartH;
+      // Dots on Cumulative WPM line
+      cumPts.forEach((pt, idx) => {
         const isHovered = (resultChartHoverIdx === idx);
         ctx.beginPath();
-        ctx.arc(pt.x, lineY, isHovered ? 5 : 2.5, 0, Math.PI * 2);
+        ctx.arc(pt.x, pt.y, isHovered ? 5.5 : 2.5, 0, Math.PI * 2);
         ctx.fillStyle = isHovered ? "#fff" : "#f59e0b";
         ctx.fill();
         if (isHovered) {
@@ -3147,27 +3342,49 @@
       renderResultChart(lastResultTelemetry.charLogs);
 
       const pt = chartPoints[closestIdx];
-      const log = pt.log;
-      const decompStr = log.decomp ? `<div class="tooltip-decomp">${escapeHtml(log.decomp)}</div>` : "";
-      const errorStr = (log.backspaces > 0 || !log.correct)
-        ? `<div class="tooltip-err">退格修正: ${log.backspaces} 次</div>`
-        : "";
 
-      tooltip.innerHTML = `
-        <div class="tooltip-char-line">
-          <span class="tooltip-char">「${escapeHtml(log.char)}」</span>
-          <span class="tooltip-duration">${log.duration} ms</span>
-        </div>
-        <div class="tooltip-detail-grid">
-          <div>首鍵思維: <strong>${log.cognitiveLatency} ms</strong></div>
-          <div>即時速度: <strong>${log.cpm} CPM</strong></div>
-        </div>
-        ${decompStr}
-        ${errorStr}
-      `;
+      if (pt.type === "macro" && pt.bucket) {
+        const b = pt.bucket;
+        const charsSample = b.chars.slice(0, 8).join("");
+        const moreSuffix = b.chars.length > 8 ? "…" : "";
+        const charsDisplay = b.chars.length > 0 ? `「${escapeHtml(charsSample + moreSuffix)}」` : "（無擊鍵）";
+
+        tooltip.innerHTML = `
+          <div class="tooltip-char-line">
+            <span class="tooltip-char">${b.timeSec} 秒處</span>
+            <span class="tooltip-duration">${b.charCount} 字</span>
+          </div>
+          <div class="tooltip-detail-grid">
+            <div>累計均速: <strong style="color:#f59e0b">${b.cumulativeWpm} WPM</strong></div>
+            <div>即時速度: <strong style="color:#38bdf8">${b.instantWpm} WPM</strong></div>
+            <div style="margin-top:2px;color:#a1a1aa">區間字元: <span style="color:#f4f4f5">${charsDisplay}</span></div>
+          </div>
+        `;
+      } else {
+        const log = pt.log;
+        const decompStr = log.decomp ? `<div class="tooltip-decomp">${escapeHtml(log.decomp)}</div>` : "";
+        const errorStr = (log.backspaces > 0 || !log.correct)
+          ? `<div class="tooltip-err">退格修正: ${log.backspaces} 次</div>`
+          : "";
+        const displayDur = log.netDuration != null ? log.netDuration : log.duration;
+
+        tooltip.innerHTML = `
+          <div class="tooltip-char-line">
+            <span class="tooltip-char">「${escapeHtml(log.char)}」</span>
+            <span class="tooltip-duration">${displayDur} ms</span>
+          </div>
+          <div class="tooltip-detail-grid">
+            <div>首鍵思維: <strong>${log.cognitiveLatency} ms</strong></div>
+            <div>選字耗時: <strong>${log.imeSelectDuration || 0} ms</strong></div>
+            <div>即時速度: <strong>${log.cpm} CPM</strong></div>
+          </div>
+          ${decompStr}
+          ${errorStr}
+        `;
+      }
 
       tooltip.classList.remove("hidden");
-      const ttWidth = 180;
+      const ttWidth = 190;
       let left = pt.x - ttWidth / 2;
       if (left < 10) left = 10;
       if (left + ttWidth > canvas.clientWidth - 10) left = canvas.clientWidth - ttWidth - 10;
@@ -3194,15 +3411,17 @@
     lastResultTelemetry = stats;
     resultChartHoverIdx = -1;
 
-    // 1. Update Header & Meta
+    // 1. Update Header & Meta (if present)
     const elapsedText = fmtTime(stats.sec || 0);
     const correct = stats.totalCorrect != null ? stats.totalCorrect : (stats.correctChars != null ? stats.correctChars : (state ? state.totalCorrect : 0));
     const typed = stats.totalTyped != null ? stats.totalTyped : (stats.totalChars != null ? stats.totalChars : (state ? state.totalTyped : 0));
 
-    $("#resultTimeElapsed").textContent = `用時: ${elapsedText}`;
-    $("#resultCharsStat").textContent = `答對字數: ${correct} / ${typed}`;
+    const resultTimeElapsed = $("#resultTimeElapsed");
+    if (resultTimeElapsed) resultTimeElapsed.textContent = `用時: ${elapsedText}`;
+    const resultCharsStat = $("#resultCharsStat");
+    if (resultCharsStat) resultCharsStat.textContent = `答對字數: ${correct} / ${typed}`;
 
-    // 2. Update Top KPI Cards
+    // 2. Update Top KPI Cards (WPM as primary, CPM as secondary)
     const kpiCpm = $("#kpiCpm");
     const kpiWpm = $("#kpiWpm");
     const kpiAcc = $("#kpiAcc");
@@ -3210,8 +3429,9 @@
     const kpiLatency = $("#kpiLatency");
     const kpiConsistency = $("#kpiConsistency");
 
-    if (kpiCpm) kpiCpm.textContent = stats.cpm;
-    if (kpiWpm) kpiWpm.textContent = `${Math.round(stats.cpm / 5)} WPM`;
+    const wpmVal = Math.round(stats.cpm / 5);
+    if (kpiWpm) kpiWpm.textContent = wpmVal;
+    if (kpiCpm) kpiCpm.textContent = `${stats.cpm} CPM`;
     if (kpiAcc) kpiAcc.textContent = `${stats.acc}%`;
     if (kpiAccRatio) kpiAccRatio.textContent = `${correct} / ${typed} 字`;
     if (kpiLatency) kpiLatency.innerHTML = `${stats.avgFirstKeyLatency || 0} <span class="kpi-unit">ms</span>`;
@@ -3236,14 +3456,13 @@
         if (retryBottlenecksBtn) retryBottlenecksBtn.classList.add("hidden");
       } else {
         if (retryBottlenecksBtn) retryBottlenecksBtn.classList.remove("hidden");
-        bottlenecks.forEach((b, idx) => {
+        bottlenecks.forEach((b) => {
           const card = document.createElement("div");
           card.className = "bottleneck-card";
           card.innerHTML = `
-            <div class="bottleneck-rank">#${idx + 1}</div>
             <div class="bottleneck-char">${escapeHtml(b.char)}</div>
             <div class="bottleneck-info">
-              <div class="bottleneck-duration">${b.duration} ms</div>
+              <div class="bottleneck-duration">${b.netDuration != null ? b.netDuration : b.duration} ms</div>
               <div class="bottleneck-decomp">${escapeHtml(b.decomp || "—")}</div>
             </div>
           `;
@@ -3969,10 +4188,10 @@
         tabMacro.setAttribute("aria-selected", "true");
         tabLatency.classList.remove("active");
         tabLatency.setAttribute("aria-selected", "false");
-        const legendDot = document.querySelector(".legend-item .bg-amber");
-        if (legendDot && legendDot.parentElement) {
-          legendDot.parentElement.style.display = "inline-flex";
-        }
+        const legendCum = $("#legendCumWpm");
+        const legendInst = $("#legendInstWpm");
+        if (legendCum) legendCum.style.display = "inline-flex";
+        if (legendInst) legendInst.style.display = "inline-flex";
         if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
       });
       tabLatency.addEventListener("click", () => {
@@ -3981,10 +4200,10 @@
         tabLatency.setAttribute("aria-selected", "true");
         tabMacro.classList.remove("active");
         tabMacro.setAttribute("aria-selected", "false");
-        const legendDot = document.querySelector(".legend-item .bg-amber");
-        if (legendDot && legendDot.parentElement) {
-          legendDot.parentElement.style.display = "none";
-        }
+        const legendCum = $("#legendCumWpm");
+        const legendInst = $("#legendInstWpm");
+        if (legendCum) legendCum.style.display = "none";
+        if (legendInst) legendInst.style.display = "none";
         if (lastResultTelemetry) renderResultChart(lastResultTelemetry.charLogs);
       });
     }
