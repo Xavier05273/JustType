@@ -507,8 +507,59 @@ body[data-mode="life_situations"] .hint-line{color:#4b5563}
 .auto-advance-label{
   display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none;
 }
-.auto-advance-label input{
+.auto-advance-label input[type="checkbox"]{
   cursor:pointer;width:16px;height:16px;accent-color:var(--accent);
+}
+
+.endless-group {
+  gap: 6px;
+}
+.settle-count-input {
+  width: 52px;
+  padding: 2px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--input-bg);
+  color: var(--ink);
+  transition: all 0.2s ease;
+}
+.settle-count-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.settle-count-input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: transparent;
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--muted);
+}
+/* 當無盡模式開啟時 (is-endless)："否則在第 [ 輸入框 ] 結算" 暗掉灰掉 */
+.endless-group.is-endless .endless-text {
+  opacity: 1;
+  color: var(--ink);
+  font-weight: 600;
+}
+.endless-group.is-endless .endless-settle-sep,
+.endless-group.is-endless .endless-settle-suffix {
+  opacity: 0.4;
+  color: var(--muted);
+}
+
+/* 當無盡模式關閉時 (is-finite)："無盡模式" 四個字暗掉，其餘亮起來 */
+.endless-group.is-finite .endless-text {
+  opacity: 0.45;
+  color: var(--muted);
+  font-weight: normal;
+}
+.endless-group.is-finite .endless-settle-sep,
+.endless-group.is-finite .endless-settle-suffix {
+  opacity: 1;
+  color: var(--ink);
+  font-weight: 500;
 }
 /* Practice view fills the viewport height so the target text and the
    on-screen keyboard never push each other off screen. The target box
