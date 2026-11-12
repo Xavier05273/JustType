@@ -1,5 +1,5 @@
 // JustType Service Worker - Offline support and caching
-const CACHE_NAME = "justtype-cache-v1";
+const CACHE_NAME = "justtype-cache-v2";
 
 const CORE_ASSETS = [
   "./",
@@ -19,11 +19,13 @@ const CORE_ASSETS = [
   "assets/icon-512.png"
 ];
 
-// Install: Cache all core assets
+// Install: Cache all core assets safely
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(CORE_ASSETS);
+      return Promise.allSettled(
+        CORE_ASSETS.map((asset) => cache.add(asset).catch(() => null))
+      );
     }).then(() => {
       return self.skipWaiting();
     })
@@ -47,35 +49,54 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch: Stale-While-Revalidate for application assets, Cache-First for static data/images
+// Fetch:
+// - Navigation (HTML): Network-First for prompt updates, fallback to cache offline.
+// - Static assets (CSS/JS/JSON/Images): Stale-While-Revalidate for instant load.
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") {
     return;
   }
 
-  // Handle same-origin requests
   const url = new URL(request.url);
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(request).then((cachedResponse) => {
-        const fetchPromise = fetch(request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              const responseClone = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, responseClone);
-              });
-            }
-            return networkResponse;
-          })
-          .catch(() => {
-            // Network failure: return cached if available or fallback
-            return cachedResponse;
-          });
-
-        return cachedResponse || fetchPromise;
-      })
-    );
+  if (url.origin !== self.location.origin) {
+    return;
   }
+
+  const isNavigation = request.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
+
+  if (isNavigation) {
+    // Network-First for HTML
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("index.html")))
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate for other static assets
+  event.respondWith(
+    caches.match(request).then((cachedResponse) => {
+      const fetchPromise = fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => cachedResponse);
+
+      return cachedResponse || fetchPromise;
+    })
+  );
 });

@@ -281,18 +281,32 @@
   // Speed sanity: IME needs time to select each char. If measured time is far
   // below per-char minimum, it's paste/instant input or timer started late.
   // Effective seconds floor prevents absurd 1920+ displays and best-record pollution.
-  function effectiveStats(totalTyped, totalCorrect, rawSec) {
+  function effectiveStats(totalTyped, totalCorrect, rawSec, totalKeys) {
     const floorSec = Math.max(1.0, totalCorrect * 0.20);
     const effSec = Math.max(rawSec || 0, floorSec);
     const anomalous = (rawSec || 0) < floorSec * 0.6 && totalCorrect >= 5;
-    const cpm = effSec > 0 ? Math.round(totalCorrect / (effSec / 60)) : 0;
+    // WPM: 實際打了多少字，除以秒數換算為每分鐘（即 (字數 / 秒數) * 60，不套用 / 5 死公式）
+    const wpm = effSec > 0 ? Math.round(totalCorrect / (effSec / 60)) : 0;
+    // CPM: 實際按了多少鍵，換算為每分鐘（即 (按鍵數 / 秒數) * 60）
+    const keys = Math.max(totalKeys != null ? totalKeys : 0, totalTyped || 0);
+    const cpm = effSec > 0 ? Math.round(keys / (effSec / 60)) : 0;
     const acc = totalTyped > 0 ? Math.round((totalCorrect / totalTyped) * 1000) / 10 : 100;
-    return { sec: effSec, rawSec: rawSec || 0, cpm, acc, anomalous, totalTyped, totalCorrect };
+    return { sec: effSec, rawSec: rawSec || 0, wpm, cpm, acc, anomalous, totalTyped, totalCorrect, totalKeys: keys };
   }
 
   // Half-width -> full-width normalization for comparison (lenient punctuation).
   const PUNCT_MAP = { ",": "，", ".": "。", "!": "！", "?": "？", ";": "；", ":": "：" };
   function norm(ch) { return PUNCT_MAP[ch] || ch; }
+
+  function escapeHtml(str) {
+    if (str == null) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
   function loadJSON(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -526,10 +540,10 @@
     renderHome();
     bindGlobal();
 
-    // 2. Fetch large dictionaries asynchronously in parallel in background
+    // 2. Fetch large dictionaries asynchronously in parallel in background (with IndexedDB cache)
     Promise.all([
-      fetch("data/zhuyin.json").then((r) => r.json()).then((d) => { ZHUYIN = d; }).catch(() => { ZHUYIN = null; }),
-      fetch("data/cangjie.json").then((r) => r.json()).then((d) => { CANGJIE = d; }).catch(() => { CANGJIE = null; }),
+      fetchOrLoadCached(IDB_KEY_ZHUYIN, "data/zhuyin.json").then((d) => { ZHUYIN = d; }).catch(() => { ZHUYIN = null; }),
+      fetchOrLoadCached(IDB_KEY_CANGJIE, "data/cangjie.json").then((d) => { CANGJIE = d; }).catch(() => { CANGJIE = null; }),
       loadBoshiamyFromIDB().then((d) => { BOSHIAMY = d; }).catch(() => { BOSHIAMY = null; }),
     ]).then(() => {
       // If currently practicing, refresh key hints and decomposition wheel once dictionaries are loaded
@@ -540,11 +554,13 @@
     });
   }
 
-    // ---- IndexedDB Helper for Boshiamy Table ----
+    // ---- IndexedDB Helper for Boshiamy Table & Dictionaries ----
   const IDB_NAME = "justtype_db";
   const IDB_VERSION = 1;
   const IDB_STORE = "tables";
   const IDB_KEY_BOSHIAMY = "boshiamy";
+  const IDB_KEY_ZHUYIN = "zhuyin";
+  const IDB_KEY_CANGJIE = "cangjie";
 
   function openIndexedDB() {
     return new Promise((resolve, reject) => {
@@ -564,13 +580,13 @@
     });
   }
 
-  async function loadBoshiamyFromIDB() {
+  async function loadTableFromIDB(key) {
     try {
       const db = await openIndexedDB();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(IDB_STORE, "readonly");
         const store = tx.objectStore(IDB_STORE);
-        const req = store.get(IDB_KEY_BOSHIAMY);
+        const req = store.get(key);
         req.onsuccess = () => resolve(req.result || null);
         req.onerror = () => reject(req.error);
       });
@@ -579,15 +595,40 @@
     }
   }
 
+  async function saveTableToIDB(key, table) {
+    try {
+      const db = await openIndexedDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, "readwrite");
+        const store = tx.objectStore(IDB_STORE);
+        const req = store.put(table, key);
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => reject(req.error);
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  async function fetchOrLoadCached(key, url) {
+    const cached = await loadTableFromIDB(key);
+    if (cached) return cached;
+    try {
+      const r = await fetch(url);
+      const data = await r.json();
+      saveTableToIDB(key, data);
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
+  async function loadBoshiamyFromIDB() {
+    return loadTableFromIDB(IDB_KEY_BOSHIAMY);
+  }
+
   async function saveBoshiamyToIDB(table) {
-    const db = await openIndexedDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, "readwrite");
-      const store = tx.objectStore(IDB_STORE);
-      const req = store.put(table, IDB_KEY_BOSHIAMY);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => reject(req.error);
-    });
+    return saveTableToIDB(IDB_KEY_BOSHIAMY, table);
   }
 
   // Parse .cin file or table text to { char: shortest_code }
@@ -1040,6 +1081,7 @@
     const prevCount = sameMode ? (state.sessionCompleted || 0) : 0;
     const prevRoundTyped = sameMode && prevCount > 0 ? (state.roundTotalTyped || 0) : 0;
     const prevRoundCorrect = sameMode && prevCount > 0 ? (state.roundTotalCorrect || 0) : 0;
+    const prevRoundKeys = sameMode && prevCount > 0 ? (state.roundTotalKeys || 0) : 0;
     const prevRoundElapsed = sameMode && prevCount > 0 ? (state.roundElapsed || 0) : 0;
     const prevRoundStartedAt = sameMode && prevCount > 0 ? (state.roundStartedAt || null) : null;
     state = {
@@ -1067,9 +1109,11 @@
       finished: false,
       totalTyped: 0,
       totalCorrect: 0,
+      totalKeys: 0,
       sessionCompleted: prevCount,
       roundTotalTyped: prevRoundTyped,
       roundTotalCorrect: prevRoundCorrect,
+      roundTotalKeys: prevRoundKeys,
       roundElapsed: prevRoundElapsed,
       roundStartedAt: prevRoundStartedAt,
       autoNextTimer: null,
@@ -1146,6 +1190,7 @@
       state.sessionCompleted = 0;
       state.roundTotalTyped = 0;
       state.roundTotalCorrect = 0;
+      state.roundTotalKeys = 0;
       state.roundElapsed = 0;
       state.roundStartedAt = null;
       state.roundCharLogs = [];
@@ -1157,10 +1202,16 @@
     renderHome();
   }
 
-  // English input protection: if 2 English letters typed in 'words' mode, skip question
+  // English input protection: auto-intercept and clear mistaken English letters without resetting round
   function checkEnglishProtection(val) {
-    if (!state || state.modeKey !== "words" || state.finished) return false;
-    if (state.composing) return false;
+    if (!state || state.finished || state.composing) return false;
+    if (state.modeKey === "mixed_zh_en") return false;
+    const layout = getCurrentLayout();
+    if (layout === "boshiamy") return false;
+
+    const info = getCurrentPosInfo();
+    const curTargetChar = info ? info.char : "";
+    if (/[a-zA-Z]/.test(curTargetChar)) return false;
 
     const letters = (val || "").match(/[a-zA-Z]/g);
     if (letters && letters.length >= 2) {
@@ -1172,23 +1223,20 @@
 
   function triggerEnglishProtection() {
     if (!state || state.finished) return;
-    state.finished = true;
-    stopTimer();
-    state.startedAt = null;
-
-    if (state.currentInputEl) {
-      state.currentInputEl.value = "";
-      state.currentInputEl.disabled = true;
+    const inputEl = state.currentInputEl;
+    if (inputEl) {
+      const currentVal = inputEl.value || "";
+      const cleaned = currentVal.replace(/[a-zA-Z]+/g, "");
+      inputEl.value = cleaned;
+      state.inputs[state.lineIdx] = cleaned;
+      inputEl.classList.remove("input-shake");
+      void inputEl.offsetWidth;
+      inputEl.classList.add("input-shake");
+      setTimeout(() => {
+        if (inputEl) inputEl.classList.remove("input-shake");
+      }, 500);
     }
-
-    hint("⚠️ 偵測到英文輸入法，請切換至中文輸入法！（已自動跳下一題）");
-
-    setTimeout(() => {
-      if (state && state.modeKey === "words") {
-        startRound("words");
-        hint("⚠️ 已自動跳下一題，請確認鍵盤已切換為中文輸入法。");
-      }
-    }, 450);
+    hint("⚠️ 偵測到英文輸入法，請切換至中文輸入法！（已為您自動消除誤打英文字母）");
   }
 
   // ---- 生活情境題：只做 LINE ----
@@ -1247,7 +1295,7 @@
       const who = opp ? opp.speaker : "對方";
       const header = document.createElement("div");
       header.className = "chat-header";
-      header.innerHTML = `<span class="chat-back">‹</span><span class="chat-avatar">${who.slice(0, 1)}</span><span class="chat-name">${who}</span><span class="chat-icons">☎ ▸</span>`;
+      header.innerHTML = `<span class="chat-back">‹</span><span class="chat-avatar">${escapeHtml(who.slice(0, 1))}</span><span class="chat-name">${escapeHtml(who)}</span><span class="chat-icons">☎ ▸</span>`;
       box.appendChild(header);
       const body = document.createElement("div");
       body.className = "chat-body";
@@ -1506,6 +1554,20 @@
           if (!state.selectionStartAt) {
             state.selectionStartAt = Date.now();
           }
+        }
+      }
+
+      // 統計實際敲擊按鍵次數 (Keystrokes，供計算真實 CPM)
+      if (state && !state.finished) {
+        const isSelectionNavOrChoice = (
+          e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "ArrowRight" || e.key === "ArrowLeft" ||
+          e.code === "ArrowDown" || e.code === "ArrowUp" || e.code === "ArrowRight" || e.code === "ArrowLeft" ||
+          e.key === "PageDown" || e.key === "PageUp" ||
+          /^[0-9]$/.test(e.key) || /^Digit[0-9]$/.test(e.code) || /^Numpad[0-9]$/.test(e.code) ||
+          isEnter || e.key === " " || e.code === "Space"
+        );
+        if (!isModifierOrNav || isBackspace || isEnter || ((state.composing || state.compositionStartAt) && isSelectionNavOrChoice)) {
+          state.totalKeys = (state.totalKeys || 0) + 1;
         }
       }
 
@@ -2073,7 +2135,7 @@
       return `<span class="decomp-name">${label}</span> ： <span class="decomp-import-btn" role="button" tabindex="0" title="點擊匯入碼表">匯入 .cin 檔</span>`;
     }
     const reloadBtn = methodKey === "boshiamy" ? ` <button type="button" class="decomp-reload-btn" title="重新上傳或更換碼表" aria-label="重新上傳或更換碼表">⚙️</button>` : "";
-    if (PUNCT_KEY_MAP[ch] || /^[ -]$/.test(ch)) {
+    if (PUNCT_KEY_MAP[ch] || /^[\x00-\x7f]$/.test(ch)) {
       return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： 照打${reloadBtn}`;
     }
     const dec = decompositionFor(ch, methodKey);
@@ -2835,6 +2897,7 @@
       // 無盡模式：永不結算，只給回饋並自動跳下一題（所有模式皆同）。
       state.roundTotalTyped = 0;
       state.roundTotalCorrect = 0;
+      state.roundTotalKeys = 0;
       state.roundElapsed = 0;
       state.roundStartedAt = null;
       state.roundCharLogs = [];
@@ -2850,6 +2913,7 @@
     // 有限輪（無盡關閉）：依指定目標題數 (target) 累積後結算
     state.roundTotalTyped = (state.roundTotalTyped || 0) + state.totalTyped;
     state.roundTotalCorrect = (state.roundTotalCorrect || 0) + state.totalCorrect;
+    state.roundTotalKeys = (state.roundTotalKeys || 0) + (state.totalKeys || state.totalTyped || 0);
     state.roundElapsed = (state.roundElapsed || 0) + state.elapsed;
     state.roundCharLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
     const continuousSec = state.roundStartedAt
@@ -2858,7 +2922,7 @@
 
     if (state.sessionCompleted < target) {
       // Mid-round: feedback only, auto-advance; settlement waits for target.
-      const fb = peekStats(state.roundTotalTyped, state.roundTotalCorrect, continuousSec);
+      const fb = peekStats(state.roundTotalTyped, state.roundTotalCorrect, continuousSec, state.roundTotalKeys);
       showAutoNextFeedback(fb, { progress: `${state.sessionCompleted}/${target}` });
       state.autoNextTimer = setTimeout(() => {
         state.autoNextTimer = null;
@@ -2871,51 +2935,57 @@
     const stats = recordStats({
       totalTyped: state.roundTotalTyped,
       totalCorrect: state.roundTotalCorrect,
+      totalKeys: state.roundTotalKeys,
       sec: continuousSec,
       charLogs: combinedLogs,
     });
     state.sessionCompleted = 0;
     state.roundTotalTyped = 0;
     state.roundTotalCorrect = 0;
+    state.roundTotalKeys = 0;
     state.roundElapsed = 0;
     state.roundStartedAt = null;
     state.roundCharLogs = [];
     resultTimeoutId = setTimeout(() => { resultTimeoutId = null; showResultModal(stats); }, 250);
   }
 
-  function peekStats(totalTyped, totalCorrect, sec) {
-    return effectiveStats(totalTyped, totalCorrect, sec);
+  function peekStats(totalTyped, totalCorrect, sec, totalKeys) {
+    return effectiveStats(totalTyped, totalCorrect, sec, totalKeys);
   }
 
   function recordStats(override) {
     const totalTyped = override ? override.totalTyped : state.totalTyped;
     const totalCorrect = override ? override.totalCorrect : state.totalCorrect;
+    const totalKeys = override ? override.totalKeys : state.totalKeys;
     const rawSec = override ? override.sec : state.elapsed;
-    const eff = effectiveStats(totalTyped, totalCorrect, rawSec);
+    const eff = effectiveStats(totalTyped, totalCorrect, rawSec, totalKeys);
     const sec = eff.sec;
+    const wpm = eff.wpm;
     const cpm = eff.cpm;
     const acc = eff.acc;
 
     // Guard against anomalous speeds (sub-second paste or zero-elapsed glitch)
-    const isAnomalous = eff.anomalous || cpm > 450;
+    const isAnomalous = eff.anomalous || wpm > 450;
 
     const best = loadBest();
     const prev = best[state.modeKey];
-    const isRecord = !isAnomalous && (!prev || cpm > prev.wpm) && cpm > 0;
+    const isRecord = !isAnomalous && (!prev || wpm > prev.wpm) && wpm > 0;
     if (isRecord) {
-      best[state.modeKey] = { wpm: cpm, acc, sec: Math.round(sec) };
+      best[state.modeKey] = { wpm, cpm, acc, sec: Math.round(sec) };
       saveJSON(LS_BEST, best);
     }
     if (!isAnomalous) {
       const hist = loadHist();
       hist.unshift({
         mode: state.modeKey,
-        wpm: cpm,
+        wpm,
+        cpm,
         acc,
         sec: Math.round(sec),
         id: state.item.id,
         typed: totalTyped,
         correct: totalCorrect,
+        keys: eff.totalKeys,
         time: Date.now()
       });
       saveJSON(LS_HIST, hist.slice(0, 50));
@@ -2999,12 +3069,14 @@
     return {
       sec,
       rawSec: eff.rawSec,
+      wpm,
       cpm,
       acc,
       isRecord,
       isAnomalous,
       totalTyped,
       totalCorrect,
+      totalKeys: eff.totalKeys,
       avgFirstKeyLatency,
       consistency,
       bottlenecks,
@@ -3014,13 +3086,14 @@
 
   function showAutoNextFeedback(stats, opts) {
     const progress = opts && opts.progress ? `（${opts.progress}）` : "";
+    const speed = stats.wpm != null ? stats.wpm : stats.cpm;
     if (stats.isRecord) {
-      hint(`★ 新紀錄！速度 ${stats.cpm} 字/分 · 正確率 ${stats.acc}%${progress} · 進入下一題…`);
+      hint(`★ 新紀錄！速度 ${speed} 字/分 · 正確率 ${stats.acc}%${progress} · 進入下一題…`);
     } else {
-      hint(`完成！速度 ${stats.cpm} 字/分 · 正確率 ${stats.acc}%${progress} · 進入下一題…`);
+      hint(`完成！速度 ${speed} 字/分 · 正確率 ${stats.acc}%${progress} · 進入下一題…`);
     }
     $("#hudTime").textContent = fmtTime(stats.sec);
-    $("#hudWpm").textContent = stats.cpm;
+    $("#hudWpm").textContent = speed;
     $("#hudAcc").textContent = stats.acc + "%";
     const hudProgEl = $("#hudProg");
     if (hudProgEl) hudProgEl.textContent = "100%";
@@ -3134,10 +3207,10 @@
     let cumulativeCount = 0;
     buckets.forEach((b) => {
       cumulativeCount += b.charCount;
-      // 即時 WPM = 當前時間桶字數換算為 CPM 再除以 5（標準 WPM）
-      b.instantWpm = Math.round(((b.charCount / bucketSize) * 60) / 5);
-      // 累計平均 WPM = 至今累計字數換算為 CPM 再除以 5（標準 WPM）
-      b.cumulativeWpm = Math.round(((cumulativeCount / b.timeSec) * 60) / 5);
+      // 即時 WPM = 當前時間桶實際字數換算為每分鐘字數（不套用 / 5 死公式）
+      b.instantWpm = Math.round((b.charCount / bucketSize) * 60);
+      // 累計平均 WPM = 至今累計打的字數換算為每分鐘字數
+      b.cumulativeWpm = Math.round((cumulativeCount / b.timeSec) * 60);
     });
 
     const maxVal = Math.max(20, ...buckets.map((b) => Math.max(b.instantWpm, b.cumulativeWpm))) * 1.15;
@@ -3308,7 +3381,7 @@
         <div class="tooltip-detail-grid">
           <div>累計均速: <strong style="color:#f59e0b">${b.cumulativeWpm} WPM</strong></div>
           <div>即時速度: <strong style="color:#38bdf8">${b.instantWpm} WPM</strong></div>
-          <div style="margin-top:2px;color:#a1a1aa">區間字元: <span style="color:#f4f4f5">${charsDisplay}</span></div>
+          <div class="tooltip-range-row">區間字元: <span class="tooltip-range-chars">${charsDisplay}</span></div>
         </div>
       `;
 
@@ -3358,7 +3431,7 @@
     const kpiLatency = $("#kpiLatency");
     const kpiConsistency = $("#kpiConsistency");
 
-    const wpmVal = Math.round(stats.cpm / 5);
+    const wpmVal = stats.wpm != null ? stats.wpm : Math.round(stats.cpm / 5);
     if (kpiWpm) kpiWpm.textContent = wpmVal;
     if (kpiCpm) kpiCpm.textContent = `${stats.cpm} CPM`;
     if (kpiAcc) kpiAcc.textContent = `${stats.acc}%`;
@@ -3408,14 +3481,8 @@
   function startBottlenecksPractice() {
     if (!lastResultTelemetry || !lastResultTelemetry.bottlenecks || !lastResultTelemetry.bottlenecks.length) return;
     const chars = lastResultTelemetry.bottlenecks.map((b) => b.char);
-    // Generate a 20-character muscle-memory targeted drill
-    let drill = "";
-    while (drill.length < 20) {
-      for (const ch of chars) {
-        if (drill.length >= 20) break;
-        drill += ch;
-      }
-    }
+    // 把所有卡鍵字按順序排出來重複 3 次
+    const drill = chars.join("").repeat(3);
     resultOverlay.classList.add("hidden");
     startCustomTextDirectly(drill, "卡鍵專項重練");
   }
@@ -3433,6 +3500,7 @@
     state.sessionCompleted = 0;
     state.roundTotalTyped = 0;
     state.roundTotalCorrect = 0;
+    state.roundTotalKeys = 0;
     state.roundElapsed = 0;
     state.roundStartedAt = null;
     state.roundCharLogs = [];
@@ -3466,14 +3534,15 @@
       const cont = (Date.now() - state.roundStartedAt) / 1000;
       const typedSoFar = (state.roundTotalCorrect || 0) + state.totalCorrect;
       const typedAll = (state.roundTotalTyped || 0) + state.totalTyped;
+      const keysAll = (state.roundTotalKeys || 0) + (state.totalKeys || state.totalTyped || 0);
       rawSec = Math.max(cont, 0);
-      const eff = effectiveStats(typedAll, typedSoFar, rawSec);
+      const eff = effectiveStats(typedAll, typedSoFar, rawSec, keysAll);
       $("#hudTime").textContent = fmtTime(eff.sec);
-      $("#hudWpm").textContent = eff.cpm;
+      $("#hudWpm").textContent = eff.wpm;
     } else {
-      const eff = effectiveStats(state.totalTyped, state.totalCorrect, sec);
+      const eff = effectiveStats(state.totalTyped, state.totalCorrect, sec, state.totalKeys);
       $("#hudTime").textContent = fmtTime(sec);
-      $("#hudWpm").textContent = eff.cpm;
+      $("#hudWpm").textContent = eff.wpm;
     }
     const acc = state.totalTyped > 0 ? Math.round((state.totalCorrect / state.totalTyped) * 100) : 100;
     $("#hudAcc").textContent = acc + "%";
@@ -3490,7 +3559,34 @@
     $("#fontSizeSelect").value = v;
   }
 
+  function initModalInertObserver() {
+    const overlays = [
+      document.getElementById("resultOverlay"),
+      document.getElementById("statsOverlay"),
+      document.getElementById("customTextOverlay"),
+      document.getElementById("boshiamyImportOverlay")
+    ];
+    const updateInert = () => {
+      const anyOpen = overlays.some((o) => o && !o.classList.contains("hidden"));
+      const mainEls = [document.querySelector(".topbar"), document.getElementById("homeView"), document.getElementById("practiceView")];
+      mainEls.forEach((el) => {
+        if (el) {
+          if (anyOpen) el.setAttribute("inert", "");
+          else el.removeAttribute("inert");
+        }
+      });
+    };
+    if (typeof MutationObserver !== "undefined") {
+      const observer = new MutationObserver(updateInert);
+      overlays.forEach((o) => {
+        if (o) observer.observe(o, { attributes: true, attributeFilter: ["class"] });
+      });
+    }
+    updateInert();
+  }
+
   function bindGlobal() {
+    initModalInertObserver();
     bindDecompWheel();
     const themeBtn = $("#themeToggleBtn");
     if (themeBtn) {
@@ -3609,7 +3705,8 @@
           if (wpm <= 0 || wpm > 450) return;
           const acc = Number.isFinite(item.acc) ? Math.min(100, Math.max(0, Number(item.acc))) : 100;
           const sec = Number.isFinite(item.sec) ? Math.max(0, Math.round(item.sec)) : 0;
-          const mode = typeof item.mode === "string" ? item.mode : "words";
+          const rawMode = typeof item.mode === "string" ? item.mode.trim().slice(0, 50) : "words";
+          const mode = rawMode.replace(/[<>"'&]/g, "");
           const time = Number.isFinite(item.time) ? item.time : Date.now();
           const typed = typeof item.typed === "number" ? item.typed : undefined;
           const correct = typeof item.correct === "number" ? item.correct : undefined;
@@ -3702,10 +3799,10 @@
             }
             return `
               <div class="stats-hist-item">
-                <span class="hist-mode">${mTitle}</span>
-                <span class="hist-wpm">${h.wpm} 字/分</span>
-                <span class="hist-meta">${h.acc}% · ${fmtTime(h.sec)}</span>
-                <span class="hist-meta">${timeStr}</span>
+                <span class="hist-mode">${escapeHtml(mTitle)}</span>
+                <span class="hist-wpm">${Math.round(Number(h.wpm) || 0)} 字/分</span>
+                <span class="hist-meta">${Number(h.acc) || 0}% · ${fmtTime(Number(h.sec) || 0)}</span>
+                <span class="hist-meta">${escapeHtml(timeStr)}</span>
               </div>
             `;
           }).join("");
@@ -4102,10 +4199,14 @@
 
     setupChartInteractions();
 
+    let chartResizeTimer = null;
     window.addEventListener("resize", () => {
-      if (!resultOverlay.classList.contains("hidden") && lastResultTelemetry) {
-        renderResultChart(lastResultTelemetry.charLogs);
-      }
+      if (chartResizeTimer) clearTimeout(chartResizeTimer);
+      chartResizeTimer = setTimeout(() => {
+        if (!resultOverlay.classList.contains("hidden") && lastResultTelemetry) {
+          renderResultChart(lastResultTelemetry.charLogs);
+        }
+      }, 100);
     });
 
     // Keyboard shortcuts inside Result Overlay
@@ -4136,6 +4237,7 @@
         state.sessionCompleted = 0;
         state.roundTotalTyped = 0;
         state.roundTotalCorrect = 0;
+        state.roundTotalKeys = 0;
         state.roundElapsed = 0;
         syncEndlessCheck();
         showPractice();
@@ -4152,6 +4254,7 @@
         state.sessionCompleted = 0;
         state.roundTotalTyped = 0;
         state.roundTotalCorrect = 0;
+        state.roundTotalKeys = 0;
         state.roundElapsed = 0;
         syncEndlessCheck();
       };
@@ -4221,6 +4324,8 @@
   }
 
   window.showResultModal = showResultModal;
+  window.effectiveStats = effectiveStats;
+  window.startBottlenecksPractice = startBottlenecksPractice;
 
   // Register Service Worker for PWA support
   if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {

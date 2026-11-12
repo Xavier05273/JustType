@@ -502,6 +502,16 @@ body[data-mode="life_situations"] .hint-line{color:#4b5563}
 .input-box input:focus{outline:none;border-color:var(--accent)}
 .input-box input:disabled{background:var(--input-disabled);color:var(--muted)}
 .input-box input.done{border-color:var(--green)}
+@keyframes inputShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+.input-box input.input-shake {
+  animation: inputShake 0.4s ease-in-out;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
 .hint-line{min-height:1.5em;color:var(--muted);font-size:14px;margin:10px 2px}
 .practice-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .auto-advance-label{
@@ -1081,6 +1091,26 @@ html[data-theme="light"] .tooltip-detail-grid {
 
 html[data-theme="light"] .tooltip-detail-grid strong {
   color: #18181b;
+}
+
+.tooltip-range-row {
+  margin-top: 2px;
+  color: #a1a1aa;
+}
+
+.tooltip-range-chars {
+  color: #f4f4f5;
+  font-weight: 500;
+}
+
+html[data-theme="light"] .tooltip-range-row {
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+html[data-theme="light"] .tooltip-range-chars {
+  color: #000000 !important;
+  font-weight: 600;
 }
 
 .tooltip-decomp {
