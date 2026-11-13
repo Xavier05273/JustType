@@ -95,6 +95,7 @@ let BOSHIAMY = null;
 let decompMethod = "cangjie";
 let state = null;
 let carousel = null;
+let currentBottleneckDrillText = "";
 
 // ---- 抽題隊列（Queue 演算法相容區）----
 const QUEUE = {};
@@ -322,7 +323,7 @@ function ensureCustomData() {
   if (parsed && parsed.content) {
     DATA.custom_text = {
       label: parsed.title,
-      texts: [{ id: "custom-1", text: parsed.content }]
+      texts: [{ id: "custom-1", title: parsed.title, text: parsed.content }]
     };
   } else {
     DATA.custom_text = {
@@ -674,10 +675,17 @@ function startRound(modeKey) {
   }
   const mode = MODES.find((m) => m.key === modeKey);
   const isCustom = modeKey === "custom_text";
+  const isBottlenecks = modeKey === "bottlenecks";
   let item;
   if (isCustom) {
     ensureCustomData();
     item = DATA.custom_text.texts[0];
+  } else if (isBottlenecks) {
+    item = {
+      id: "bottlenecks-drill",
+      title: "卡鍵專項重練",
+      text: currentBottleneckDrillText || "卡鍵字練習"
+    };
   } else {
     item = nextFromQueue(modeKey);
   }
@@ -706,6 +714,7 @@ function startRound(modeKey) {
   const prevRoundKeys = sameMode && prevCount > 0 ? (state.roundTotalKeys || 0) : 0;
   const prevRoundElapsed = sameMode && prevCount > 0 ? (state.roundElapsed || 0) : 0;
   const prevRoundStartedAt = sameMode && prevCount > 0 ? (state.roundStartedAt || null) : null;
+  const prevStages = sameMode && prevCount > 0 ? (state.roundStages || []) : [];
   state = {
     modeKey,
     item,
@@ -728,6 +737,7 @@ function startRound(modeKey) {
     charBackspaces: 0,
     charLogs: [],
     roundCharLogs: sameMode && prevCount > 0 ? (state.roundCharLogs || []) : [],
+    roundStages: prevStages,
     finished: false,
     totalTyped: 0,
     totalCorrect: 0,
@@ -750,11 +760,13 @@ function startRound(modeKey) {
   }
 
   document.body.dataset.mode = modeKey;
-  let titleText = mode.title;
+  let titleText = mode ? mode.title : (isBottlenecks ? "卡鍵專項" : modeKey);
   if (modeKey === "life_situations") {
     titleText = `${mode.title} · ${item.title || "LINE 對話"}`;
   } else if (isCustom && item.title) {
     titleText = `${mode.title} · ${item.title}`;
+  } else if (isBottlenecks) {
+    titleText = "卡鍵專項重練";
   }
   $("#practiceTitle").textContent = titleText;
   showPractice();
@@ -768,10 +780,10 @@ function startRound(modeKey) {
 
 function startCustomTextDirectly(content, title) {
   if (!content || !content.trim()) return;
-  saveJSON(LS_CUSTOM_TEXT, JSON.stringify({
+  saveJSON(LS_CUSTOM_TEXT, {
     title: title || "自訂文章",
     content: content.trim()
-  }));
+  });
   if (state && state.timerId) {
     clearInterval(state.timerId);
     state.timerId = null;
@@ -938,6 +950,12 @@ function renderPractice() {
     ensureTimerStarted();
     state.composingRawText = e.data || state.composingRawText;
     state.composingText = e.data || state.composingText;
+    const info = getCurrentPosInfo();
+    const completedStr = info && info.completed ? info.completed.join("") : "";
+    if (completedStr.length > (state.inputs[li] || "").length) {
+      state.inputs[li] = completedStr;
+      onCommitted(li);
+    }
     paint();
   });
   inp.addEventListener("compositionend", (e) => {
@@ -1278,12 +1296,23 @@ function syncEndlessCheck() {
 function getCurrentPosInfo() {
   if (!state || state.lineIdx >= state.lines.length) return null;
   const targetChars = Array.from(state.lines[state.lineIdx]);
-  const inputChars = Array.from(state.inputs[state.lineIdx] || "");
+  const el = state.currentInputEl;
+  const liveVal = (el && typeof el.value === "string") ? el.value : (state.inputs[state.lineIdx] || "");
+  const inputChars = Array.from(liveVal);
   let pos = 0;
   while (pos < targetChars.length && pos < inputChars.length && norm(inputChars[pos]) === norm(targetChars[pos])) {
     pos++;
   }
-  if (pos >= targetChars.length) return null;
+  if (pos >= targetChars.length) {
+    return {
+      lineIdx: state.lineIdx,
+      charIdx: pos,
+      char: "",
+      zhuyin: null,
+      completed: inputChars.slice(0, pos),
+      composingSlice: "",
+    };
+  }
   const ch = targetChars[pos];
   const zhuyin = (ZHUYIN && ZHUYIN[ch]) || null;
   return {
@@ -1508,9 +1537,11 @@ function paintOnKeyboard() {
 
 function displayFor(li) {
   if (li === state.lineIdx) {
-    const info = getCurrentPosInfo();
-    if (info && info.completed) {
-      return info.completed.join("");
+    if (state.composing) {
+      const info = getCurrentPosInfo();
+      if (info && info.completed) {
+        return info.completed.join("");
+      }
     }
     const el = state.currentInputEl;
     if (el) return el.value;
@@ -1635,8 +1666,18 @@ function onCommitted(lineIdx) {
       }
     }
   }
-  state.totalTyped = inputChars.length;
-  state.totalCorrect = correct;
+  let allTyped = 0;
+  let allCorrect = 0;
+  state.lines.forEach((l, idx) => {
+    const tChars = Array.from(l);
+    const iChars = Array.from(state.inputs[idx] || "");
+    allTyped += iChars.length;
+    for (let j = 0; j < tChars.length && j < iChars.length; j++) {
+      if (norm(iChars[j]) === norm(tChars[j])) allCorrect++;
+    }
+  });
+  state.totalTyped = allTyped;
+  state.totalCorrect = allCorrect;
 }
 
 function advance(lineIdx) {
@@ -1652,12 +1693,27 @@ function advance(lineIdx) {
 
 function maybeFinish() {
   if (state.finished) return;
+  // 組字（preedit / composition）中：不前進、不結束，等確定後 compositionend 再評估
+  if (state.composing) return;
   const isChat = state.modeKey === "life_situations";
   if (isChat) {
     if (state.animationPhase === ANIMATION_PHASE.COMPLETED) {
       finishRound();
     }
     return;
+  }
+  // 自動前進：目前行打完且全數正確，直接 advance，不必按 Enter 確認
+  if (!isEndlessEnabled(state.modeKey)) {
+    const li = state.lineIdx;
+    const line = state.lines[li];
+    const targetArr = Array.from(line);
+    const inputArr = Array.from(state.inputs[li] || "");
+    const complete = inputArr.length === targetArr.length;
+    const allOk = targetArr.every((ch, i) => norm(inputArr[i]) === norm(ch));
+    if (li + 1 < state.lines.length && complete && allOk) {
+      advance(li);
+      return;
+    }
   }
   const allCorrect = state.lines.every((line, li) => {
     const targetArr = Array.from(line);
@@ -1677,6 +1733,20 @@ function finishRound() {
   state.elapsed = elapsedNow();
   state.sessionCompleted = (state.sessionCompleted || 0) + 1;
 
+  const currentStageEff = effectiveStats(state.totalTyped, state.totalCorrect, state.elapsed, state.totalKeys);
+  const stageRecord = {
+    stageNum: state.sessionCompleted,
+    text: state.lines.join(" "),
+    item: state.item,
+    sec: state.elapsed,
+    wpm: currentStageEff.wpm,
+    cpm: currentStageEff.cpm,
+    acc: currentStageEff.acc,
+    correct: state.totalCorrect,
+    typed: state.totalTyped
+  };
+  state.roundStages = (state.roundStages || []).concat([stageRecord]);
+
   const targetCount = getModeSettleTarget(state.modeKey);
   const isEndless = isEndlessEnabled(state.modeKey);
 
@@ -1687,6 +1757,7 @@ function finishRound() {
     state.roundElapsed = 0;
     state.roundStartedAt = null;
     state.roundCharLogs = [];
+    state.roundStages = [];
     const stats = recordStats();
     showAutoNextFeedback(stats);
     state.autoNextTimer = setTimeout(() => {
@@ -1717,6 +1788,7 @@ function finishRound() {
   const combinedKeys = (state.roundTotalKeys || 0) + state.totalKeys;
   const combinedSec = (state.roundElapsed || 0) + state.elapsed;
   const combinedLogs = (state.roundCharLogs || []).concat(state.charLogs || []);
+  const allStages = (state.roundStages || []).slice();
 
   const stats = recordStats({
     totalTyped: combinedTyped,
@@ -1724,6 +1796,7 @@ function finishRound() {
     totalKeys: combinedKeys,
     sec: combinedSec,
     charLogs: combinedLogs,
+    stages: allStages,
   });
 
   state.sessionCompleted = 0;
@@ -1733,6 +1806,7 @@ function finishRound() {
   state.roundElapsed = 0;
   state.roundStartedAt = null;
   state.roundCharLogs = [];
+  state.roundStages = [];
   resultTimeoutId = setTimeout(() => {
     resultTimeoutId = null;
     showResultModal(stats);
@@ -1748,6 +1822,7 @@ function recordStats(override) {
   const totalCorrect = override ? override.totalCorrect : state.totalCorrect;
   const totalKeys = override ? override.totalKeys : state.totalKeys;
   const rawSec = override ? override.sec : state.elapsed;
+  const stages = (override && override.stages) || [];
   const eff = effectiveStats(totalTyped, totalCorrect, rawSec, totalKeys);
   const sec = eff.sec;
   const wpm = eff.wpm;
@@ -1764,13 +1839,22 @@ function recordStats(override) {
   }
   if (!isAnomalous) {
     const hist = loadHist();
+    const stageIds = stages.length > 0
+      ? stages.map((s) => s.item && s.item.id).filter(Boolean)
+      : (state.item ? [state.item.id] : []);
+    const stageTexts = stages.length > 0
+      ? stages.map((s) => s.text).filter(Boolean)
+      : (state.lines ? [state.lines.join(" ")] : []);
     hist.unshift({
       mode: state.modeKey,
       wpm,
       cpm,
       acc,
       sec: Math.round(sec),
-      id: state.item.id,
+      id: state.item ? state.item.id : (stageIds[0] || ""),
+      stageIds,
+      stageTexts,
+      stagesCount: stages.length || 1,
       typed: totalTyped,
       correct: totalCorrect,
       keys: eff.totalKeys,
@@ -1812,7 +1896,8 @@ function recordStats(override) {
     avgFirstKeyLatency,
     consistency,
     bottlenecks,
-    charLogs
+    charLogs,
+    stages
   };
 }
 
@@ -1860,6 +1945,55 @@ function showResultModal(stats) {
     if (stats.isAnomalous) warn.textContent = "⚠️ 計時異常（完成時間過短，疑似貼上或瞬間輸入），速度未計入最佳紀錄。";
   }
 
+  const stagesPanel = $("#profilerStagesPanel");
+  const stagesList = $("#stagesList");
+  const stagesSummary = $("#stagesSummary");
+  const stages = stats.stages || [];
+  if (stagesPanel && stagesList) {
+    if (stages.length > 1) {
+      stagesPanel.classList.remove("hidden");
+      if (stagesSummary) stagesSummary.textContent = `共 ${stages.length} 關`;
+      stagesList.innerHTML = stages.map((s) => `
+        <div class="stage-card">
+          <div class="stage-card-head">
+            <span class="stage-num">第 ${s.stageNum} 關</span>
+            <span class="stage-speed text-amber">${s.wpm} 字/分</span>
+          </div>
+          <div class="stage-text" title="${escapeHtml(s.text)}">${escapeHtml(s.text)}</div>
+          <div class="stage-meta">正確率 ${s.acc}% · ${fmtTime(s.sec)} · ${s.correct}/${s.typed} 字</div>
+        </div>
+      `).join("");
+    } else {
+      stagesPanel.classList.add("hidden");
+    }
+  }
+
+  if (stages.length > 1) {
+    const box = $("#targetBox");
+    if (box) {
+      box.className = "target-box";
+      box.innerHTML = "";
+      stages.forEach((s, idx) => {
+        const div = document.createElement("div");
+        div.className = "target-line";
+        div.dataset.line = idx;
+        const stagePrefix = document.createElement("span");
+        stagePrefix.style.color = "var(--muted)";
+        stagePrefix.style.fontSize = "13px";
+        stagePrefix.style.marginRight = "8px";
+        stagePrefix.textContent = `${idx + 1}.`;
+        div.appendChild(stagePrefix);
+        Array.from(s.text).forEach((ch) => {
+          const sp = document.createElement("span");
+          sp.className = "char correct";
+          sp.textContent = ch === " " ? "\u00a0" : ch;
+          div.appendChild(sp);
+        });
+        box.appendChild(div);
+      });
+    }
+  }
+
   const bottleneckList = $("#bottleneckList");
   const retryBottlenecksBtn = $("#retryBottlenecksBtn");
   if (bottleneckList) {
@@ -1894,7 +2028,22 @@ function startBottlenecksPractice() {
   if (!tele || !tele.bottlenecks || !tele.bottlenecks.length) return;
   const drill = generateBottleneckDrill(tele.bottlenecks);
   resultOverlay.classList.add("hidden");
-  startCustomTextDirectly(drill, "卡鍵專項重練");
+  currentBottleneckDrillText = drill;
+  if (state && state.timerId) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+  if (state) {
+    state.sessionCompleted = 0;
+    state.roundTotalTyped = 0;
+    state.roundTotalCorrect = 0;
+    state.roundTotalKeys = 0;
+    state.roundElapsed = 0;
+    state.roundStartedAt = null;
+    state.roundCharLogs = [];
+    state.roundStages = [];
+  }
+  startRound("bottlenecks");
 }
 
 // ---- 全域事件與 Modal 控制 ----
@@ -2643,6 +2792,8 @@ if (typeof window !== "undefined") {
   window.effectiveStats = effectiveStats;
   window.showResultModal = showResultModal;
   window.startBottlenecksPractice = startBottlenecksPractice;
+  window.startRound = startRound;
+  window.getState = () => state;
 }
 
 // 註冊 Service Worker

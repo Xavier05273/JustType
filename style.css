@@ -32,6 +32,7 @@ body[data-mode="general_legal_docs"]{--accent:#475569;--current-bg:#e2e8f0;--cur
 body[data-mode="litigation_legal_docs"]{--accent:#c2410c;--current-bg:#ffedd5;--current-border:#fdba74;--active-line-bg:rgba(194,65,12,.08)}
 body[data-mode="classical_texts"]{--accent:#b91c1c;--current-bg:#fee2e2;--current-border:#fca5a5;--active-line-bg:rgba(185,28,28,.08)}
 body[data-mode="custom_text"]{--accent:#9333ea;--current-bg:#f3e8ff;--current-border:#d8b4fe;--active-line-bg:rgba(147,51,234,.08)}
+body[data-mode="bottlenecks"]{--accent:#f59e0b;--current-bg:#fef3c7;--current-border:#fcd34d;--active-line-bg:rgba(245,158,11,.08)}
 /* ===== 9 themes (dark) ===== */
 html[data-theme="dark"] body[data-mode="words"]{--accent:#60a5fa;--current-bg:#1e3a5f;--current-border:#3b82f6;--active-line-bg:rgba(96,165,250,.16)}
 html[data-theme="dark"] body[data-mode="sentences"]{--accent:#34d399;--current-bg:#064e3b;--current-border:#059669;--active-line-bg:rgba(52,211,153,.16)}
@@ -43,6 +44,7 @@ html[data-theme="dark"] body[data-mode="general_legal_docs"]{--accent:#94a3b8;--
 html[data-theme="dark"] body[data-mode="litigation_legal_docs"]{--accent:#fb923c;--current-bg:#431407;--current-border:#c2410c;--active-line-bg:rgba(251,146,60,.16)}
 html[data-theme="dark"] body[data-mode="classical_texts"]{--accent:#f87171;--current-bg:#450a0a;--current-border:#b91c1c;--active-line-bg:rgba(248,113,113,.16)}
 html[data-theme="dark"] body[data-mode="custom_text"]{--accent:#c084fc;--current-bg:#3b0764;--current-border:#9333ea;--active-line-bg:rgba(192,132,252,.16)}
+html[data-theme="dark"] body[data-mode="bottlenecks"]{--accent:#fbbf24;--current-bg:#451a03;--current-border:#f59e0b;--active-line-bg:rgba(251,191,36,.16)}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink);
@@ -1132,6 +1134,99 @@ html[data-theme="light"] .tooltip-decomp {
   color: #ef4444;
   font-weight: 600;
   font-size: 11px;
+}
+
+/* 2.5 關卡紀錄清單 (多關卡結算明細) */
+.profiler-stages-panel {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stages-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stages-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+.stages-summary {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.stages-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.stage-card {
+  flex: 0 0 auto;
+  min-width: 130px;
+  max-width: 200px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stage-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.stage-num {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.stage-speed {
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.stage-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stage-meta {
+  font-size: 10px;
+  color: var(--muted);
 }
 
 /* 3. 底部診斷與重練區 */

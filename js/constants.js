@@ -193,6 +193,7 @@ export const MODES = [
 export const LEGACY_MODE_TITLES = {
   legal_texts: "法律條文（舊）",
   official_docs: "正式公文（舊）",
+  bottlenecks: "卡鍵專項",
 };
 
 export const ANIMATION_PHASE = {
