@@ -1,11 +1,21 @@
 // JustType Service Worker - Offline support and caching
-const CACHE_NAME = "justtype-cache-v3";
+const CACHE_NAME = "justtype-cache-v4";
 
 const CORE_ASSETS = [
   "./",
   "index.html",
   "style.css",
   "app.js",
+  "js/constants.js",
+  "js/queue.js",
+  "js/cin-parser.js",
+  "js/storage.js",
+  "js/bottlenecks.js",
+  "js/chart.js",
+  "js/keyboard.js",
+  "js/decomp-wheel.js",
+  "js/chat-mode.js",
+  "js/carousel.js",
   "manifest.webmanifest",
   "data/data.json",
   "data/zhuyin.json",
