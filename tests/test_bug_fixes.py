@@ -419,7 +419,13 @@ class TestBugFixes(unittest.TestCase):
                 # 測試 9: 嘸蝦米未匯入碼表時首頁點擊關卡卡片，不應彈窗阻擋進入練習
                 # ====================================================
                 # 切換至嘸蝦米
-                page.evaluate("() => { if (window.setDecompWheelTarget) window.setDecompWheelTarget(2, true); }")
+                page.evaluate("""() => {
+                    const sel = document.getElementById("layoutSelect");
+                    if (sel) {
+                        sel.value = "boshiamy";
+                        sel.dispatchEvent(new Event("change"));
+                    }
+                }""")
                 time.sleep(0.3)
                 # 點擊回首頁
                 page.click("#backHomeBtn")
@@ -438,6 +444,37 @@ class TestBugFixes(unittest.TestCase):
 
                 self.assertTrue(modal_hidden, "首頁點擊關卡時，不應強制彈出匯入無蝦米彈窗阻擋")
                 self.assertFalse(practice_hidden, "首頁點擊關卡應直接進入練習畫面")
+
+                # ====================================================
+                # 測試 10: 彈窗觸發條件驗證（僅限主動按滾輪卡片或按下方鍵盤區，打字不得觸發）
+                # ====================================================
+                # 1. 點擊滾輪卡片 -> 應彈出匯入彈窗
+                page.click(".decomp-wheel")
+                time.sleep(0.3)
+                self.assertFalse(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "按滾輪應觸發匯入彈窗")
+
+                # 關閉彈窗
+                page.click("#closeBoshiamyModalBtn")
+                time.sleep(0.2)
+                self.assertTrue(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "彈窗應已關閉")
+
+                # 2. 在練習中打字 -> 不得觸發彈窗
+                page.keyboard.type("abc")
+                time.sleep(0.2)
+                self.assertTrue(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "打字時絕不應觸發匯入彈窗")
+
+                # 3. 開啟虛擬鍵盤，點擊下方鍵盤區的按鈕 -> 應彈出匯入彈窗
+                page.evaluate("""() => {
+                    const chk = document.getElementById("onKeyboardCheck");
+                    if (chk && !chk.checked) {
+                        chk.checked = true;
+                        chk.dispatchEvent(new Event("change"));
+                    }
+                }""")
+                time.sleep(0.3)
+                page.click(".on-kb-overlay-btn")
+                time.sleep(0.3)
+                self.assertFalse(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "按下方鍵盤區按鈕應觸發匯入彈窗")
 
                 browser.close()
         finally:

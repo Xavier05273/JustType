@@ -1,5 +1,5 @@
 // JustType Service Worker - Offline support and caching
-const CACHE_NAME = "justtype-cache-v4";
+const CACHE_NAME = "justtype-cache-v5";
 
 const CORE_ASSETS = [
   "./",

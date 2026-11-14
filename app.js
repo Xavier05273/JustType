@@ -2599,18 +2599,6 @@ function bindGlobal() {
   }
 
   document.addEventListener("keydown", (e) => {
-    if (getCurrentLayout() === "boshiamy" && !BOSHIAMY && practiceView && !practiceView.classList.contains("hidden")) {
-      const activeEl = document.activeElement;
-      const isInput = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA");
-      if (!isInput && e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        if (typeof openBoshiamyModal === "function") {
-          e.preventDefault();
-          openBoshiamyModal();
-          return;
-        }
-      }
-    }
-
     if (e.key === "Escape") {
       if (e.isComposing || (state && state.composing) || e.keyCode === 229) return;
       if (boshiamyImportOverlay && !boshiamyImportOverlay.classList.contains("hidden")) {
@@ -2879,7 +2867,9 @@ if (typeof window !== "undefined") {
 // 註冊 Service Worker
 if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker.register("sw.js").then((reg) => {
+      reg.update().catch(() => {});
+    }).catch(() => {});
   });
 }
 

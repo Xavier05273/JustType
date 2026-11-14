@@ -305,14 +305,6 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
   cangjieHint.dataset.decompBound = "1";
 
   cangjieHint.addEventListener("click", (e) => {
-    const importBtn = e.target.closest(".decomp-import-btn");
-    const reloadBtn = e.target.closest(".decomp-reload-btn");
-    if (importBtn || reloadBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof callbacks.openBoshiamyModal === "function") callbacks.openBoshiamyModal();
-      return;
-    }
     const prev = e.target.closest(".decomp-wheel-prev");
     const next = e.target.closest(".decomp-wheel-next");
     if (prev) {
@@ -327,17 +319,41 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
       if (typeof callbacks.focusCurrent === "function") callbacks.focusCurrent();
       return;
     }
+
+    const reloadBtn = e.target.closest(".decomp-reload-btn");
+    const importBtn = e.target.closest(".decomp-import-btn");
+    const card = e.target.closest(".decomp-wheel-card");
+    const vp = e.target.closest(".decomp-wheel");
+
+    if (importBtn || reloadBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof callbacks.openBoshiamyModal === "function") callbacks.openBoshiamyModal();
+      return;
+    }
+
+    // 點擊滾輪或卡片：當目前顯示為嘸蝦米且無碼表時，點擊卡片任何處均彈出匯入彈窗
+    if (card || vp) {
+      const activeCard = card || cangjieHint.querySelector(".decomp-wheel-card.is-center");
+      if (activeCard && activeCard.dataset.method === "boshiamy") {
+        const needsImport = !!activeCard.querySelector(".decomp-import-btn");
+        if (needsImport) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof callbacks.openBoshiamyModal === "function") callbacks.openBoshiamyModal();
+          return;
+        }
+      }
+    }
   });
 
   cangjieHint.addEventListener("pointerdown", (e) => {
     if (e.button != null && e.button !== 0) return;
     const vp = e.target.closest(".decomp-wheel");
     if (!vp || !decompWheel) return;
-    try {
-      vp.setPointerCapture(e.pointerId);
-    } catch (_) {}
     decompWheel.dragging = true;
     decompWheel.moved = false;
+    decompWheel.captured = false;
     decompWheel.dragStartX = e.clientX;
     decompWheel.dragStartPos = decompWheel.pos;
     decompWheel.lastX = e.clientX;
@@ -349,7 +365,15 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
   window.addEventListener("pointermove", (e) => {
     if (!decompWheel || !decompWheel.dragging) return;
     const dx = e.clientX - decompWheel.dragStartX;
-    if (Math.abs(dx) > 5) decompWheel.moved = true;
+    if (Math.abs(dx) > 5) {
+      decompWheel.moved = true;
+      if (!decompWheel.captured && decompWheel.viewport && decompWheel.viewport.setPointerCapture) {
+        try {
+          decompWheel.viewport.setPointerCapture(e.pointerId);
+          decompWheel.captured = true;
+        } catch (_) {}
+      }
+    }
     const dragScale = decompWheel.viewport ? decompWheel.viewport.clientWidth * 0.75 : 180;
     decompWheel.pos = decompWheel.dragStartPos - dx / dragScale;
     const now = performance.now();
@@ -362,11 +386,12 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
 
   const endDrag = (e) => {
     if (!decompWheel || !decompWheel.dragging) return;
-    if (e && e.pointerId != null && decompWheel.viewport) {
+    if (decompWheel.captured && e && e.pointerId != null && decompWheel.viewport) {
       try {
         decompWheel.viewport.releasePointerCapture(e.pointerId);
       } catch (_) {}
     }
+    decompWheel.captured = false;
     decompWheel.dragging = false;
     if (decompWheel.viewport) decompWheel.viewport.classList.remove("dragging");
     const now = performance.now();
