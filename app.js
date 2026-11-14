@@ -1394,10 +1394,21 @@ function paintCangjieHint() {
         decompMethod = newKey;
         saveJSON(LS_DECOMP, newKey);
         syncLayoutSelectors(newKey);
+        const pref = loadJSON(LS_ONKB, {}) || {};
+        pref.layout = newKey;
+        saveJSON(LS_ONKB, pref);
+        if (onKeyboard) onKeyboard.dataset.layout = "";
+        renderOnKeyboard();
         paintOnKeyboard();
       }
     }
   });
+}
+
+function syncLayoutSelectors(layout) {
+  if (layoutSelect && layoutSelect.value !== layout) {
+    layoutSelect.value = layout;
+  }
 }
 
 function bindDecompWheel() {

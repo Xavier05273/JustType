@@ -142,20 +142,28 @@ function decompWheelFrame() {
   decompWheel.raf = null;
   if (!decompWheel.dragging) {
     const diff = decompWheel.target - decompWheel.pos;
-    if (Math.abs(diff) > 0.001) {
-      decompWheel.pos += diff * 0.22;
+    if (Math.abs(diff) > 0.002) {
+      decompWheel.pos += diff * 0.26;
     } else {
       decompWheel.pos = decompWheel.target;
     }
   }
-  paintDecompWheel();
-  const settled = !decompWheel.dragging && Math.abs(decompWheel.target - decompWheel.pos) <= 0.001;
+  try {
+    paintDecompWheel();
+  } catch (err) {
+    console.error("paintDecompWheel error:", err);
+  }
+  const settled = !decompWheel.dragging && Math.abs(decompWheel.target - decompWheel.pos) <= 0.002;
   if (settled) {
     const n = decompWheel.cards.length;
     const wrapped = ((Math.round(decompWheel.pos) % n) + n) % n;
     decompWheel.pos = wrapped;
     decompWheel.target = wrapped;
-    paintDecompWheel();
+    try {
+      paintDecompWheel();
+    } catch (err) {
+      console.error("paintDecompWheel error:", err);
+    }
     decompWheel.raf = null;
   } else {
     queueDecompWheelFrame();
@@ -191,7 +199,11 @@ export function paintDecompWheel() {
   decompWheel.selected = sel;
   const newKey = DECOMP_METHODS[sel].key;
   if (lastSel !== sel && typeof decompWheel.onMethodChange === "function") {
-    decompWheel.onMethodChange(newKey);
+    try {
+      decompWheel.onMethodChange(newKey);
+    } catch (err) {
+      console.error("onMethodChange error:", err);
+    }
   }
 }
 

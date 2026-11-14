@@ -1,12 +1,14 @@
 import unittest
 import subprocess
 import time
+import os
 from playwright.sync_api import sync_playwright
 
 class TestBugFixes(unittest.TestCase):
     def test_bug1_mistyped_char_and_bug2_round2_wpm(self):
         port = "8098"
-        server = subprocess.Popen(["python3", "serve.py", port])
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        server = subprocess.Popen(["python3", "serve.py", port], cwd=base_dir)
         time.sleep(1)
 
         try:
@@ -339,22 +341,31 @@ class TestBugFixes(unittest.TestCase):
                 # ====================================================
                 # 測試 6: 滾輪循環切換注音與卡片對齊驗證（防卡在一半）
                 # ====================================================
-                # 從注音往左點擊 prev 到速成，再點擊 next 回到注音
-                page.click(".decomp-wheel-prev")
-                time.sleep(0.35)
-                st_prev = page.evaluate("""() => {
-                    const center = document.querySelector(".decomp-wheel-card.is-center");
-                    return center ? center.dataset.method : null;
-                }""")
-                self.assertEqual(st_prev, "sucheng", "從注音向左應切換至速成")
+                # 連續點擊 next 測試前進循環（注音 -> 倉頡 -> 嘸蝦米 -> 速成 -> 注音）
+                expected_next = ["cangjie", "boshiamy", "sucheng", "bopomofo"]
+                for exp in expected_next:
+                    page.click(".decomp-wheel-next")
+                    time.sleep(0.45)
+                    center = page.evaluate("""() => {
+                        const c = document.querySelector(".decomp-wheel-card.is-center");
+                        return c ? { method: c.dataset.method, transform: c.style.transform } : null;
+                    }""")
+                    self.assertIsNotNone(center, "滾輪應有置中卡片")
+                    self.assertEqual(center["method"], exp, f"點擊 next 應切換至 {exp}")
+                    self.assertIn("translateX(0px)", center["transform"], f"卡片 {exp} 應精確置中對齊（translateX(0px)），不應卡在半路")
 
-                page.click(".decomp-wheel-next")
-                time.sleep(0.35)
-                st_next = page.evaluate("""() => {
-                    const center = document.querySelector(".decomp-wheel-card.is-center");
-                    return center ? center.dataset.method : null;
-                }""")
-                self.assertEqual(st_next, "bopomofo", "從速成向右應切換回注音且正中對齊，不應卡在一半")
+                # 連續點擊 prev 測試倒退循環（注音 -> 速成 -> 嘸蝦米 -> 倉頡 -> 注音）
+                expected_prev = ["sucheng", "boshiamy", "cangjie", "bopomofo"]
+                for exp in expected_prev:
+                    page.click(".decomp-wheel-prev")
+                    time.sleep(0.45)
+                    center = page.evaluate("""() => {
+                        const c = document.querySelector(".decomp-wheel-card.is-center");
+                        return c ? { method: c.dataset.method, transform: c.style.transform } : null;
+                    }""")
+                    self.assertIsNotNone(center, "滾輪應有置中卡片")
+                    self.assertEqual(center["method"], exp, f"點擊 prev 應切換至 {exp}")
+                    self.assertIn("translateX(0px)", center["transform"], f"卡片 {exp} 應精確置中對齊（translateX(0px)），不應卡在半路")
 
                 browser.close()
         finally:
