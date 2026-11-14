@@ -504,12 +504,6 @@ function onCardClicked(idx) {
   }
   if (idx === carousel.selected) {
     const modeKey = MODES[idx].key;
-    if (getCurrentLayout() === "boshiamy" && !BOSHIAMY) {
-      if (typeof openBoshiamyModal === "function") {
-        openBoshiamyModal();
-        return;
-      }
-    }
     if (modeKey === "custom_text") {
       const raw = getCustomTextRaw();
       if (!raw || !raw.trim()) {

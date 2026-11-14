@@ -367,6 +367,78 @@ class TestBugFixes(unittest.TestCase):
                     self.assertEqual(center["method"], exp, f"點擊 prev 應切換至 {exp}")
                     self.assertIn("translateX(0px)", center["transform"], f"卡片 {exp} 應精確置中對齊（translateX(0px)），不應卡在半路")
 
+                # ====================================================
+                # 測試 7: 鍵盤方向鍵切換滾輪卡片（ArrowLeft / ArrowRight / ArrowUp / ArrowDown）
+                # ====================================================
+                page.focus(".decomp-wheel")
+                kb_tests = [
+                    ("ArrowRight", "cangjie"),
+                    ("ArrowRight", "boshiamy"),
+                    ("ArrowDown", "sucheng"),
+                    ("ArrowLeft", "boshiamy"),
+                    ("ArrowUp", "cangjie")
+                ]
+                for key, exp in kb_tests:
+                    page.keyboard.press(key)
+                    time.sleep(0.35)
+                    center = page.evaluate("""() => {
+                        const c = document.querySelector(".decomp-wheel-card.is-center");
+                        return c ? { method: c.dataset.method, transform: c.style.transform } : null;
+                    }""")
+                    self.assertIsNotNone(center, f"按鍵盤方向鍵 {key} 應有置中卡片")
+                    self.assertEqual(center["method"], exp, f"按鍵盤方向鍵 {key} 應切換至 {exp}")
+                    self.assertIn("translateX(0px)", center["transform"], f"按鍵盤方向鍵 {key} 切換至 {exp} 應精確置中對齊，不應卡在半路")
+
+                # ====================================================
+                # 測試 8: 滑鼠/觸控拖動滾輪（各種距離與停留放開，永不卡在兩張卡片中間）
+                # ====================================================
+                wheel = page.locator(".decomp-wheel")
+                box = wheel.bounding_box()
+                drag_tests = [
+                    (40, 5, "向右拖曳"),
+                    (-40, 5, "向左拖曳"),
+                    (100.5, 20, "拖動半張卡片並停頓後釋放"),
+                    (-100.5, 20, "負向拖動半張卡片並停頓後釋放")
+                ]
+                for dx, steps, desc in drag_tests:
+                    page.mouse.move(box["x"] + box["width"]/2, box["y"] + box["height"]/2)
+                    page.mouse.down()
+                    page.mouse.move(box["x"] + box["width"]/2 + dx, box["y"] + box["height"]/2, steps=steps)
+                    if "停頓" in desc:
+                        time.sleep(0.15)
+                    page.mouse.up()
+                    time.sleep(0.4)
+                    center = page.evaluate("""() => {
+                        const c = document.querySelector(".decomp-wheel-card.is-center");
+                        return c ? { method: c.dataset.method, transform: c.style.transform } : null;
+                    }""")
+                    self.assertIsNotNone(center, f"{desc} (dx={dx}) 後不應卡在兩張卡片中間，必須有置中卡片")
+                    self.assertIn("translateX(0px)", center["transform"], f"{desc} (dx={dx}) 後卡片應對齊置中 (translateX(0px))")
+
+                # ====================================================
+                # 測試 9: 嘸蝦米未匯入碼表時首頁點擊關卡卡片，不應彈窗阻擋進入練習
+                # ====================================================
+                # 切換至嘸蝦米
+                page.evaluate("() => { if (window.setDecompWheelTarget) window.setDecompWheelTarget(2, true); }")
+                time.sleep(0.3)
+                # 點擊回首頁
+                page.click("#backHomeBtn")
+                time.sleep(0.2)
+                if not page.evaluate("() => !document.getElementById('homeView').classList.contains('hidden')"):
+                    page.click("#backHomeBtn")
+                    time.sleep(0.2)
+                self.assertTrue(page.evaluate("() => !document.getElementById('homeView').classList.contains('hidden')"), "應返回首頁")
+
+                # 首頁點擊當前選中的模式卡片
+                page.click(".mode-card.is-center")
+                time.sleep(0.3)
+
+                modal_hidden = page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')")
+                practice_hidden = page.evaluate("() => document.getElementById('practiceView').classList.contains('hidden')")
+
+                self.assertTrue(modal_hidden, "首頁點擊關卡時，不應強制彈出匯入無蝦米彈窗阻擋")
+                self.assertFalse(practice_hidden, "首頁點擊關卡應直接進入練習畫面")
+
                 browser.close()
         finally:
             server.terminate()

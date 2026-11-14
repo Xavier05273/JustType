@@ -142,8 +142,8 @@ function decompWheelFrame() {
   decompWheel.raf = null;
   if (!decompWheel.dragging) {
     const diff = decompWheel.target - decompWheel.pos;
-    if (Math.abs(diff) > 0.002) {
-      decompWheel.pos += diff * 0.26;
+    if (Math.abs(diff) > 0.004) {
+      decompWheel.pos += diff * 0.32;
     } else {
       decompWheel.pos = decompWheel.target;
     }
@@ -153,7 +153,7 @@ function decompWheelFrame() {
   } catch (err) {
     console.error("paintDecompWheel error:", err);
   }
-  const settled = !decompWheel.dragging && Math.abs(decompWheel.target - decompWheel.pos) <= 0.002;
+  const settled = !decompWheel.dragging && Math.abs(decompWheel.target - decompWheel.pos) <= 0.004;
   if (settled) {
     const n = decompWheel.cards.length;
     const wrapped = ((Math.round(decompWheel.pos) % n) + n) % n;
@@ -165,6 +165,14 @@ function decompWheelFrame() {
       console.error("paintDecompWheel error:", err);
     }
     decompWheel.raf = null;
+    const newKey = DECOMP_METHODS[wrapped].key;
+    if (typeof decompWheel.onMethodChange === "function") {
+      try {
+        decompWheel.onMethodChange(newKey);
+      } catch (err) {
+        console.error("onMethodChange error:", err);
+      }
+    }
   } else {
     queueDecompWheelFrame();
   }
@@ -195,20 +203,13 @@ export function paintDecompWheel() {
     card.classList.toggle("is-center", ao < 0.5);
   });
   const sel = ((Math.round(decompWheel.pos) % n) + n) % n;
-  const lastSel = decompWheel.selected;
   decompWheel.selected = sel;
-  const newKey = DECOMP_METHODS[sel].key;
-  if (lastSel !== sel && typeof decompWheel.onMethodChange === "function") {
-    try {
-      decompWheel.onMethodChange(newKey);
-    } catch (err) {
-      console.error("onMethodChange error:", err);
-    }
-  }
 }
 
 export function setDecompWheelTarget(targetIdx, immediate = false) {
   if (!decompWheel) return;
+  decompWheel.dragging = false;
+  if (decompWheel.viewport) decompWheel.viewport.classList.remove("dragging");
   const n = decompWheel.cards.length;
   const currentWrapped = ((decompWheel.pos % n) + n) % n;
   const diff = shortestDistance(currentWrapped, targetIdx, n);
@@ -223,6 +224,14 @@ export function setDecompWheelTarget(targetIdx, immediate = false) {
     decompWheel.pos = wrapped;
     decompWheel.target = wrapped;
     paintDecompWheel();
+    const newKey = DECOMP_METHODS[wrapped].key;
+    if (typeof decompWheel.onMethodChange === "function") {
+      try {
+        decompWheel.onMethodChange(newKey);
+      } catch (err) {
+        console.error("onMethodChange error:", err);
+      }
+    }
     return;
   }
   queueDecompWheelFrame();
@@ -230,18 +239,20 @@ export function setDecompWheelTarget(targetIdx, immediate = false) {
 
 export function setDecompWheelTargetOffset(offset) {
   if (!decompWheel) return;
-  decompWheel.target = Math.round(decompWheel.target) + offset;
+  decompWheel.dragging = false;
+  if (decompWheel.viewport) decompWheel.viewport.classList.remove("dragging");
+  decompWheel.target = Math.round(decompWheel.pos) + offset;
   queueDecompWheelFrame();
 }
 
 export function buildDecompWheel(container, ch, initialMethod, dictionaries, callbacks = {}) {
   const startIdx = Math.max(0, methodIndex(initialMethod));
   container.innerHTML =
-    `<span class="decomp-wheel" role="group" aria-label="拆字輸入法滾輪：注音、倉頡、嘸蝦米、速成">` +
+    `<span class="decomp-wheel" role="group" aria-label="拆字輸入法滾輪：注音、倉頡、嘸蝦米、速成" tabindex="0">` +
     `<span class="decomp-wheel-track"></span></span>` +
     `<span class="decomp-wheel-nav">` +
-    `<button type="button" class="decomp-wheel-prev" aria-label="上一個輸入法" tabindex="-1">‹</button>` +
-    `<button type="button" class="decomp-wheel-next" aria-label="下一個輸入法" tabindex="-1">›</button>` +
+    `<button type="button" class="decomp-wheel-prev" aria-label="上一個輸入法">‹</button>` +
+    `<button type="button" class="decomp-wheel-next" aria-label="下一個輸入法">›</button>` +
     `</span>`;
   const viewport = container.querySelector(".decomp-wheel");
   const track = container.querySelector(".decomp-wheel-track");
@@ -319,8 +330,12 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
   });
 
   cangjieHint.addEventListener("pointerdown", (e) => {
+    if (e.button != null && e.button !== 0) return;
     const vp = e.target.closest(".decomp-wheel");
     if (!vp || !decompWheel) return;
+    try {
+      vp.setPointerCapture(e.pointerId);
+    } catch (_) {}
     decompWheel.dragging = true;
     decompWheel.moved = false;
     decompWheel.dragStartX = e.clientX;
@@ -347,8 +362,17 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
 
   const endDrag = (e) => {
     if (!decompWheel || !decompWheel.dragging) return;
+    if (e && e.pointerId != null && decompWheel.viewport) {
+      try {
+        decompWheel.viewport.releasePointerCapture(e.pointerId);
+      } catch (_) {}
+    }
     decompWheel.dragging = false;
     if (decompWheel.viewport) decompWheel.viewport.classList.remove("dragging");
+    const now = performance.now();
+    if (now - decompWheel.lastT > 80) {
+      decompWheel.velocity = 0;
+    }
     if (decompWheel.moved) {
       decompWheel.target = Math.round(decompWheel.pos + decompWheel.velocity * 0.15);
       queueDecompWheelFrame();
@@ -386,6 +410,35 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
   };
   window.addEventListener("pointerup", endDrag);
   window.addEventListener("pointercancel", endDrag);
+
+  cangjieHint.addEventListener("keydown", (e) => {
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setDecompWheelTargetOffset(-1);
+    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      setDecompWheelTargetOffset(1);
+    }
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (!decompWheel) return;
+    if (e.isComposing || e.keyCode === 229) return;
+    const active = document.activeElement;
+    const isHintFocus = active && active.closest && active.closest("#cangjieHint");
+    if (isHintFocus) return;
+    const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+    if (isInput) {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+        setDecompWheelTargetOffset(e.key === "ArrowUp" ? -1 : 1);
+      } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && (!active.value || active.value.length === 0)) {
+        e.preventDefault();
+        setDecompWheelTargetOffset(e.key === "ArrowLeft" ? -1 : 1);
+      }
+    }
+  });
 
   cangjieHint.addEventListener("wheel", (e) => {
     if (!decompWheel) return;
