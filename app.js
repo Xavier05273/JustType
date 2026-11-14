@@ -282,8 +282,8 @@ function isEndlessApplicable(modeKey) {
 }
 
 function getCurrentLayout() {
-  let val = (onKeyboard && onKeyboard.dataset.layout) ||
-            (layoutSelect ? layoutSelect.value : "") ||
+  let val = (layoutSelect ? layoutSelect.value : "") ||
+            decompMethod ||
             ((loadJSON(LS_ONKB, {}) || {}).layout) ||
             "bopomofo";
   if (val === "qwerty") val = "boshiamy";
@@ -796,6 +796,36 @@ function startCustomTextDirectly(content, title) {
   startRound("custom_text");
 }
 
+function syncInputState() {
+  const inp = state && state.currentInputEl;
+  if (!inp) return;
+  const isChat = state.modeKey === "life_situations";
+  const li = state.lineIdx || 0;
+  const active = li < (state.lines ? state.lines.length : 1) && !state.finished;
+  const lifeActive = !isChat || state.animationPhase === ANIMATION_PHASE.USER_TYPING;
+  const layout = getCurrentLayout();
+  const isBoshiamyUninitialized = layout === "boshiamy" && !BOSHIAMY;
+
+  if (isBoshiamyUninitialized) {
+    inp.placeholder = "請先點擊上方或鍵盤匯入碼表";
+    inp.disabled = true;
+  } else if (state.lines && state.lines.length > 1 && !isChat) {
+    const isLastLine = li >= state.lines.length - 1;
+    inp.placeholder = active
+      ? `第 ${li + 1} / ${state.lines.length} 行：在此輸入…（${isLastLine ? "打滿即完成" : "打滿自動換行"}）`
+      : "（已完成）";
+    inp.disabled = !active || !lifeActive;
+  } else if (isChat) {
+    inp.placeholder = active
+      ? (lifeActive ? "輸入訊息…（打滿按 Enter 送出）" : "等對方回覆…")
+      : "（已完成）";
+    inp.disabled = !active || !lifeActive;
+  } else {
+    inp.placeholder = active ? "在此輸入…" : "（已完成）";
+    inp.disabled = !active || !lifeActive;
+  }
+}
+
 function renderPractice() {
   clearKeyError(onKeyboard, state);
   const box = $("#targetBox");
@@ -901,33 +931,14 @@ function renderPractice() {
   }
 
   const li = state.lineIdx;
-  const active = li < state.lines.length && !state.finished;
-  const lifeActive = !isChat || state.animationPhase === ANIMATION_PHASE.USER_TYPING;
-  const layout = getCurrentLayout();
-  const isBoshiamyUninitialized = layout === "boshiamy" && !BOSHIAMY;
-
   const inp = document.createElement("input");
   inp.type = "text";
   inp.value = state.inputs[li] || "";
-  if (isBoshiamyUninitialized) {
-    inp.placeholder = "請先點擊上方或鍵盤匯入碼表";
-    inp.disabled = true;
-  } else if (state.lines.length > 1 && !isChat) {
-    const isLastLine = li >= state.lines.length - 1;
-    inp.placeholder = active
-      ? `第 ${li + 1} / ${state.lines.length} 行：在此輸入…（${isLastLine ? "打滿即完成" : "打滿自動換行"}）`
-      : "（已完成）";
-  } else if (isChat) {
-    inp.placeholder = active
-      ? (lifeActive ? "輸入訊息…（打滿按 Enter 送出）" : "等對方回覆…")
-      : "（已完成）";
-  } else {
-    inp.placeholder = active ? "在此輸入…" : "（已完成）";
-  }
-  inp.disabled = !active || !lifeActive || isBoshiamyUninitialized;
   inp.autocomplete = "off"; inp.autocorrect = "off"; inp.autocapitalize = "off"; inp.spellcheck = false;
   inp.setAttribute("aria-label", `第 ${li + 1} 行輸入`);
   inp.dataset.line = li;
+  state.currentInputEl = inp;
+  syncInputState();
 
   inp.addEventListener("compositionstart", () => {
     ensureTimerStarted();
@@ -1397,6 +1408,7 @@ function paintCangjieHint() {
         if (onKeyboard) onKeyboard.dataset.layout = "";
         renderOnKeyboard();
         paintOnKeyboard();
+        syncInputState();
       }
     }
   });
@@ -2794,7 +2806,7 @@ function bindGlobal() {
     const pref = loadJSON(LS_ONKB, {}) || {};
     const savedLayout = pref.layout;
     const migrated = savedLayout === "qwerty" ? "boshiamy" : savedLayout;
-    const currentInitialLayout = migrated || "bopomofo";
+    const currentInitialLayout = decompMethod || migrated || "bopomofo";
     if (layoutSelect) {
       layoutSelect.value = currentInitialLayout;
     }
@@ -2835,10 +2847,13 @@ async function init() {
   DATA = await res.json();
   ensureCustomData();
 
-  const savedLayout = (loadJSON(LS_ONKB, {}) || {}).layout;
-  const initialMethod = savedLayout || "bopomofo";
-  decompMethod = ["bopomofo", "cangjie", "boshiamy", "sucheng"].includes(loadJSON(LS_DECOMP, initialMethod))
-    ? loadJSON(LS_DECOMP, initialMethod) : "bopomofo";
+  const savedDecomp = loadJSON(LS_DECOMP, null);
+  const savedOnkb = (loadJSON(LS_ONKB, {}) || {}).layout;
+  const migratedOnkb = savedOnkb === "qwerty" ? "boshiamy" : savedOnkb;
+  const initialMethod = ["bopomofo", "cangjie", "boshiamy", "sucheng"].includes(savedDecomp)
+    ? savedDecomp
+    : (["bopomofo", "cangjie", "boshiamy", "sucheng"].includes(migratedOnkb) ? migratedOnkb : "bopomofo");
+  decompMethod = initialMethod;
   renderHome();
   bindGlobal();
 
@@ -2864,6 +2879,7 @@ if (typeof window !== "undefined") {
   window.paint = paint;
   window.paintOnKeyboard = paintOnKeyboard;
   window.renderOnKeyboard = renderOnKeyboard;
+  window.setDecompWheelTarget = setDecompWheelTarget;
   window.getState = () => state;
 }
 

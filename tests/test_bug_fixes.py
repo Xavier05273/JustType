@@ -488,6 +488,33 @@ class TestBugFixes(unittest.TestCase):
                 time.sleep(0.3)
                 self.assertFalse(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "按下方鍵盤區按鈕應觸發匯入彈窗")
 
+                # 關閉彈窗
+                page.click("#closeBoshiamyModalBtn")
+                time.sleep(0.2)
+
+                # 5. 切換回倉頡或注音時，打字框必須立即恢復可輸入狀態，不再顯示匯入提示
+                # (a) 目前在嘸蝦米未匯入狀態，輸入框應為 disabled
+                self.assertTrue(page.evaluate("() => document.querySelector('#inputBox input').disabled"), "嘸蝦米未匯入時打字框應為 disabled")
+                self.assertIn("請先點擊上方或鍵盤匯入碼表", page.evaluate("() => document.querySelector('#inputBox input').placeholder"))
+
+                # (b) 滾輪切換至倉頡
+                page.evaluate("() => { if (window.setDecompWheelTarget) window.setDecompWheelTarget(1); }")
+                time.sleep(0.4)
+                self.assertFalse(page.evaluate("() => document.querySelector('#inputBox input').disabled"), "切換至倉頡後打字框應恢復 enabled")
+                self.assertNotIn("請先點擊上方或鍵盤匯入碼表", page.evaluate("() => document.querySelector('#inputBox input').placeholder"))
+
+                # (c) 鍵位提示下拉切換至注音
+                page.evaluate("""() => {
+                    const sel = document.getElementById("layoutSelect");
+                    if (sel) {
+                        sel.value = "bopomofo";
+                        sel.dispatchEvent(new Event("change"));
+                    }
+                }""")
+                time.sleep(0.3)
+                self.assertFalse(page.evaluate("() => document.querySelector('#inputBox input').disabled"), "切換至注音後打字框應維持 enabled")
+                self.assertNotIn("請先點擊上方或鍵盤匯入碼表", page.evaluate("() => document.querySelector('#inputBox input').placeholder"))
+
                 browser.close()
         finally:
             server.terminate()
