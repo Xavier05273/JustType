@@ -1289,7 +1289,7 @@ function getCurrentPosInfo() {
     };
   }
   const ch = targetChars[pos];
-  const zhuyin = (ZHUYIN && ZHUYIN[ch]) || null;
+  const zhuyin = (ZHUYIN && (ZHUYIN.chars ? ZHUYIN.chars[ch] : ZHUYIN[ch])) || null;
   return {
     lineIdx: state.lineIdx,
     charIdx: pos,

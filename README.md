@@ -47,8 +47,9 @@ python3 serve.py 8092
 
 - `index.html`、`style.css`、`app.js` — 頁面、樣式與打字引擎
 - `assets/` — favicon 圖示
-- `data/` — 題庫與字庫：`data.json`（題庫）、`zhuyin.json`（注音對齊）、`cangjie.json`（倉頡，速成由倉頡推導）
-- `build_cangjie.py` — 重建拆字字庫
+- `data/` — 題庫與字庫：`data.json`（題庫）、`zhuyin.json`（注音，源自 CNS11643 全字庫）、`cangjie.json`（倉頡，源自 Cangjie3-Plus，速成由倉頡推導）
+- `build_cangjie.py` — 重建倉頡拆字字庫（Cangjie3-Plus）
+- `build_zhuyin.py` — 重建注音字庫（全字庫 CNS11643）
 - `serve.py`、`serve.sh` — 靜態伺服器
 - `validate_queue.js` — 抽題回歸門（`node validate_queue.js`）
 
