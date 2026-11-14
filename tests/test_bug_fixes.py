@@ -336,6 +336,26 @@ class TestBugFixes(unittest.TestCase):
                 self.assertEqual(zhuyin_hint["nextKeyZh"], "ㄐ", "鍵盤上下一個待敲鍵應標記在'ㄐ'")
                 self.assertEqual(zhuyin_hint["nextKeyCode"], "KeyR", "鍵盤上下一個待敲鍵之 keyCode 應為 KeyR")
 
+                # ====================================================
+                # 測試 6: 滾輪循環切換注音與卡片對齊驗證（防卡在一半）
+                # ====================================================
+                # 從注音往左點擊 prev 到速成，再點擊 next 回到注音
+                page.click(".decomp-wheel-prev")
+                time.sleep(0.35)
+                st_prev = page.evaluate("""() => {
+                    const center = document.querySelector(".decomp-wheel-card.is-center");
+                    return center ? center.dataset.method : null;
+                }""")
+                self.assertEqual(st_prev, "sucheng", "從注音向左應切換至速成")
+
+                page.click(".decomp-wheel-next")
+                time.sleep(0.35)
+                st_next = page.evaluate("""() => {
+                    const center = document.querySelector(".decomp-wheel-card.is-center");
+                    return center ? center.dataset.method : null;
+                }""")
+                self.assertEqual(st_next, "bopomofo", "從速成向右應切換回注音且正中對齊，不應卡在一半")
+
                 browser.close()
         finally:
             server.terminate()

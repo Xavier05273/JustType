@@ -132,13 +132,18 @@ export function queueDecompWheelFrame() {
   decompWheel.raf = requestAnimationFrame(decompWheelFrame);
 }
 
+function shortestDistance(from, to, n) {
+  const rawDiff = ((to - from) % n + n) % n;
+  return rawDiff > n / 2 ? rawDiff - n : rawDiff;
+}
+
 function decompWheelFrame() {
   if (!decompWheel) return;
   decompWheel.raf = null;
   if (!decompWheel.dragging) {
     const diff = decompWheel.target - decompWheel.pos;
     if (Math.abs(diff) > 0.001) {
-      decompWheel.pos += diff * 0.18;
+      decompWheel.pos += diff * 0.22;
     } else {
       decompWheel.pos = decompWheel.target;
     }
@@ -147,7 +152,7 @@ function decompWheelFrame() {
   const settled = !decompWheel.dragging && Math.abs(decompWheel.target - decompWheel.pos) <= 0.001;
   if (settled) {
     const n = decompWheel.cards.length;
-    const wrapped = ((decompWheel.pos % n) + n) % n;
+    const wrapped = ((Math.round(decompWheel.pos) % n) + n) % n;
     decompWheel.pos = wrapped;
     decompWheel.target = wrapped;
     paintDecompWheel();
@@ -182,25 +187,38 @@ export function paintDecompWheel() {
     card.classList.toggle("is-center", ao < 0.5);
   });
   const sel = ((Math.round(decompWheel.pos) % n) + n) % n;
+  const lastSel = decompWheel.selected;
   decompWheel.selected = sel;
   const newKey = DECOMP_METHODS[sel].key;
-  if (typeof decompWheel.onMethodChange === "function") {
+  if (lastSel !== sel && typeof decompWheel.onMethodChange === "function") {
     decompWheel.onMethodChange(newKey);
   }
 }
 
-export function setDecompWheelTarget(idx, immediate = false) {
+export function setDecompWheelTarget(targetIdx, immediate = false) {
   if (!decompWheel) return;
-  decompWheel.target = idx;
+  const n = decompWheel.cards.length;
+  const currentWrapped = ((decompWheel.pos % n) + n) % n;
+  const diff = shortestDistance(currentWrapped, targetIdx, n);
+  const newTarget = Math.round(decompWheel.pos + diff);
+  decompWheel.target = newTarget;
   if (immediate) {
     if (decompWheel.raf != null) {
       cancelAnimationFrame(decompWheel.raf);
       decompWheel.raf = null;
     }
-    decompWheel.pos = idx;
+    const wrapped = ((newTarget % n) + n) % n;
+    decompWheel.pos = wrapped;
+    decompWheel.target = wrapped;
     paintDecompWheel();
     return;
   }
+  queueDecompWheelFrame();
+}
+
+export function setDecompWheelTargetOffset(offset) {
+  if (!decompWheel) return;
+  decompWheel.target = Math.round(decompWheel.target) + offset;
   queueDecompWheelFrame();
 }
 
@@ -276,13 +294,13 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
     const next = e.target.closest(".decomp-wheel-next");
     if (prev) {
       e.preventDefault();
-      setDecompWheelTarget(Math.round(decompWheel ? decompWheel.target : 0) - 1);
+      setDecompWheelTargetOffset(-1);
       if (typeof callbacks.focusCurrent === "function") callbacks.focusCurrent();
       return;
     }
     if (next) {
       e.preventDefault();
-      setDecompWheelTarget(Math.round(decompWheel ? decompWheel.target : 0) + 1);
+      setDecompWheelTargetOffset(1);
       if (typeof callbacks.focusCurrent === "function") callbacks.focusCurrent();
       return;
     }
@@ -320,7 +338,8 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
     decompWheel.dragging = false;
     if (decompWheel.viewport) decompWheel.viewport.classList.remove("dragging");
     if (decompWheel.moved) {
-      setDecompWheelTarget(Math.round(decompWheel.pos + decompWheel.velocity * 0.15));
+      decompWheel.target = Math.round(decompWheel.pos + decompWheel.velocity * 0.15);
+      queueDecompWheelFrame();
     } else if (e) {
       const card = e.target.closest(".decomp-wheel-card");
       const vp = e.target.closest(".decomp-wheel");
@@ -328,23 +347,27 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
         const targetMethod = card.dataset.method;
         const targetIdx = methodIndex(targetMethod);
         if (targetIdx !== -1) {
-          let diff = targetIdx - (((decompWheel.pos % 3) + 3) % 3);
-          diff = ((diff + 1.5) % 3 + 3) % 3 - 1.5;
-          if (Math.abs(diff) < 0.2 && vp) {
-            const rect = vp.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            if (e.clientX < cx - 40) setDecompWheelTarget(Math.round(decompWheel.pos) - 1);
-            else if (e.clientX > cx + 40) setDecompWheelTarget(Math.round(decompWheel.pos) + 1);
-          } else {
-            setDecompWheelTarget(Math.round(decompWheel.pos + diff));
-          }
+          setDecompWheelTarget(targetIdx);
+        } else {
+          decompWheel.target = Math.round(decompWheel.pos);
+          queueDecompWheelFrame();
         }
       } else if (vp) {
         const rect = vp.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
-        if (e.clientX < cx - 35) setDecompWheelTarget(Math.round(decompWheel.pos) - 1);
-        else if (e.clientX > cx + 35) setDecompWheelTarget(Math.round(decompWheel.pos) + 1);
+        if (e.clientX < cx - 35) setDecompWheelTargetOffset(-1);
+        else if (e.clientX > cx + 35) setDecompWheelTargetOffset(1);
+        else {
+          decompWheel.target = Math.round(decompWheel.pos);
+          queueDecompWheelFrame();
+        }
+      } else {
+        decompWheel.target = Math.round(decompWheel.pos);
+        queueDecompWheelFrame();
       }
+    } else {
+      decompWheel.target = Math.round(decompWheel.pos);
+      queueDecompWheelFrame();
     }
     if (typeof callbacks.focusCurrent === "function") callbacks.focusCurrent();
     setTimeout(() => { if (decompWheel) decompWheel.moved = false; }, 0);
@@ -359,7 +382,7 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (Math.abs(delta) < 4) return;
     decompWheel.wheelLockedUntil = now + 180;
-    setDecompWheelTarget(Math.round(decompWheel.target) + (delta > 0 ? 1 : -1));
+    setDecompWheelTargetOffset(delta > 0 ? 1 : -1);
     e.preventDefault();
   }, { passive: false });
 }
