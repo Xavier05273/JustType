@@ -322,8 +322,6 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
 
     const reloadBtn = e.target.closest(".decomp-reload-btn");
     const importBtn = e.target.closest(".decomp-import-btn");
-    const card = e.target.closest(".decomp-wheel-card");
-    const vp = e.target.closest(".decomp-wheel");
 
     if (importBtn || reloadBtn) {
       e.preventDefault();
@@ -331,18 +329,16 @@ export function bindDecompWheelEvents(cangjieHint, callbacks = {}) {
       if (typeof callbacks.openBoshiamyModal === "function") callbacks.openBoshiamyModal();
       return;
     }
+  });
 
-    // 點擊滾輪或卡片：當目前顯示為嘸蝦米且無碼表時，點擊卡片任何處均彈出匯入彈窗
-    if (card || vp) {
-      const activeCard = card || cangjieHint.querySelector(".decomp-wheel-card.is-center");
-      if (activeCard && activeCard.dataset.method === "boshiamy") {
-        const needsImport = !!activeCard.querySelector(".decomp-import-btn");
-        if (needsImport) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (typeof callbacks.openBoshiamyModal === "function") callbacks.openBoshiamyModal();
-          return;
-        }
+  cangjieHint.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      const reloadBtn = e.target.closest(".decomp-reload-btn");
+      const importBtn = e.target.closest(".decomp-import-btn");
+      if (importBtn || reloadBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof callbacks.openBoshiamyModal === "function") callbacks.openBoshiamyModal();
       }
     }
   });

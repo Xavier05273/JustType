@@ -1200,12 +1200,15 @@ function renderOnKeyboard() {
     if (!overlay) {
       overlay = document.createElement("div");
       overlay.className = "on-kb-overlay";
-      overlay.setAttribute("role", "button");
-      overlay.setAttribute("tabindex", "0");
       overlay.innerHTML = `<button type="button" class="on-kb-overlay-btn">📥 點擊匯入 .cin 碼表啟用鍵盤</button>`;
-      overlay.addEventListener("click", () => {
-        if (typeof openBoshiamyModal === "function") openBoshiamyModal();
-      });
+      const btn = overlay.querySelector(".on-kb-overlay-btn");
+      if (btn) {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof openBoshiamyModal === "function") openBoshiamyModal();
+        });
+      }
       onKeyboard.appendChild(overlay);
     }
   } else if (overlay) {

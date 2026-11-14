@@ -203,7 +203,14 @@ class TestBugFixes(unittest.TestCase):
                 # 測試 3: 生活情境題（LINE 回合對話）修復驗證
                 # ====================================================
                 page.evaluate("""() => {
-                    window.startRound("life_situations");
+                    // 確保題目首句為對手發言，以利驗證進場動畫與氣泡排版
+                    for (let attempt = 0; attempt < 20; attempt++) {
+                        window.startRound("life_situations");
+                        const s = window.getState();
+                        if (s.chatSegs && s.chatSegs.length && !s.chatSegs[0].isMe) {
+                            break;
+                        }
+                    }
                 }""")
 
                 # 等候對手進場並切換至使用者輸入 (user_typing)
@@ -446,24 +453,29 @@ class TestBugFixes(unittest.TestCase):
                 self.assertFalse(practice_hidden, "首頁點擊關卡應直接進入練習畫面")
 
                 # ====================================================
-                # 測試 10: 彈窗觸發條件驗證（僅限主動按滾輪卡片或按下方鍵盤區，打字不得觸發）
+                # 測試 10: 彈窗觸發條件驗證（切換至無蝦米不主動彈窗，僅限主動按匯入按鈕或按下方鍵盤按鈕，打字不得觸發）
                 # ====================================================
-                # 1. 點擊滾輪卡片 -> 應彈出匯入彈窗
-                page.click(".decomp-wheel")
+                # 1. 點擊滾輪非按鈕處（如中央卡片名稱標籤） -> 不應主動彈窗
+                page.click(".decomp-wheel-card.is-center .decomp-name")
                 time.sleep(0.3)
-                self.assertFalse(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "按滾輪應觸發匯入彈窗")
+                self.assertTrue(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "點擊滾輪卡片標籤時不應主動彈窗")
+
+                # 2. 點擊滾輪上的「匯入 .cin 檔」按鈕 -> 應彈出匯入彈窗
+                page.click(".decomp-import-btn")
+                time.sleep(0.3)
+                self.assertFalse(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "按滾輪卡片上的匯入按鈕應觸發匯入彈窗")
 
                 # 關閉彈窗
                 page.click("#closeBoshiamyModalBtn")
                 time.sleep(0.2)
                 self.assertTrue(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "彈窗應已關閉")
 
-                # 2. 在練習中打字 -> 不得觸發彈窗
+                # 3. 在練習中打字 -> 不得觸發彈窗
                 page.keyboard.type("abc")
                 time.sleep(0.2)
                 self.assertTrue(page.evaluate("() => document.getElementById('boshiamyImportOverlay').classList.contains('hidden')"), "打字時絕不應觸發匯入彈窗")
 
-                # 3. 開啟虛擬鍵盤，點擊下方鍵盤區的按鈕 -> 應彈出匯入彈窗
+                # 4. 開啟虛擬鍵盤，點擊下方鍵盤區的高亮按鈕 -> 應彈出匯入彈窗
                 page.evaluate("""() => {
                     const chk = document.getElementById("onKeyboardCheck");
                     if (chk && !chk.checked) {
