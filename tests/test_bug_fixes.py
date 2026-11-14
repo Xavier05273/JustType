@@ -229,6 +229,74 @@ class TestBugFixes(unittest.TestCase):
                 self.assertTrue(chat_dom["hasCurrentChar"], "待打氣泡中的第一個字必須正確標記為 .char.current 游標")
                 self.assertEqual(chat_dom["phase"], "user_typing", "進入等待輸入時 animationPhase 應為 user_typing")
 
+                # ====================================================
+                # 測試 4: 虛擬鍵盤按鍵發光與紅光錯誤反饋驗證
+                # ====================================================
+                page.evaluate("""() => {
+                    const chk = document.getElementById("onKeyboardCheck");
+                    if (chk) {
+                        chk.checked = true;
+                        chk.dispatchEvent(new Event("change"));
+                    }
+                    window.startRound("words");
+                    const s = window.getState();
+                    s.lines = ["h"];
+                    s.inputs = [""];
+                    s.lineIdx = 0;
+                    document.getElementById("targetBox").innerHTML = `
+                        <div class="target-line current-line" data-line="0">
+                            <span class="char current" data-pos="0">h</span>
+                        </div>
+                    `;
+                    window.renderOnKeyboard();
+                    window.paint();
+                }""")
+
+                # 1. 模擬按對鍵 'h'
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.dispatchEvent(new KeyboardEvent("keydown", { key: "h", code: "KeyH", bubbles: true }));
+                }""")
+                h_key_flash = page.evaluate("""() => {
+                    const keyEl = document.querySelector('.on-kb-key[data-key="h"]');
+                    return {
+                        hasWhite: keyEl ? keyEl.classList.contains("flash-white") : false,
+                        hasRed: keyEl ? keyEl.classList.contains("flash-red") : false,
+                        isError: keyEl ? keyEl.classList.contains("is-error") : false
+                    };
+                }""")
+                self.assertTrue(h_key_flash["hasWhite"], "按對鍵時該鍵應閃白光 (.flash-white)")
+                self.assertFalse(h_key_flash["isError"], "按對鍵時不應標記為 .is-error")
+
+                # 2. 模擬按錯鍵 'x' (預期為 'h' 或此時的輸入)
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.dispatchEvent(new KeyboardEvent("keydown", { key: "x", code: "KeyX", bubbles: true }));
+                }""")
+                x_key_flash = page.evaluate("""() => {
+                    const keyEl = document.querySelector('.on-kb-key[data-key="x"]');
+                    return {
+                        hasWhite: keyEl ? keyEl.classList.contains("flash-white") : false,
+                        hasRed: keyEl ? keyEl.classList.contains("flash-red") : false,
+                        isError: keyEl ? keyEl.classList.contains("is-error") : false
+                    };
+                }""")
+                self.assertTrue(x_key_flash["hasRed"], "按錯鍵時該鍵應閃紅光 (.flash-red)")
+                self.assertTrue(x_key_flash["isError"], "按錯鍵時該鍵應維持 .is-error 錯誤提示")
+
+                # 3. 模擬按 Backspace 退格
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", code: "Backspace", bubbles: true }));
+                }""")
+                x_key_after_backspace = page.evaluate("""() => {
+                    const keyEl = document.querySelector('.on-kb-key[data-key="x"]');
+                    return {
+                        isError: keyEl ? keyEl.classList.contains("is-error") : false
+                    };
+                }""")
+                self.assertFalse(x_key_after_backspace["isError"], "按 Backspace 時應清除鍵盤上的 .is-error 錯誤狀態")
+
                 browser.close()
         finally:
             server.terminate()

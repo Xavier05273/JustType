@@ -1061,6 +1061,52 @@ function renderPractice() {
       setHintDefault();
     }
 
+    // Flash feedback for on-screen keyboard: white = correct, red = wrong (persist until Backspace)
+    if (onKeyboard && onKeyboardWrap && !onKeyboardWrap.classList.contains("hidden") && !isBackspace && !isEnter && !isModifierOrNav) {
+      const expected = getCurrentExpectedKey();
+      if (expected) {
+        let pressedEl = null;
+        if (e.code) {
+          pressedEl = onKeyboard.querySelector(`.on-kb-key[data-code="${e.code}"]`);
+        }
+        if (!pressedEl && e.key && e.key !== "Process") {
+          const k = e.key.toLowerCase();
+          pressedEl = k === " "
+            ? onKeyboard.querySelector('.on-kb-key[data-code="Space"]')
+            : findOnKbKey(k, onKeyboard);
+        }
+
+        if (pressedEl) {
+          const isSpacePress = e.code === "Space" || (expected.isSpace && (e.code === "Digit1" || e.key === "1")) || (e.key === " " && e.key !== "Process");
+          let isCorrect = false;
+
+          if (expected.isSpace) {
+            isCorrect = isSpacePress;
+          } else if (isSpacePress) {
+            isCorrect = false;
+          } else {
+            isCorrect = (
+              (expected.code && pressedEl.dataset.code === expected.code) ||
+              (expected.el && pressedEl === expected.el) ||
+              (expected.key && pressedEl.dataset.key && pressedEl.dataset.key.toLowerCase() === expected.key.toLowerCase())
+            );
+          }
+
+          if (isCorrect) {
+            flashKeyElement(pressedEl, "flash-white");
+            clearKeyError(onKeyboard, state);
+            setHintDefault();
+          } else {
+            flashKeyElement(pressedEl, "flash-red");
+            onKeyboard.querySelectorAll(".is-error").forEach((k) => k.classList.remove("is-error"));
+            pressedEl.classList.add("is-error");
+            if (state) state.lastKeyError = pressedEl.dataset.code || pressedEl.dataset.key || "error";
+            hint("❌ 按錯鍵 — 請按 Backspace 修改");
+          }
+        }
+      }
+    }
+
     if (state && !state.finished && (state.composing || state.compositionStartAt)) {
       let pressedLetter = null;
       if (/^[a-zA-Z]$/.test(e.key)) {
@@ -2814,6 +2860,9 @@ if (typeof window !== "undefined") {
   window.showResultModal = showResultModal;
   window.startBottlenecksPractice = startBottlenecksPractice;
   window.startRound = startRound;
+  window.paint = paint;
+  window.paintOnKeyboard = paintOnKeyboard;
+  window.renderOnKeyboard = renderOnKeyboard;
   window.getState = () => state;
 }
 

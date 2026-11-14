@@ -47,12 +47,16 @@ export function clearKeyError(onKeyboard, state) {
   if (state) state.lastKeyError = null;
 }
 
-export function flashKeyElement(keyEl, cls) {
+export function flashKeyElement(keyEl, kind) {
   if (!keyEl) return;
-  const idKey = keyEl.dataset.code || keyEl.dataset.key;
-  if (flashTimeoutIds[idKey]) clearTimeout(flashTimeoutIds[idKey]);
+  const idKey = keyEl.dataset.code || keyEl.dataset.key || "key";
+  if (flashTimeoutIds[idKey]) {
+    clearTimeout(flashTimeoutIds[idKey]);
+    delete flashTimeoutIds[idKey];
+  }
   keyEl.classList.remove("flash-white", "flash-red");
   void keyEl.offsetWidth; // 重新觸發 CSS 動畫
+  const cls = (kind === "white" || kind === "flash-white") ? "flash-white" : "flash-red";
   keyEl.classList.add(cls);
   flashTimeoutIds[idKey] = setTimeout(() => {
     keyEl.classList.remove("flash-white", "flash-red");
