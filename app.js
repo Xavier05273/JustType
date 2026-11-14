@@ -773,6 +773,8 @@ function startRound(modeKey) {
   renderPractice();
   paint();
   focusCurrent();
+  setHintDefault();
+  updateHud();
   if (modeKey === "life_situations") {
     lifeKick();
   }
@@ -918,7 +920,7 @@ function renderPractice() {
   } else if (state.lines.length > 1 && !isChat) {
     const isLastLine = li >= state.lines.length - 1;
     inp.placeholder = active
-      ? `第 ${li + 1} / ${state.lines.length} 行：在此輸入…（${isLastLine ? "打對即完成" : "打對自動換行"}）`
+      ? `第 ${li + 1} / ${state.lines.length} 行：在此輸入…（${isLastLine ? "打滿即完成" : "打滿自動換行"}）`
       : "（已完成）";
   } else if (isChat) {
     inp.placeholder = active
@@ -950,12 +952,7 @@ function renderPractice() {
     ensureTimerStarted();
     state.composingRawText = e.data || state.composingRawText;
     state.composingText = e.data || state.composingText;
-    const info = getCurrentPosInfo();
-    const completedStr = info && info.completed ? info.completed.join("") : "";
-    if (completedStr.length > (state.inputs[li] || "").length) {
-      state.inputs[li] = completedStr;
-      onCommitted(li);
-    }
+    onCommitted(li);
     paint();
   });
   inp.addEventListener("compositionend", (e) => {
@@ -994,13 +991,6 @@ function renderPractice() {
       setHintDefault();
     }
     if (state) state.lastInputVal = e.target.value;
-    const info = getCurrentPosInfo();
-    const completedStr = info && info.completed ? info.completed.join("") : "";
-    if (completedStr.length > (state.inputs[li] || "").length) {
-      state.inputs[li] = completedStr;
-      onCommitted(li);
-      maybeFinish();
-    }
 
     if (state.composing) {
       const val = e.target.value;
@@ -1016,6 +1006,7 @@ function renderPractice() {
         state.composingText = "";
         state.composingRawText = "";
       }
+      onCommitted(li);
       paint();
       return;
     }
@@ -1212,9 +1203,6 @@ function ensureTimerStarted() {
 
 function startTimer() {
   state.startedAt = Date.now();
-  if (state.sessionCompleted > 0 && !state.roundStartedAt) {
-    state.roundStartedAt = state.startedAt;
-  }
   state.charStartTime = state.startedAt;
   state.charFirstKeyTime = state.startedAt;
   state.timerId = setInterval(() => {
@@ -1238,20 +1226,10 @@ function elapsedNow() {
 
 function updateHud() {
   if (!state) return;
-  const sec = state.elapsed;
-  if (state.sessionCompleted > 0 && state.roundStartedAt) {
-    const cont = (Date.now() - state.roundStartedAt) / 1000;
-    const typedSoFar = (state.roundTotalCorrect || 0) + state.totalCorrect;
-    const typedAll = (state.roundTotalTyped || 0) + state.totalTyped;
-    const keysAll = (state.roundTotalKeys || 0) + (state.totalKeys || state.totalTyped || 0);
-    const eff = effectiveStats(typedAll, typedSoFar, Math.max(cont, 0), keysAll);
-    $("#hudTime").textContent = fmtTime(eff.sec);
-    $("#hudWpm").textContent = eff.wpm;
-  } else {
-    const eff = effectiveStats(state.totalTyped, state.totalCorrect, sec, state.totalKeys);
-    $("#hudTime").textContent = fmtTime(sec);
-    $("#hudWpm").textContent = eff.wpm;
-  }
+  const sec = state.elapsed || (state.startedAt ? elapsedNow() : 0);
+  const eff = effectiveStats(state.totalTyped, state.totalCorrect, sec, state.totalKeys);
+  $("#hudTime").textContent = fmtTime(sec);
+  $("#hudWpm").textContent = String(eff.wpm);
   const acc = state.totalTyped > 0 ? Math.round((state.totalCorrect / state.totalTyped) * 100) : 100;
   $("#hudAcc").textContent = acc + "%";
 }
@@ -1296,20 +1274,16 @@ function syncEndlessCheck() {
 function getCurrentPosInfo() {
   if (!state || state.lineIdx >= state.lines.length) return null;
   const targetChars = Array.from(state.lines[state.lineIdx]);
-  const el = state.currentInputEl;
-  const liveVal = (el && typeof el.value === "string") ? el.value : (state.inputs[state.lineIdx] || "");
-  const inputChars = Array.from(liveVal);
-  let pos = 0;
-  while (pos < targetChars.length && pos < inputChars.length && norm(inputChars[pos]) === norm(targetChars[pos])) {
-    pos++;
-  }
+  const displayStr = displayFor(state.lineIdx);
+  const inputChars = Array.from(displayStr);
+  const pos = inputChars.length;
   if (pos >= targetChars.length) {
     return {
       lineIdx: state.lineIdx,
       charIdx: pos,
       char: "",
       zhuyin: null,
-      completed: inputChars.slice(0, pos),
+      completed: inputChars,
       composingSlice: "",
     };
   }
@@ -1320,7 +1294,7 @@ function getCurrentPosInfo() {
     charIdx: pos,
     char: ch,
     zhuyin,
-    completed: inputChars.slice(0, pos),
+    completed: inputChars,
     composingSlice: state.composingRawText || state.composingText || "",
   };
 }
@@ -1535,16 +1509,31 @@ function paintOnKeyboard() {
   }
 }
 
+function getComposedDisplay(li) {
+  const el = state.currentInputEl;
+  const val = (el && typeof el.value === "string") ? el.value : (state.inputs[li] || "");
+  if (!val) return "";
+  if (!state.composing) return val;
+
+  const targetLine = state.lines[li] || "";
+  const targetChars = Array.from(targetLine);
+
+  // 1) 移除結尾的注音符號（選字/組字緩衝區中的未完成拼音）
+  let stripped = val.replace(/[ㄅ-ㄩˊˇˋ˙]+$/, "");
+
+  // 2) 移除結尾的英文字母或倉頡字根（若目標字元在該位置不是英文字母）
+  const strippedChars = Array.from(stripped);
+  const nextTargetChar = targetChars[strippedChars.length];
+  if (!nextTargetChar || !/[a-zA-Z]/.test(nextTargetChar)) {
+    stripped = stripped.replace(/[a-zA-Z日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重]+$/, "");
+  }
+
+  return stripped;
+}
+
 function displayFor(li) {
   if (li === state.lineIdx) {
-    if (state.composing) {
-      const info = getCurrentPosInfo();
-      if (info && info.completed) {
-        return info.completed.join("");
-      }
-    }
-    const el = state.currentInputEl;
-    if (el) return el.value;
+    return getComposedDisplay(li);
   }
   return state.inputs[li] || "";
 }
@@ -1556,11 +1545,13 @@ function paint() {
 
   let totalChars = 0;
   let correctChars = 0;
+  let typedChars = 0;
 
   state.lines.forEach((line, li) => {
     const targetArr = Array.from(line);
     const typedArr = Array.from(displayFor(li));
     totalChars += targetArr.length;
+    typedChars += Math.min(targetArr.length, typedArr.length);
 
     let lineDiv;
     if (isChat) {
@@ -1574,7 +1565,7 @@ function paint() {
       lineDiv.classList.toggle("current-line", isLineCurrent);
     }
 
-    let foundFirstErrorOrCurrent = false;
+    let foundCurrent = false;
 
     targetArr.forEach((tch, pos) => {
       let span;
@@ -1587,9 +1578,9 @@ function paint() {
       const u = typedArr[pos];
 
       if (u === undefined) {
-        if (isLineCurrent && !foundFirstErrorOrCurrent) {
+        if (isLineCurrent && !foundCurrent) {
           span.classList.add("current");
-          foundFirstErrorOrCurrent = true;
+          foundCurrent = true;
         } else {
           span.classList.add("pending");
         }
@@ -1598,12 +1589,11 @@ function paint() {
         correctChars++;
       } else {
         span.classList.add("error");
-        foundFirstErrorOrCurrent = true;
       }
     });
   });
 
-  const pct = totalChars > 0 ? Math.min(100, Math.round((correctChars / totalChars) * 100)) : 0;
+  const pct = totalChars > 0 ? Math.min(100, Math.round((typedChars / totalChars) * 100)) : 0;
   const progEl = document.getElementById("progressBar");
   if (progEl) progEl.style.width = pct + "%";
 
@@ -1625,52 +1615,54 @@ function paint() {
 function onCommitted(lineIdx) {
   const line = state.lines[lineIdx];
   const targetChars = Array.from(line);
-  const inputChars = Array.from(state.inputs[lineIdx] || "");
+  const inputChars = Array.from(displayFor(lineIdx));
   let correct = 0;
   const now = Date.now();
 
   for (let i = 0; i < targetChars.length && i < inputChars.length; i++) {
-    if (norm(inputChars[i]) === norm(targetChars[i])) {
+    const isCorrect = norm(inputChars[i]) === norm(targetChars[i]);
+    if (isCorrect) {
       correct++;
-      const isLogged = state.charLogs.some((l) => l.line === lineIdx && l.pos === i);
-      if (!isLogged) {
-        const start = state.charStartTime || now;
-        const dur = Math.max(10, now - start);
-        const imeDur = state.selectionInteractionDuration || 0;
-        const netDur = Math.max(20, dur - imeDur);
-        const firstKey = state.charFirstKeyTime || start;
-        const latency = Math.max(0, firstKey - start);
-        const ch = targetChars[i];
-        let decomp = "—";
-        const dec = decompositionFor(ch, decompMethod, { BOSHIAMY, CANGJIE });
-        if (dec && !dec.missing && !dec.isBoshiamyUninitialized) {
-          if (dec.lettersOnly) decomp = Array.from(dec.code).map((c) => c.toUpperCase()).join(" ");
-          else if (dec.radicals) decomp = `${dec.radicals} (${dec.code})`;
-          else decomp = dec.code;
-        }
-        state.charLogs.push({
-          line: lineIdx,
-          pos: i,
-          char: ch,
-          duration: dur,
-          netDuration: netDur,
-          imeSelectDuration: imeDur,
-          cognitiveLatency: latency,
-          decomp,
-          backspaces: state.charBackspaces || 0
-        });
-        state.charStartTime = now;
-        state.charFirstKeyTime = null;
-        state.charBackspaces = 0;
-        state.selectionInteractionDuration = 0;
+    }
+    const isLogged = state.charLogs.some((l) => l.line === lineIdx && l.pos === i);
+    if (!isLogged) {
+      const start = state.charStartTime || now;
+      const dur = Math.max(10, now - start);
+      const imeDur = state.selectionInteractionDuration || 0;
+      const netDur = Math.max(20, dur - imeDur);
+      const firstKey = state.charFirstKeyTime || start;
+      const latency = Math.max(0, firstKey - start);
+      const ch = targetChars[i];
+      let decomp = "—";
+      const dec = decompositionFor(ch, decompMethod, { BOSHIAMY, CANGJIE });
+      if (dec && !dec.missing && !dec.isBoshiamyUninitialized) {
+        if (dec.lettersOnly) decomp = Array.from(dec.code).map((c) => c.toUpperCase()).join(" ");
+        else if (dec.radicals) decomp = `${dec.radicals} (${dec.code})`;
+        else decomp = dec.code;
       }
+      state.charLogs.push({
+        line: lineIdx,
+        pos: i,
+        char: ch,
+        duration: dur,
+        netDuration: netDur,
+        imeSelectDuration: imeDur,
+        cognitiveLatency: latency,
+        decomp,
+        backspaces: state.charBackspaces || 0,
+        error: !isCorrect
+      });
+      state.charStartTime = now;
+      state.charFirstKeyTime = null;
+      state.charBackspaces = 0;
+      state.selectionInteractionDuration = 0;
     }
   }
   let allTyped = 0;
   let allCorrect = 0;
   state.lines.forEach((l, idx) => {
     const tChars = Array.from(l);
-    const iChars = Array.from(state.inputs[idx] || "");
+    const iChars = Array.from(displayFor(idx));
     allTyped += iChars.length;
     for (let j = 0; j < tChars.length && j < iChars.length; j++) {
       if (norm(iChars[j]) === norm(tChars[j])) allCorrect++;
@@ -1702,26 +1694,22 @@ function maybeFinish() {
     }
     return;
   }
-  // 自動前進：目前行打完且全數正確，直接 advance，不必按 Enter 確認
-  if (!isEndlessEnabled(state.modeKey)) {
-    const li = state.lineIdx;
-    const line = state.lines[li];
-    const targetArr = Array.from(line);
-    const inputArr = Array.from(state.inputs[li] || "");
-    const complete = inputArr.length === targetArr.length;
-    const allOk = targetArr.every((ch, i) => norm(inputArr[i]) === norm(ch));
-    if (li + 1 < state.lines.length && complete && allOk) {
-      advance(li);
-      return;
-    }
+  // 自動前進：目前行打完，直接 advance，不必按 Enter 確認
+  const li = state.lineIdx;
+  const line = state.lines[li];
+  const targetArr = Array.from(line);
+  const inputArr = Array.from(displayFor(li));
+  const complete = inputArr.length >= targetArr.length;
+  if (li + 1 < state.lines.length && complete) {
+    advance(li);
+    return;
   }
-  const allCorrect = state.lines.every((line, li) => {
-    const targetArr = Array.from(line);
-    const inputArr = Array.from(state.inputs[li] || "");
-    if (inputArr.length !== targetArr.length) return false;
-    return targetArr.every((ch, i) => norm(inputArr[i]) === norm(ch));
+  const allComplete = state.lines.every((l, i) => {
+    const tArr = Array.from(l);
+    const iArr = Array.from(displayFor(i));
+    return iArr.length >= tArr.length;
   });
-  if (allCorrect) {
+  if (allComplete) {
     finishRound();
   }
 }
@@ -2614,11 +2602,29 @@ function bindGlobal() {
   });
   $("#restartBtn").addEventListener("click", () => {
     resetEscConfirm();
+    if (state) {
+      state.sessionCompleted = 0;
+      state.roundTotalTyped = 0;
+      state.roundTotalCorrect = 0;
+      state.roundTotalKeys = 0;
+      state.roundElapsed = 0;
+      state.roundStartedAt = null;
+      state.roundCharLogs = [];
+      state.roundStages = [];
+    }
     startRound(state.modeKey);
   });
   $("#againBtn").addEventListener("click", () => {
     resultOverlay.classList.add("hidden");
     if (state) {
+      state.sessionCompleted = 0;
+      state.roundTotalTyped = 0;
+      state.roundTotalCorrect = 0;
+      state.roundTotalKeys = 0;
+      state.roundElapsed = 0;
+      state.roundStartedAt = null;
+      state.roundCharLogs = [];
+      state.roundStages = [];
       startRound(state.modeKey);
     }
   });
@@ -2649,6 +2655,14 @@ function bindGlobal() {
       e.preventDefault();
       resultOverlay.classList.add("hidden");
       if (state) {
+        state.sessionCompleted = 0;
+        state.roundTotalTyped = 0;
+        state.roundTotalCorrect = 0;
+        state.roundTotalKeys = 0;
+        state.roundElapsed = 0;
+        state.roundStartedAt = null;
+        state.roundCharLogs = [];
+        state.roundStages = [];
         startRound(state.modeKey);
       }
     }

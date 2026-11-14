@@ -1,0 +1,205 @@
+import unittest
+import subprocess
+import time
+from playwright.sync_api import sync_playwright
+
+class TestBugFixes(unittest.TestCase):
+    def test_bug1_mistyped_char_and_bug2_round2_wpm(self):
+        port = "8098"
+        server = subprocess.Popen(["python3", "serve.py", port])
+        time.sleep(1)
+
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.goto(f"http://127.0.0.1:{port}/")
+
+                # 等待主程式與資料初始化完成
+                page.wait_for_selector(".mode-card")
+
+                # ====================================================
+                # 測試 1: 在選字緩衝區（IME 組字中）即時推進、對字變綠、錯字變紅、游標與拆字前進
+                # ====================================================
+                page.evaluate("""() => {
+                    window.startRound("words");
+                    const s = window.getState();
+                    s.lines = ["今天天氣很好"];
+                    s.inputs = [""];
+                    s.lineIdx = 0;
+                    document.getElementById("targetBox").innerHTML = `
+                        <div class="target-line current-line" data-line="0">
+                            <span class="char current" data-pos="0">今</span>
+                            <span class="char pending" data-pos="1">天</span>
+                            <span class="char pending" data-pos="2">天</span>
+                            <span class="char pending" data-pos="3">氣</span>
+                            <span class="char pending" data-pos="4">很</span>
+                            <span class="char pending" data-pos="5">好</span>
+                        </div>
+                    `;
+                }""")
+
+                # 模擬進入 IME 組字狀態（選字緩衝區）
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.dispatchEvent(new Event("compositionstart", { bubbles: true }));
+                    // 緩衝區輸入第一個字 '今'（尚未按 Enter 確認）
+                    inp.value = "今";
+                    inp.dispatchEvent(new Event("compositionupdate", { bubbles: true }));
+                    inp.dispatchEvent(new Event("input", { bubbles: true }));
+                }""")
+
+                status_comp1 = page.evaluate("""() => {
+                    const c0 = document.querySelector('.target-line[data-line="0"] .char[data-pos="0"]');
+                    const c1 = document.querySelector('.target-line[data-line="0"] .char[data-pos="1"]');
+                    return {
+                        c0: c0.className,
+                        c1: c1.className,
+                        hint: document.getElementById("cangjieHint").textContent
+                    };
+                }""")
+                self.assertIn("correct", status_comp1["c0"], "選字緩衝區中構建出的'今'必須標記為 correct")
+                self.assertIn("current", status_comp1["c1"], "選字緩衝區中第 1 個字'天'必須前進為 current 游標")
+                self.assertIn("天", status_comp1["hint"], "選字緩衝區中拆字提示應即時前進到第 1 個字'天'")
+
+                # 在緩衝區中輸入未完成的注音符號 'ㄊㄧㄢ'（不應誤判為字元或錯字，游標應停在'天'）
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.value = "今ㄊㄧㄢ";
+                    inp.dispatchEvent(new Event("compositionupdate", { bubbles: true }));
+                    inp.dispatchEvent(new Event("input", { bubbles: true }));
+                }""")
+                status_comp_preedit = page.evaluate("""() => {
+                    const c1 = document.querySelector('.target-line[data-line="0"] .char[data-pos="1"]');
+                    return c1.className;
+                }""")
+                self.assertIn("current", status_comp_preedit, "鍵入注音符號時當前待打字仍應維持 current")
+
+                # 注音轉出字元 '今天'
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.value = "今天";
+                    inp.dispatchEvent(new Event("compositionupdate", { bubbles: true }));
+                    inp.dispatchEvent(new Event("input", { bubbles: true }));
+                }""")
+                status_comp2 = page.evaluate("""() => {
+                    const c0 = document.querySelector('.target-line[data-line="0"] .char[data-pos="0"]');
+                    const c1 = document.querySelector('.target-line[data-line="0"] .char[data-pos="1"]');
+                    const c2 = document.querySelector('.target-line[data-line="0"] .char[data-pos="2"]');
+                    return {
+                        c0: c0.className,
+                        c1: c1.className,
+                        c2: c2.className,
+                        hint: document.getElementById("cangjieHint").textContent
+                    };
+                }""")
+                self.assertIn("correct", status_comp2["c0"])
+                self.assertIn("correct", status_comp2["c1"])
+                self.assertIn("current", status_comp2["c2"])
+                self.assertIn("天", status_comp2["hint"], "拆字提示推進至第 2 個字'天'")
+
+                # 測試緩衝區打錯字：第 2 個字打錯成 '下' -> "今天下"
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.value = "今天下";
+                    inp.dispatchEvent(new Event("compositionupdate", { bubbles: true }));
+                    inp.dispatchEvent(new Event("input", { bubbles: true }));
+                }""")
+                status_comp_err = page.evaluate("""() => {
+                    const c1 = document.querySelector('.target-line[data-line="0"] .char[data-pos="1"]');
+                    const c2 = document.querySelector('.target-line[data-line="0"] .char[data-pos="2"]');
+                    const c3 = document.querySelector('.target-line[data-line="0"] .char[data-pos="3"]');
+                    return {
+                        c1: c1.className,
+                        c2: c2.className,
+                        c3: c3.className,
+                        hint: document.getElementById("cangjieHint").textContent
+                    };
+                }""")
+                self.assertIn("correct", status_comp_err["c1"], "第 1 個字為 correct")
+                self.assertIn("error", status_comp_err["c2"], "選字緩衝區中打錯的第 2 個字必須標記為 error 紅色")
+                self.assertIn("current", status_comp_err["c3"], "選字緩衝區中打錯字後，下一個字'氣'必須前進為 current")
+                self.assertIn("氣", status_comp_err["hint"], "拆字提示必須同步前進至'氣'")
+
+                # 緩衝區繼續打 '氣' -> "今天下氣"
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.value = "今天下氣";
+                    inp.dispatchEvent(new Event("compositionupdate", { bubbles: true }));
+                    inp.dispatchEvent(new Event("input", { bubbles: true }));
+                }""")
+                status_comp_cont = page.evaluate("""() => {
+                    const c2 = document.querySelector('.target-line[data-line="0"] .char[data-pos="2"]');
+                    const c3 = document.querySelector('.target-line[data-line="0"] .char[data-pos="3"]');
+                    const c4 = document.querySelector('.target-line[data-line="0"] .char[data-pos="4"]');
+                    return {
+                        c2: c2.className,
+                        c3: c3.className,
+                        c4: c4.className
+                    };
+                }""")
+                self.assertIn("error", status_comp_cont["c2"], "第 2 個字維持 error 紅色")
+                self.assertIn("correct", status_comp_cont["c3"], "第 3 個字為 correct")
+                self.assertIn("current", status_comp_cont["c4"], "第 4 個字前進為 current")
+
+                # 送出組字完成（compositionend）
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.value = "今天下氣很好";
+                    inp.dispatchEvent(new Event("compositionend", { bubbles: true }));
+                }""")
+                is_fin = page.evaluate("""() => {
+                    return window.getState().finished;
+                }""")
+                self.assertTrue(is_fin, "組字完成且全句打滿時，即便有錯字也應順利結算")
+
+                # ====================================================
+                # 測試 2: 進入第二輪測驗時，右上角打字速度不可突然暴衝到 300 WPM
+                # ====================================================
+                page.evaluate("""() => {
+                    // 模擬進入第 2 關（第 1 關已完成，sessionCompleted = 1）
+                    const s = window.getState();
+                    s.sessionCompleted = 1;
+                    s.roundTotalTyped = 50;
+                    s.roundTotalCorrect = 50;
+                    s.roundTotalKeys = 50;
+                    s.roundElapsed = 15;
+                    window.startRound("sentences");
+                }""")
+
+                # 進入第二輪剛開始時，HUD 必須初始化為 00:00 / 0 / 100%
+                hud_initial = page.evaluate("""() => {
+                    return {
+                        time: document.getElementById("hudTime").textContent,
+                        wpm: document.getElementById("hudWpm").textContent,
+                        acc: document.getElementById("hudAcc").textContent
+                    };
+                }""")
+                self.assertEqual(hud_initial["time"], "00:00", "第二輪剛進入時時間應初始化為 00:00")
+                self.assertEqual(hud_initial["wpm"], "0", "第二輪剛進入時速度應初始化為 0")
+                self.assertEqual(hud_initial["acc"], "100%", "第二輪剛進入時正確率應初始化為 100%")
+
+                # 模擬敲下第二輪的第一個鍵
+                page.evaluate("""() => {
+                    const inp = document.querySelector("#inputBox input");
+                    inp.value = "這";
+                    inp.dispatchEvent(new Event("input", { bubbles: true }));
+                }""")
+
+                # 稍候一小段時間讓 timer 更新
+                time.sleep(0.3)
+
+                hud_after_first_key = page.evaluate("""() => {
+                    return {
+                        time: document.getElementById("hudTime").textContent,
+                        wpm: parseInt(document.getElementById("hudWpm").textContent, 10)
+                    };
+                }""")
+                self.assertLess(hud_after_first_key["wpm"], 250, f"第二輪首字敲下後速度不應暴衝為 300 wpm，實測為 {hud_after_first_key['wpm']}")
+
+                browser.close()
+        finally:
+            server.terminate()
+
+if __name__ == "__main__":
+    unittest.main()
