@@ -205,7 +205,8 @@ class TestBugFixes(unittest.TestCase):
                 }""")
 
                 # 等候對手進場並切換至使用者輸入 (user_typing)
-                time.sleep(2.5)
+                page.wait_for_selector(".chat-msg.chat-right.chat-draft", timeout=6000)
+                time.sleep(0.2)
 
                 chat_dom = page.evaluate("""() => {
                     const box = document.getElementById("targetBox");
@@ -296,6 +297,44 @@ class TestBugFixes(unittest.TestCase):
                     };
                 }""")
                 self.assertFalse(x_key_after_backspace["isError"], "按 Backspace 時應清除鍵盤上的 .is-error 錯誤狀態")
+
+                # ====================================================
+                # 測試 5: 注音拆字與鍵位提示整合驗證
+                # ====================================================
+                page.evaluate("""() => {
+                    const sel = document.getElementById("layoutSelect");
+                    if (sel) {
+                        sel.value = "bopomofo";
+                        sel.dispatchEvent(new Event("change"));
+                    }
+                    window.startRound("words");
+                    const s = window.getState();
+                    s.lines = ["今天天氣很好"];
+                    s.inputs = [""];
+                    s.lineIdx = 0;
+                    document.getElementById("targetBox").innerHTML = `
+                        <div class="target-line current-line" data-line="0">
+                            <span class="char current" data-pos="0">今</span>
+                            <span class="char pending" data-pos="1">天</span>
+                        </div>
+                    `;
+                    window.paint();
+                }""")
+
+                zhuyin_hint = page.evaluate("""() => {
+                    const hintEl = document.getElementById("cangjieHint");
+                    const nextKey = document.querySelector('.on-kb-key.is-next');
+                    return {
+                        hintText: hintEl ? hintEl.textContent : "",
+                        nextKeyZh: nextKey ? nextKey.dataset.zh : null,
+                        nextKeyCode: nextKey ? nextKey.dataset.code : null
+                    };
+                }""")
+                self.assertIn("注音", zhuyin_hint["hintText"], "拆字滾輪提示應支援注音")
+                self.assertIn("ㄐ", zhuyin_hint["hintText"], "注音提示中應包含首字'今'的注音符號'ㄐ'")
+                self.assertIn("r", zhuyin_hint["hintText"].lower(), "注音提示中應包含按鍵'r'")
+                self.assertEqual(zhuyin_hint["nextKeyZh"], "ㄐ", "鍵盤上下一個待敲鍵應標記在'ㄐ'")
+                self.assertEqual(zhuyin_hint["nextKeyCode"], "KeyR", "鍵盤上下一個待敲鍵之 keyCode 應為 KeyR")
 
                 browser.close()
         finally:

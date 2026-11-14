@@ -21,9 +21,14 @@ export function clearCurrentExpectedKey() {
 
 export function findOnKbKey(k, onKeyboard) {
   if (!onKeyboard || k == null) return null;
+  const target = String(k).toLowerCase();
   const keys = onKeyboard.querySelectorAll(".on-kb-key[data-key]");
   for (const el of keys) {
-    if (el.dataset.key === k) return el;
+    if ((el.dataset.key || "").toLowerCase() === target) return el;
+  }
+  const zhKeys = onKeyboard.querySelectorAll(".on-kb-key[data-zh]");
+  for (const el of zhKeys) {
+    if (el.dataset.zh === k) return el;
   }
   return null;
 }

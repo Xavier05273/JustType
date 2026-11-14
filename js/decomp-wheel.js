@@ -1,8 +1,9 @@
-// js/decomp-wheel.js — 拆字提示（倉頡 / 嘸蝦米 / 速成）3D 橫向反向環滾輪模組
+// js/decomp-wheel.js — 拆字與鍵位提示（注音 / 倉頡 / 嘸蝦米 / 速成）3D 橫向反向環滾輪模組
 
-import { CANGJIE_RADICAL, PUNCT_KEY_MAP } from "./constants.js";
+import { CANGJIE_RADICAL, BOPOMOFO_TO_KEY, PUNCT_KEY_MAP } from "./constants.js";
 
 export const DECOMP_METHODS = [
+  { key: "bopomofo", label: "注音", dataKey: "zhuyin" },
   { key: "cangjie", label: "倉頡", dataKey: "cangjie" },
   { key: "boshiamy", label: "嘸蝦米", dataKey: "boshiamy" },
   { key: "sucheng", label: "速成", dataKey: "sucheng" },
@@ -48,7 +49,29 @@ export function suchengCodeForChar(ch, CANGJIE) {
 
 export function decompositionFor(ch, method, dictionaries = {}) {
   if (!ch) return null;
-  const { BOSHIAMY, CANGJIE } = dictionaries;
+  const { BOSHIAMY, CANGJIE, ZHUYIN } = dictionaries;
+  if (method === "bopomofo") {
+    if (!ZHUYIN) return { missing: "字庫未載入" };
+    const zy = (ZHUYIN.chars ? ZHUYIN.chars[ch] : ZHUYIN[ch]) || null;
+    if (!zy) return { missing: "查無注音" };
+    const rawSymbols = Array.from(zy);
+    const keys = [];
+    let hasTone = false;
+    rawSymbols.forEach((sym) => {
+      if (BOPOMOFO_TO_KEY[sym]) {
+        if (/[ˊˇˋ˙]/.test(sym)) hasTone = true;
+        keys.push(BOPOMOFO_TO_KEY[sym]);
+      }
+    });
+    if (!hasTone) {
+      keys.push("Space");
+    }
+    return {
+      code: keys.join(" "),
+      radicals: rawSymbols.join(" "),
+      zhuyin: zy
+    };
+  }
   if (method === "boshiamy") {
     if (!BOSHIAMY) return { isBoshiamyUninitialized: true };
     const code = BOSHIAMY[ch] || null;
@@ -82,6 +105,9 @@ export function decompositionCardHTML(ch, methodKey, dictionaries = {}) {
   const dec = decompositionFor(ch, methodKey, dictionaries);
   if (dec && dec.missing) {
     return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： ${dec.missing}${reloadBtn}`;
+  }
+  if (methodKey === "bopomofo") {
+    return `<span class="decomp-name">${label}</span> <strong>${ch}</strong> ： <span class="cj-radicals">${dec.radicals}</span> <span class="cj-code">${dec.code}</span>`;
   }
   if (dec && dec.lettersOnly) {
     const letters = Array.from(dec.code).map((c) => c.toUpperCase()).join(" ");
@@ -163,16 +189,25 @@ export function paintDecompWheel() {
   }
 }
 
-export function setDecompWheelTarget(idx) {
+export function setDecompWheelTarget(idx, immediate = false) {
   if (!decompWheel) return;
   decompWheel.target = idx;
+  if (immediate) {
+    if (decompWheel.raf != null) {
+      cancelAnimationFrame(decompWheel.raf);
+      decompWheel.raf = null;
+    }
+    decompWheel.pos = idx;
+    paintDecompWheel();
+    return;
+  }
   queueDecompWheelFrame();
 }
 
 export function buildDecompWheel(container, ch, initialMethod, dictionaries, callbacks = {}) {
   const startIdx = Math.max(0, methodIndex(initialMethod));
   container.innerHTML =
-    `<span class="decomp-wheel" role="group" aria-label="拆字輸入法滾輪：倉頡、嘸蝦米、速成">` +
+    `<span class="decomp-wheel" role="group" aria-label="拆字輸入法滾輪：注音、倉頡、嘸蝦米、速成">` +
     `<span class="decomp-wheel-track"></span></span>` +
     `<span class="decomp-wheel-nav">` +
     `<button type="button" class="decomp-wheel-prev" aria-label="上一個輸入法" tabindex="-1">‹</button>` +

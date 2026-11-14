@@ -45,8 +45,8 @@ export const IDB_NAME = "justtype_db";
 export const IDB_VERSION = 1;
 export const IDB_STORE = "tables";
 export const IDB_KEY_BOSHIAMY = "boshiamy";
-export const IDB_KEY_ZHUYIN = "zhuyin";
-export const IDB_KEY_CANGJIE = "cangjie";
+export const IDB_KEY_ZHUYIN = "zhuyin_v2";
+export const IDB_KEY_CANGJIE = "cangjie_v2";
 
 export function openIndexedDB() {
   return new Promise((resolve, reject) => {

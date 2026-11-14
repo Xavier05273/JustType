@@ -1190,7 +1190,7 @@ function renderOnKeyboard() {
           if (inp && !inp.disabled) {
             inp.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
           }
-        } else if (layout !== "bopomofo" && item.key) {
+        } else if (item.key) {
           typeOnKeyboardKey(item.key, key);
         } else {
           focusCurrent();
@@ -1385,14 +1385,15 @@ function paintCangjieHint() {
   const ch = info.char;
   if (getDecompWheel()) {
     setDecompWheelChar(ch);
-    updateDecompWheelCardText({ BOSHIAMY, CANGJIE });
+    updateDecompWheelCardText({ BOSHIAMY, CANGJIE, ZHUYIN });
     return;
   }
-  buildDecompWheel(cangjieHint, ch, decompMethod, { BOSHIAMY, CANGJIE }, {
+  buildDecompWheel(cangjieHint, ch, decompMethod, { BOSHIAMY, CANGJIE, ZHUYIN }, {
     onMethodChange: (newKey) => {
       if (newKey !== decompMethod) {
         decompMethod = newKey;
         saveJSON(LS_DECOMP, newKey);
+        syncLayoutSelectors(newKey);
         paintOnKeyboard();
       }
     }
@@ -1678,7 +1679,7 @@ function onCommitted(lineIdx) {
       const latency = Math.max(0, firstKey - start);
       const ch = targetChars[i];
       let decomp = "—";
-      const dec = decompositionFor(ch, decompMethod, { BOSHIAMY, CANGJIE });
+      const dec = decompositionFor(ch, decompMethod, { BOSHIAMY, CANGJIE, ZHUYIN });
       if (dec && !dec.missing && !dec.isBoshiamyUninitialized) {
         if (dec.lettersOnly) decomp = Array.from(dec.code).map((c) => c.toUpperCase()).join(" ");
         else if (dec.radicals) decomp = `${dec.radicals} (${dec.code})`;
@@ -2773,9 +2774,11 @@ function bindGlobal() {
     syncLayoutSelectors(val);
     if (onKeyboard) onKeyboard.dataset.layout = "";
     renderOnKeyboard();
+    decompMethod = val;
+    saveJSON(LS_DECOMP, val);
     const mIdx = methodIndex(val);
     if (mIdx !== -1) {
-      setDecompWheelTarget(mIdx);
+      setDecompWheelTarget(mIdx, true);
     }
     if (state && !state.finished) {
       renderPractice();
@@ -2836,8 +2839,10 @@ async function init() {
   DATA = await res.json();
   ensureCustomData();
 
-  decompMethod = ["cangjie", "boshiamy", "sucheng"].includes(loadJSON(LS_DECOMP, "cangjie"))
-    ? loadJSON(LS_DECOMP, "cangjie") : "cangjie";
+  const savedLayout = (loadJSON(LS_ONKB, {}) || {}).layout;
+  const initialMethod = savedLayout || "bopomofo";
+  decompMethod = ["bopomofo", "cangjie", "boshiamy", "sucheng"].includes(loadJSON(LS_DECOMP, initialMethod))
+    ? loadJSON(LS_DECOMP, initialMethod) : "bopomofo";
   renderHome();
   bindGlobal();
 
