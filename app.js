@@ -870,7 +870,8 @@ function renderPractice() {
         const meta = document.createElement("div");
         meta.className = "chat-meta";
         meta.textContent = hhmm;
-        msg.appendChild(body);
+        msg.appendChild(meta);
+        body.appendChild(msg);
       }
     }
     if (phase === ANIMATION_PHASE.USER_TYPING && state.lineIdx < state.lines.length) {
@@ -1553,24 +1554,21 @@ function paint() {
     totalChars += targetArr.length;
     typedChars += Math.min(targetArr.length, typedArr.length);
 
-    let lineDiv;
-    if (isChat) {
-      lineDiv = box ? box.querySelector(`.chat-msg.chat-right:nth-of-type(${li + 1}) .chat-bubble`) : null;
-    } else {
-      lineDiv = box ? box.querySelector(`.target-line[data-line="${li}"]`) : null;
-    }
-
+    let lineDiv = (!isChat && box) ? box.querySelector(`.target-line[data-line="${li}"]`) : null;
     let isLineCurrent = (li === state.lineIdx);
-    if (lineDiv && !isChat) {
+    if (lineDiv) {
       lineDiv.classList.toggle("current-line", isLineCurrent);
     }
 
     let foundCurrent = false;
 
     targetArr.forEach((tch, pos) => {
-      let span;
+      let span = null;
       if (lineDiv) {
         span = lineDiv.querySelector(`.char[data-pos="${pos}"]`);
+      }
+      if (!span && box) {
+        span = box.querySelector(`.char[data-line="${li}"][data-pos="${pos}"]`);
       }
       if (!span) return;
 
@@ -2035,6 +2033,23 @@ function startBottlenecksPractice() {
 }
 
 // ---- 全域事件與 Modal 控制 ----
+function updateInert() {
+  const overlays = [
+    document.getElementById("resultOverlay"),
+    document.getElementById("statsOverlay"),
+    document.getElementById("customTextOverlay"),
+    document.getElementById("boshiamyImportOverlay")
+  ];
+  const anyOpen = overlays.some((o) => o && !o.classList.contains("hidden"));
+  const mainEls = [document.querySelector(".topbar"), document.getElementById("homeView"), document.getElementById("practiceView")];
+  mainEls.forEach((el) => {
+    if (el) {
+      if (anyOpen) el.setAttribute("inert", "");
+      else el.removeAttribute("inert");
+    }
+  });
+}
+
 function initModalInertObserver() {
   const overlays = [
     document.getElementById("resultOverlay"),
@@ -2042,16 +2057,6 @@ function initModalInertObserver() {
     document.getElementById("customTextOverlay"),
     document.getElementById("boshiamyImportOverlay")
   ];
-  const updateInert = () => {
-    const anyOpen = overlays.some((o) => o && !o.classList.contains("hidden"));
-    const mainEls = [document.querySelector(".topbar"), document.getElementById("homeView"), document.getElementById("practiceView")];
-    mainEls.forEach((el) => {
-      if (el) {
-        if (anyOpen) el.setAttribute("inert", "");
-        else el.removeAttribute("inert");
-      }
-    });
-  };
   if (typeof MutationObserver !== "undefined") {
     const observer = new MutationObserver(updateInert);
     overlays.forEach((o) => {
@@ -2089,6 +2094,7 @@ function bindGlobal() {
     setStatsMsg("");
     renderStatsModal();
     statsOverlay.classList.remove("hidden");
+    updateInert();
   }
 
   function closeStatsModal() {
@@ -2098,6 +2104,7 @@ function bindGlobal() {
     if (practiceView && !practiceView.classList.contains("hidden")) {
       focusCurrent();
     }
+    updateInert();
   }
 
   function exportStats() {

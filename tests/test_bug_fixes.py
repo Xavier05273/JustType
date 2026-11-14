@@ -197,6 +197,38 @@ class TestBugFixes(unittest.TestCase):
                 }""")
                 self.assertLess(hud_after_first_key["wpm"], 250, f"第二輪首字敲下後速度不應暴衝為 300 wpm，實測為 {hud_after_first_key['wpm']}")
 
+                # ====================================================
+                # 測試 3: 生活情境題（LINE 回合對話）修復驗證
+                # ====================================================
+                page.evaluate("""() => {
+                    window.startRound("life_situations");
+                }""")
+
+                # 等候對手進場並切換至使用者輸入 (user_typing)
+                time.sleep(2.5)
+
+                chat_dom = page.evaluate("""() => {
+                    const box = document.getElementById("targetBox");
+                    const body = box ? box.querySelector(".chat-body") : null;
+                    const opponentMsg = body ? body.querySelector(".chat-msg.chat-left") : null;
+                    const draftMsg = body ? body.querySelector(".chat-msg.chat-right.chat-draft") : null;
+                    const currentChar = box ? box.querySelector(".char.current") : null;
+                    const phase = window.getState().animationPhase;
+                    return {
+                        hasBody: Boolean(body),
+                        hasOpponentMsg: Boolean(opponentMsg),
+                        hasDraftMsg: Boolean(draftMsg),
+                        hasCurrentChar: Boolean(currentChar),
+                        phase
+                    };
+                }""")
+
+                self.assertTrue(chat_dom["hasBody"], "targetBox 必須包含 chat-body，不得因 DOM 操作錯誤而遺失")
+                self.assertTrue(chat_dom["hasOpponentMsg"], "chat-body 中必須有對手發言氣泡")
+                self.assertTrue(chat_dom["hasDraftMsg"], "chat-body 中必須有使用者草稿待打氣泡")
+                self.assertTrue(chat_dom["hasCurrentChar"], "待打氣泡中的第一個字必須正確標記為 .char.current 游標")
+                self.assertEqual(chat_dom["phase"], "user_typing", "進入等待輸入時 animationPhase 應為 user_typing")
+
                 browser.close()
         finally:
             server.terminate()
